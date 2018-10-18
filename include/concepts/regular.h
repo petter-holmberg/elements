@@ -142,6 +142,24 @@ concept Regular =
     // }
 
 template <typename T>
+requires Equality_comparable<T>
+struct less;
+
+template <typename T>
+concept Default_totally_ordered =
+    Regular<T> and
+    requires (T const& x, T const& y) {
+        { less<T>{}(x, y) } -> bool;
+        // axiom total_ordering {
+        //    std::less<T>{}(x, y) and std::less<T>{}(y, z) => std::less<T>{}(x, z);
+        //    std::less<T>{}(x, y) or std::less<T>{}(y, x) or x == y;
+        // }
+        // complexity {
+        //     O(areaof(x));
+        // }
+    };
+
+template <typename T>
 concept Totally_ordered =
     Regular<T> and
     requires (T const& x, T const& y) {

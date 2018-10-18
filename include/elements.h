@@ -8,3 +8,5 @@
 #endif
 
 #include "algorithms/algebra.h"
+#include "algorithms/regular.h"
+#include "algorithms/ordering.h"
