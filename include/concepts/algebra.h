@@ -1,6 +1,6 @@
 #pragma once
 
-#include "invokable.h"
+#include "invocable.h"
 #include "regular.h"
 
 namespace elements {
@@ -286,7 +286,13 @@ concept Module =
 
 // Linear algebra
 
-template <typename V, typename S>
+template <typename>
+struct scalar_type_t;
+
+template <typename V>
+using scalar_type = typename scalar_type_t<V>::type;
+
+template <typename V, typename S = scalar_type<V>>
 concept Vector_space =
     Module<V, sum<V>, S, sum<S>, product<S>> and
     Field<S, sum<S>, product<S>> and
@@ -297,7 +303,13 @@ concept Vector_space =
         { v /= s } -> V&;
     };
 
-template <typename P, typename V, typename S>
+template <typename>
+struct vector_type_t;
+
+template <typename P>
+using vector_type = typename vector_type_t<P>::type;
+
+template <typename P, typename V = vector_type<P>, typename S = scalar_type<V>>
 concept Affine_space =
     Regular<P> and
     Vector_space<V, S> and
@@ -310,4 +322,5 @@ concept Affine_space =
         { p += v } -> P&;
         { p -= v } -> P&;
     };
+
 }

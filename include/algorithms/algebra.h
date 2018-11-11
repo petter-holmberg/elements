@@ -1,6 +1,7 @@
 #pragma once
 
 #include "concepts/algebra.h"
+#include "type_functions/algebra.h"
 
 namespace elements {
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "regular.h"
-#include "type_functions/invokable.h"
+#include "type_functions/invocable.h"
 #include "type_functions/regular.h"
 
 namespace elements {

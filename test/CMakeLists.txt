@@ -1,6 +1,8 @@
 set (CMAKE_BUILD_TYPE Debug)
 set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/algebra.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/invocable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ordering.cpp)
 
 add_executable (tests ${TEST_SOURCES})

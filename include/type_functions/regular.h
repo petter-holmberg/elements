@@ -38,21 +38,21 @@ template <typename T>
 requires Semiregular<decay<T>>
 using underlying_type = typename underlying_type_t<T>::type;
 
-template <typename T>
+template <typename>
 struct distance_type_t;
 
 template <typename T>
 requires Semiregular<decay<T>>
 using distance_type = typename distance_type_t<T>::type;
 
-template <typename T>
+template <typename>
 struct difference_type_t;
 
 template <typename T>
 requires Semiregular<decay<T>>
 using difference_type = typename difference_type_t<T>::type;
 
-template <typename T>
+template <typename>
 struct size_type_t;
 
 template <typename T>

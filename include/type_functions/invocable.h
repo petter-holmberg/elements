@@ -7,11 +7,11 @@
 namespace elements {
 
 template <typename>
-struct invokable_t;
+struct invocable_t;
 
 // Free function
 template <typename Ret, typename... Args>
-struct invokable_t<Ret(Args...)>
+struct invocable_t<Ret(Args...)>
 {
     using codomain_type = Ret;
 
@@ -29,32 +29,32 @@ struct invokable_t<Ret(Args...)>
 
 // Function pointer
 template <typename Ret, typename... Args>
-struct invokable_t<Ret(*)(Args...)> : invokable_t<Ret(Args...)>
+struct invocable_t<Ret(*)(Args...)> : invocable_t<Ret(Args...)>
 {};
 
 // Member function pointer
 template <typename T, typename Ret, typename... Args>
-struct invokable_t<Ret(T::*)(Args...)> : invokable_t<Ret(T&, Args...)>
+struct invocable_t<Ret(T::*)(Args...)> : invocable_t<Ret(T&, Args...)>
 {
-    using domain_type = decay<typename invokable_t<Ret(T&, Args...)>::template parameter_t<1>::type>;
+    using domain_type = decay<typename invocable_t<Ret(T&, Args...)>::template parameter_t<1>::type>;
 };
 
 // Const member function pointer
 template <typename T, typename Ret, typename... Args>
-struct invokable_t<Ret(T::*)(Args...) const> : invokable_t<Ret(T::*)(Args...)>
+struct invocable_t<Ret(T::*)(Args...) const> : invocable_t<Ret(T::*)(Args...)>
 {};
 
 // Member object pointer
 template <typename T, typename Ret>
-struct invokable_t<Ret(T::*)> : invokable_t<Ret(T&)>
+struct invocable_t<Ret(T::*)> : invocable_t<Ret(T&)>
 {};
 
 // Function object
 template <typename T>
-struct invokable_t
+struct invocable_t
 {
     private:
-        using call_type = invokable_t<decltype(&T::operator())>;
+        using call_type = invocable_t<decltype(&T::operator())>;
     public:
         using codomain_type = typename call_type::codomain_type;
 
@@ -72,24 +72,24 @@ struct invokable_t
 
 // Lvalue reference
 template <typename T>
-struct invokable_t<T&> : invokable_t<T>
+struct invocable_t<T&> : invocable_t<T>
 {};
 
 // Forwarding reference
 template <typename T>
-struct invokable_t<T&&> : invokable_t<T>
+struct invocable_t<T&&> : invocable_t<T>
 {};
 
 template <typename T>
-using codomain = typename invokable_t<T>::codomain_type;
+using codomain = typename invocable_t<T>::codomain_type;
 
 template <typename T, std::size_t n>
-using input_type = typename invokable_t<T>::template parameter_t<n>::type;
+using input_type = typename invocable_t<T>::template parameter_t<n>::type;
 
 template <typename T>
-constexpr auto arity = invokable_t<T>::arity;
+constexpr auto arity = invocable_t<T>::arity;
 
 template <typename T>
-using domain = typename invokable_t<T>::domain_type;
+using domain = typename invocable_t<T>::domain_type;
 
 }

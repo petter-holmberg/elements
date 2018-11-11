@@ -1,6 +1,6 @@
 #pragma once
 
-#include "concepts/invokable.h"
+#include "concepts/invocable.h"
 #include "concepts/regular.h"
 
 namespace elements {
