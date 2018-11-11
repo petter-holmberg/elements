@@ -42,89 +42,45 @@ SCENARIO ("Using built-in and library algebraic types", "[algebra]")
 
     SECTION ("Semirings")
     {
-        static_assert(e::Semiring<int, e::sum<int>, e::product<int>>);
+        static_assert(e::Semiring<int>);
 
-        static_assert(e::Commutative_semiring<int, e::sum<int>, e::product<int>>);
-
-        static_assert(e::Integral_semiring<int>);
+        static_assert(e::Commutative_semiring<int>);
     }
 
     SECTION ("Rings")
     {
-        static_assert(e::Ring<int, e::sum<int>, e::product<int>>);
+        static_assert(e::Ring<int>);
 
-        static_assert(e::Commutative_ring<int, e::sum<int>, e::product<int>>);
-
-        static_assert(e::Integral_ring<int>);
+        static_assert(e::Commutative_ring<int>);
     }
 
     SECTION ("Integral domains")
     {
-        static_assert(e::Integral_domain<int, e::sum<int>, e::product<int>>);
+        static_assert(e::Integral_domain<int>);
     }
 
     SECTION ("Fields")
     {
-        static_assert(e::Field<double, e::sum<double>, e::product<double>>);
-        static_assert(
-            e::Field<
-                std::complex<double>,
-                e::sum<std::complex<double>>,
-                e::product<std::complex<double>>>);
+        static_assert(e::Field<double>);
+        static_assert(e::Field<std::complex<double>>);
     }
 
     SECTION ("Semimodules")
     {
-        static_assert(
-            e::Left_semimodule<
-                std::ptrdiff_t,
-                e::sum<std::ptrdiff_t>,
-                int,
-                e::sum<int>,
-                e::product<int>>);
+        static_assert(e::Left_semimodule<std::ptrdiff_t>);
 
-        static_assert(
-            e::Right_semimodule<
-                std::ptrdiff_t,
-                e::sum<std::ptrdiff_t>,
-                int,
-                e::sum<int>,
-                e::product<int>>);
+        static_assert(e::Right_semimodule<std::ptrdiff_t>);
 
-        static_assert(
-            e::Semimodule<
-                std::ptrdiff_t,
-                e::sum<std::ptrdiff_t>,
-                int,
-                e::sum<int>,
-                e::product<int>>);
+        static_assert(e::Semimodule<std::ptrdiff_t>);
     }
 
     SECTION ("Modules")
     {
-        static_assert(
-            e::Left_module<
-                std::ptrdiff_t,
-                e::sum<std::ptrdiff_t>,
-                int,
-                e::sum<int>,
-                e::product<int>>);
+        static_assert(e::Left_module<std::ptrdiff_t>);
 
-        static_assert(
-            e::Right_module<
-                std::ptrdiff_t,
-                e::sum<std::ptrdiff_t>,
-                int,
-                e::sum<int>,
-                e::product<int>>);
+        static_assert(e::Right_module<std::ptrdiff_t>);
 
-        static_assert(
-            e::Module<
-                std::ptrdiff_t,
-                e::sum<std::ptrdiff_t>,
-                int,
-                e::sum<int>,
-                e::product<int>>);
+        static_assert(e::Module<std::ptrdiff_t>);
     }
 
     SECTION ("Vector spaces")
@@ -139,7 +95,7 @@ SCENARIO ("Using built-in and library algebraic types", "[algebra]")
         static_assert(
             e::Affine_space<
                 std::chrono::system_clock::time_point,
-                std::chrono::system_clock::duration,
-                int>);
+                typename std::chrono::system_clock::time_point::duration,
+                typename std::chrono::system_clock::time_point::duration::rep>);
     }
 }

@@ -63,16 +63,13 @@ concept Monoid =
     //     Op(a, identity_element<M, Op>) == a;
     // }
 
-template <typename S>
-requires Additive_semigroup<S>
+template <Additive_semigroup S>
 struct zero_t;
 
-template <typename S>
-requires Additive_semigroup<S>
+template <Additive_semigroup S>
 constexpr S zero = zero_t<S>::value;
 
-template <typename S>
-requires Additive_semigroup<S>
+template <Additive_semigroup S>
 struct sum;
 
 template <typename M>
@@ -86,23 +83,19 @@ concept Additive_monoid =
     //     a + zero<M> == a;
     // }
 
-template <typename S>
-requires Additive_semigroup<S>
+template <Additive_semigroup S>
 struct zero_t
 {
     static constexpr S value = S{0};
 };
 
-template <typename S>
-requires Multiplicative_semigroup<S>
+template <Multiplicative_semigroup S>
 struct one_t;
 
-template <typename S>
-requires Multiplicative_semigroup<S>
+template <Multiplicative_semigroup S>
 constexpr S one = one_t<S>::value;
 
-template <typename S>
-requires Multiplicative_semigroup<S>
+template <Multiplicative_semigroup S>
 struct product;
 
 template <typename M>
@@ -116,8 +109,7 @@ concept Multiplicative_monoid =
     //     a * one<M> == a;
     // }
 
-template <typename S>
-requires Multiplicative_semigroup<S>
+template <Multiplicative_semigroup S>
 struct one_t
 {
     static constexpr S value = S{1};
@@ -151,8 +143,7 @@ concept Additive_group =
     //     -a + a == zero<G>;
     // }
 
-template <typename M>
-requires Multiplicative_monoid<M>
+template <Multiplicative_monoid M>
 struct reciprocal;
 
 template <typename G>
@@ -172,7 +163,7 @@ concept Multiplicative_group =
 
 // Ring-like
 
-template <typename S, typename Add_op, typename Mul_op>
+template <typename S, typename Add_op = sum<S>, typename Mul_op = product<S>>
 concept Semiring =
     Monoid<S, Add_op> and
     Monoid<S, Mul_op>;
@@ -185,58 +176,48 @@ concept Semiring =
     //     Mul_op(a, zero<S>) == zero<S>;
     // }
 
-template <typename S, typename Add_op, typename Mul_op>
+template <typename S, typename Add_op = sum<S>, typename Mul_op = product<S>>
 concept Commutative_semiring =
     Semiring<S, Add_op, Mul_op>;
     // axiom commutative(Mul_op) {
     //     Mul_op(a, b) == Mul_op(b, a);
     // }
 
-template <typename S>
-concept Integral_semiring =
-    Additive_monoid<S> and
-    Multiplicative_monoid<S>;
-    // axiom distributive(+, *) {
-    //     a * (b + c) == (a * b) + (a * c);
-    //     (a + b) * c == (a * c) + (b * c);
-    // }
-    // axiom annihilation(*, 0) {
-    //     0 * a == 0;
-    //     a * 0 == 0;
-    // }
-
-template <typename R, typename Add_op, typename Mul_op>
+template <typename R, typename Add_op = sum<R>, typename Mul_op = product<R>>
 concept Ring =
     Semiring<R, Add_op, Mul_op> and
     Group<R, Add_op>;
 
-template <typename R, typename Add_op, typename Mul_op>
+template <typename R, typename Add_op = sum<R>, typename Mul_op = product<R>>
 concept Commutative_ring =
     Ring<R, Add_op, Mul_op>;
     // axiom commutative(Mul_op) {
     //     Mul_op(a, b) == Mul_op(b, a);
     // }
 
-template <typename R>
-concept Integral_ring =
-    Integral_semiring<R> and
-    Additive_group<R>;
-
-template <typename I, typename Add_op, typename Mul_op>
+template <typename I, typename Add_op = sum<I>, typename Mul_op = product<I>>
 concept Integral_domain =
     Commutative_ring<I, Add_op, Mul_op>;
     // axiom no_nonzero_zero_divisors(Mul_op) {
     //     a, b != 0 => Mul_op(a, b) != 0;
     // }
 
-template <typename F, typename Add_op, typename Mul_op>
+template <typename F, typename Add_op = sum<F>, typename Mul_op = product<F>>
 concept Field =
     Integral_domain<F, Add_op, Mul_op> and
     Group<F, Mul_op>;
 
 // Module-like
 
-template <typename V, typename V_add_op, typename S, typename S_add_op, typename S_mul_op>
+template <typename>
+struct scalar_type_t;
+
+template <typename V>
+using scalar_type = typename scalar_type_t<V>::type;
+
+template <
+    typename V, typename V_add_op = sum<V>,
+    typename S = scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Left_semimodule =
     Monoid<V, V_add_op> and
     Commutative_semiring<S, S_add_op, S_mul_op> and
@@ -247,7 +228,9 @@ concept Left_semimodule =
     //     MulV_add_op(a, b) == V_add_op(b, a);
     // }
 
-template <typename V, typename V_add_op, typename S, typename S_add_op, typename S_mul_op>
+template <
+    typename V, typename V_add_op = sum<V>,
+    typename S = scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Right_semimodule =
     Monoid<V, V_add_op> and
     Commutative_semiring<S, S_add_op, S_mul_op> and
@@ -261,36 +244,38 @@ concept Right_semimodule =
     //     MulV_add_op(a, b) == V_add_op(b, a);
     // }
 
-template <typename V, typename V_add_op, typename S, typename S_add_op, typename S_mul_op>
+template <
+    typename V, typename V_add_op = sum<V>,
+    typename S = scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Semimodule =
     Left_semimodule<V, V_add_op, S, S_add_op, S_mul_op> and
     Right_semimodule<V, V_add_op, S, S_add_op, S_mul_op>;
 
-template <typename V, typename V_add_op, typename S, typename S_add_op, typename S_mul_op>
+template <
+    typename V, typename V_add_op = sum<V>,
+    typename S = scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Left_module =
     Left_semimodule<V, V_add_op, S, S_add_op, S_mul_op> and
     Group<V, V_add_op> and
     Ring<S, S_add_op, S_mul_op>;
 
-template <typename V, typename V_add_op, typename S, typename S_add_op, typename S_mul_op>
+template <
+    typename V, typename V_add_op = sum<V>,
+    typename S = scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Right_module =
     Right_semimodule<V, V_add_op, S, S_add_op, S_mul_op> and
     Group<V, V_add_op> and
     Ring<S, S_add_op, S_mul_op>;
 
-template <typename V, typename V_add_op, typename S, typename S_add_op, typename S_mul_op>
+template <
+    typename V, typename V_add_op = sum<V>,
+    typename S = scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Module =
     Left_module<V, V_add_op, S, S_add_op, S_mul_op> and
     Right_module<V, V_add_op, S, S_add_op, S_mul_op> and
     Commutative_ring<S, S_add_op, S_mul_op>;
 
 // Linear algebra
-
-template <typename>
-struct scalar_type_t;
-
-template <typename V>
-using scalar_type = typename scalar_type_t<V>::type;
 
 template <typename V, typename S = scalar_type<V>>
 concept Vector_space =
