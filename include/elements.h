@@ -9,4 +9,5 @@
 
 #include "algorithms/algebra.h"
 #include "algorithms/regular.h"
+#include "algorithms/ordered_algebra.h"
 #include "algorithms/ordering.h"
