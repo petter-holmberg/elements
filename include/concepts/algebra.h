@@ -50,13 +50,13 @@ struct identity_element_t;
 
 template <typename S, typename Op>
 requires Semigroup<S, Op>
-constexpr S identity_element = identity_element_t<S, Op>::value;
+constexpr S Identity_element = identity_element_t<S, Op>::value;
 
 template <typename M, typename Op>
 concept Monoid =
     Semigroup<M, Op> and
     requires {
-        M{identity_element<M, Op>};
+        M{Identity_element<M, Op>};
     };
     // axiom identity(identity_element<M, Op>) {
     //     Op(identity_element<M, Op>, a) == a;
@@ -67,7 +67,7 @@ template <Additive_semigroup S>
 struct zero_t;
 
 template <Additive_semigroup S>
-constexpr S zero = zero_t<S>::value;
+constexpr S Zero = zero_t<S>::value;
 
 template <Additive_semigroup S>
 struct sum;
@@ -76,7 +76,7 @@ template <typename M>
 concept Additive_monoid =
     Additive_semigroup<M> and
     requires {
-        M{zero<M>};
+        M{Zero<M>};
     };
     // axiom identity(zero<M>) {
     //     zero<M> + a == a;
@@ -93,7 +93,7 @@ template <Multiplicative_semigroup S>
 struct one_t;
 
 template <Multiplicative_semigroup S>
-constexpr S one = one_t<S>::value;
+constexpr S One = one_t<S>::value;
 
 template <Multiplicative_semigroup S>
 struct product;
@@ -102,7 +102,7 @@ template <typename M>
 concept Multiplicative_monoid =
     Multiplicative_semigroup<M> and
     requires {
-        M{one<M>};
+        M{One<M>};
     };
     // axiom identity(one<M>) {
     //     one<M> * a == a;
@@ -213,11 +213,11 @@ template <typename>
 struct scalar_type_t;
 
 template <typename V>
-using scalar_type = typename scalar_type_t<V>::type;
+using Scalar_type = typename scalar_type_t<V>::type;
 
 template <
     typename V, typename V_add_op = sum<V>,
-    typename S = scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename S = Scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Left_semimodule =
     Monoid<V, V_add_op> and
     Commutative_semiring<S, S_add_op, S_mul_op> and
@@ -230,7 +230,7 @@ concept Left_semimodule =
 
 template <
     typename V, typename V_add_op = sum<V>,
-    typename S = scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename S = Scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Right_semimodule =
     Monoid<V, V_add_op> and
     Commutative_semiring<S, S_add_op, S_mul_op> and
@@ -246,14 +246,14 @@ concept Right_semimodule =
 
 template <
     typename V, typename V_add_op = sum<V>,
-    typename S = scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename S = Scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Semimodule =
     Left_semimodule<V, V_add_op, S, S_add_op, S_mul_op> and
     Right_semimodule<V, V_add_op, S, S_add_op, S_mul_op>;
 
 template <
     typename V, typename V_add_op = sum<V>,
-    typename S = scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename S = Scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Left_module =
     Left_semimodule<V, V_add_op, S, S_add_op, S_mul_op> and
     Group<V, V_add_op> and
@@ -261,7 +261,7 @@ concept Left_module =
 
 template <
     typename V, typename V_add_op = sum<V>,
-    typename S = scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename S = Scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Right_module =
     Right_semimodule<V, V_add_op, S, S_add_op, S_mul_op> and
     Group<V, V_add_op> and
@@ -269,7 +269,7 @@ concept Right_module =
 
 template <
     typename V, typename V_add_op = sum<V>,
-    typename S = scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename S = Scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Module =
     Left_module<V, V_add_op, S, S_add_op, S_mul_op> and
     Right_module<V, V_add_op, S, S_add_op, S_mul_op> and
@@ -277,7 +277,7 @@ concept Module =
 
 // Linear algebra
 
-template <typename V, typename S = scalar_type<V>>
+template <typename V, typename S = Scalar_type<V>>
 concept Vector_space =
     Module<V, sum<V>, S, sum<S>, product<S>> and
     Field<S, sum<S>, product<S>> and
@@ -292,9 +292,9 @@ template <typename>
 struct vector_type_t;
 
 template <typename P>
-using vector_type = typename vector_type_t<P>::type;
+using Vector_type = typename vector_type_t<P>::type;
 
-template <typename P, typename V = vector_type<P>, typename S = scalar_type<V>>
+template <typename P, typename V = Vector_type<P>, typename S = Scalar_type<V>>
 concept Affine_space =
     Regular<P> and
     Vector_space<V, S> and

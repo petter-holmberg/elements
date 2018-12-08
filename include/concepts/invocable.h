@@ -8,47 +8,47 @@ namespace elements {
 
 template <typename P>
 concept Procedure =
-    requires (domain<P> const& x) {
-        domain<P>(x);
-        Same<arity<P>, std::size_t>;
+    requires (Domain<P> const& x) {
+        Domain<P>(x);
+        Same<Arity<P>, std::size_t>;
     };
 
 template <typename F>
 concept Functional_procedure =
     Procedure<F> and
-    Regular<domain<F>>;
+    Regular<Domain<F>>;
 
 template <typename F>
 concept Unary_function =
     Functional_procedure<F> and
-    arity<F> == 1 and
-    Regular<domain<F>>;
+    Arity<F> == 1 and
+    Regular<Domain<F>>;
 
 template <typename F>
 concept Homogeneous_function =
     Functional_procedure<F> and
-    arity<F> > 0 and
-    Regular<domain<F>>;
+    Arity<F> > 0 and
+    Regular<Domain<F>>;
 
 template <typename Op>
 concept Operation =
     Homogeneous_function<Op> and
-    Same<codomain<Op>, domain<Op>>;
+    Same<Codomain<Op>, Domain<Op>>;
 
 template <typename Op>
 concept Unary_operation =
     Operation<Op> and
-    arity<Op> == 1;
+    Arity<Op> == 1;
 
 template <typename Op>
 concept Binary_operation =
     Operation<Op> and
-    arity<Op> == 2;
+    Arity<Op> == 2;
 
 template <typename P>
 concept Predicate =
     Functional_procedure<P> and
-    Same<codomain<P>, bool>;
+    Same<Codomain<P>, bool>;
 
 template <typename P>
 concept Unary_predicate =
@@ -63,6 +63,6 @@ concept Homogeneous_predicate =
 template <typename R>
 concept Relation =
     Homogeneous_predicate<R> and
-    arity<R> == 2;
+    Arity<R> == 2;
 
 }

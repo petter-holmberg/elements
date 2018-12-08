@@ -39,4 +39,20 @@ SCENARIO ("Using access functions", "[position]")
 
 SCENARIO ("Using linear traversal functions", "[position]")
 {
+    int x[] = {0, 1, 2};
+    auto px = x;
+
+    SECTION ("Position")
+    {
+        e::increment(px);
+        REQUIRE (px == e::successor(x));
+    }
+
+    SECTION ("Indexed_Position")
+    {
+        px = px + 2;
+        REQUIRE (px == x + 2);
+        px = px - 2;
+        REQUIRE (px == x);
+    }
 }

@@ -25,9 +25,9 @@ add_custom_target (
     --check-config
     --suppress=missingInclude missingIncludeSystem
     ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/algorithms/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/concepts/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/type_functions/*.h)
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/type_functions/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/algorithms/*.h)
 
 enable_testing ()
 add_subdirectory (test)

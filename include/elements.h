@@ -12,3 +12,4 @@
 #include "algorithms/ordered_algebra.h"
 #include "algorithms/ordering.h"
 #include "algorithms/position.h"
+#include "algorithms/search.h"

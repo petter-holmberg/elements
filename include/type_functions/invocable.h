@@ -24,7 +24,7 @@ struct invocable_t<Ret(Args...)>
         using type = std::tuple_element_t<n, std::tuple<Args...>>;
     };
 
-    using domain_type = decay<typename parameter_t<0>::type>;
+    using domain_type = Decay<typename parameter_t<0>::type>;
 };
 
 // Function pointer
@@ -36,7 +36,7 @@ struct invocable_t<Ret(*)(Args...)> : invocable_t<Ret(Args...)>
 template <typename T, typename Ret, typename... Args>
 struct invocable_t<Ret(T::*)(Args...)> : invocable_t<Ret(T&, Args...)>
 {
-    using domain_type = decay<typename invocable_t<Ret(T&, Args...)>::template parameter_t<1>::type>;
+    using domain_type = Decay<typename invocable_t<Ret(T&, Args...)>::template parameter_t<1>::type>;
 };
 
 // Const member function pointer
@@ -67,7 +67,7 @@ struct invocable_t
             using type = typename call_type::template parameter_t<n + 1>::type;
         };
 
-        using domain_type = remove_cv<remove_ref<typename parameter_t<0>::type>>;
+        using domain_type = Remove_cv<Remove_ref<typename parameter_t<0>::type>>;
 };
 
 // Lvalue reference
@@ -75,21 +75,16 @@ template <typename T>
 struct invocable_t<T&> : invocable_t<T>
 {};
 
-// Forwarding reference
 template <typename T>
-struct invocable_t<T&&> : invocable_t<T>
-{};
-
-template <typename T>
-using codomain = typename invocable_t<T>::codomain_type;
+using Codomain = typename invocable_t<T>::codomain_type;
 
 template <typename T, std::size_t n>
-using input_type = typename invocable_t<T>::template parameter_t<n>::type;
+using Input_type = typename invocable_t<T>::template parameter_t<n>::type;
 
 template <typename T>
-constexpr auto arity = invocable_t<T>::arity;
+constexpr auto Arity = invocable_t<T>::arity;
 
 template <typename T>
-using domain = typename invocable_t<T>::domain_type;
+using Domain = typename invocable_t<T>::domain_type;
 
 }

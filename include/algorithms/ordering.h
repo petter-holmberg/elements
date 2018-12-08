@@ -10,9 +10,9 @@ namespace elements {
 template <Relation R>
 constexpr auto
 select_0_2(
-    domain<R>& a,
-    domain<R>& b,
-    R rel) -> domain<R>&
+    Domain<R>& a,
+    Domain<R>& b,
+    R rel) -> Domain<R>&
 //[[expects axiom: weak_ordering(rel)]]
 {
     if (rel(b, a)) return b;
@@ -22,9 +22,9 @@ select_0_2(
 template <Relation R>
 constexpr auto
 select_0_2(
-    domain<R> const& a,
-    domain<R> const& b,
-    R rel) -> domain<R> const&
+    Domain<R> const& a,
+    Domain<R> const& b,
+    R rel) -> Domain<R> const&
 //[[expects axiom: weak_ordering(rel)]]
 {
     if (rel(b, a)) return b;
@@ -52,9 +52,9 @@ min(
 template <Relation R>
 constexpr auto
 select_1_2(
-    domain<R> const& a,
-    domain<R> const& b,
-    R rel) -> domain<R> const&
+    Domain<R> const& a,
+    Domain<R> const& b,
+    R rel) -> Domain<R> const&
 //[[expects axiom: weak_ordering(rel)]]
 {
     if (rel(b, a)) return a;
@@ -64,9 +64,9 @@ select_1_2(
 template <Relation R>
 constexpr auto
 select_1_2(
-    domain<R>& a,
-    domain<R>& b,
-    R rel) -> domain<R>&
+    Domain<R>& a,
+    Domain<R>& b,
+    R rel) -> Domain<R>&
 //[[expects axiom: weak_ordering(rel)]]
 {
     if (rel(b, a)) return a;
@@ -96,10 +96,10 @@ max(
 template <Relation R>
 constexpr auto
 select_0_3(
-    domain<R> const& a,
-    domain<R> const& b,
-    domain<R> const& c,
-    R rel) -> domain<R> const&
+    Domain<R> const& a,
+    Domain<R> const& b,
+    Domain<R> const& c,
+    R rel) -> Domain<R> const&
 //[[expects axiom: weak_ordering(rel)]]
 {
     return select_0_2(select_0_2(a, b, rel), c, rel);
@@ -108,10 +108,10 @@ select_0_3(
 template <Relation R>
 constexpr auto
 select_0_3(
-    domain<R>& a,
-    domain<R>& b,
-    domain<R>& c,
-    R rel) -> domain<R>&
+    Domain<R>& a,
+    Domain<R>& b,
+    Domain<R>& c,
+    R rel) -> Domain<R>&
 //[[expects axiom: weak_ordering(rel)]]
 {
     return select_0_2(select_0_2(a, b, rel), c, rel);
@@ -140,10 +140,10 @@ min(
 template <Relation R>
 constexpr auto
 select_1_3_ab(
-    domain<R> const& a,
-    domain<R> const& b,
-    domain<R> const& c,
-    R rel) -> domain<R> const&
+    Domain<R> const& a,
+    Domain<R> const& b,
+    Domain<R> const& c,
+    R rel) -> Domain<R> const&
 //[[expects axiom: weak_ordering(rel)]]
 //[[expects: select_0_1(a, b, rel) == a]]
 {
@@ -154,10 +154,10 @@ select_1_3_ab(
 template <Relation R>
 constexpr auto
 select_1_3_ab(
-    domain<R>& a,
-    domain<R>& b,
-    domain<R>& c,
-    R rel) -> domain<R>&
+    Domain<R>& a,
+    Domain<R>& b,
+    Domain<R>& c,
+    R rel) -> Domain<R>&
 //[[expects axiom: weak_ordering(rel)]]
 //[[expects: select_0_1(a, b, rel) == a]]
 {
@@ -168,10 +168,10 @@ select_1_3_ab(
 template <Relation R>
 constexpr auto
 select_1_3(
-    domain<R> const& a,
-    domain<R> const& b,
-    domain<R> const& c,
-    R rel) -> domain<R> const&
+    Domain<R> const& a,
+    Domain<R> const& b,
+    Domain<R> const& c,
+    R rel) -> Domain<R> const&
 //[[expects axiom: weak_ordering(rel)]]
 {
     if (rel(b, a))
@@ -183,10 +183,10 @@ select_1_3(
 template <Relation R>
 constexpr auto
 select_1_3(
-    domain<R>& a,
-    domain<R>& b,
-    domain<R>& c,
-    R rel) -> domain<R>&
+    Domain<R>& a,
+    Domain<R>& b,
+    Domain<R>& c,
+    R rel) -> Domain<R>&
 //[[expects axiom: weak_ordering(rel)]]
 {
     if (rel(b, a))
@@ -218,10 +218,10 @@ median(
 template <Relation R>
 constexpr auto
 select_2_3(
-    domain<R> const& a,
-    domain<R> const& b,
-    domain<R> const& c,
-    R rel) -> domain<R> const&
+    Domain<R> const& a,
+    Domain<R> const& b,
+    Domain<R> const& c,
+    R rel) -> Domain<R> const&
 //[[expects axiom: weak_ordering(rel)]]
 {
     return select_1_2(select_1_2(a, b, rel), c, rel);
@@ -230,10 +230,10 @@ select_2_3(
 template <Relation R>
 constexpr auto
 select_2_3(
-    domain<R>& a,
-    domain<R>& b,
-    domain<R>& c,
-    R rel) -> domain<R>&
+    Domain<R>& a,
+    Domain<R>& b,
+    Domain<R>& c,
+    R rel) -> Domain<R>&
 //[[expects axiom: weak_ordering(rel)]]
 {
     return select_1_2(select_1_2(a, b, rel), c, rel);

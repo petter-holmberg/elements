@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 #include "concepts/algebra.h"
 #include "concepts/regular.h"
 
@@ -9,36 +11,57 @@ template <typename>
 struct difference_type_t;
 
 template <typename T>
-requires Semiregular<decay<T>>
-using difference_type = typename difference_type_t<T>::type;
+requires Semiregular<Decay<T>>
+using Difference_type = typename difference_type_t<T>::type;
 
 // Pointers
 
 template <typename T>
-using pointer_type = T*;
+using Pointer_type = T*;
 
 template <typename T>
-requires Semiregular<decay<T>>
-struct value_type_t<pointer_type<T>>
+requires Semiregular<Decay<T>>
+struct value_type_t<Pointer_type<T>>
 {
     using type = T;
 };
 
-template <typename T>
-constexpr bool is_forward_position<pointer_type<T>> = true;
+template <typename>
+constexpr bool Is_forward_position = false;
 
 template <typename T>
-requires Semiregular<decay<T>>
-struct distance_type_t<pointer_type<T>>
+constexpr bool Is_forward_position<Pointer_type<T>> = true;
+
+template <typename>
+struct distance_type_t;
+
+template <typename T>
+requires Semiregular<Decay<T>>
+struct distance_type_t<Pointer_type<T>>
 {
     using type = std::ptrdiff_t;
 };
 
 template <typename T>
-requires Semiregular<decay<T>>
+requires Semiregular<Decay<T>>
+using Distance_type = typename distance_type_t<T>::type;
+
+template <typename T>
+requires Semiregular<Decay<T>>
 struct position_type_t
 {
-    using type = pointer_type<T>;
+    using type = Pointer_type<T>;
 };
+
+template <typename>
+constexpr bool Is_contiguously_addressable = false;
+
+template <typename T>
+requires Semiregular<Decay<T>>
+struct position_type_t;
+
+template <typename T>
+requires Semiregular<Decay<T>>
+using Position_type = typename position_type_t<T>::type;
 
 }

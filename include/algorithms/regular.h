@@ -16,6 +16,21 @@ struct equal
 };
 
 template <Equality_comparable T>
+struct equal_unary
+{
+    T const& x;
+
+    constexpr
+    equal_unary(T const& x_) : x{x_} {}
+
+    constexpr auto
+    operator()(T const& y) -> bool
+    {
+        return x == y;
+    }
+};
+
+template <Equality_comparable T>
 struct less
 {
     constexpr auto
@@ -54,11 +69,11 @@ operator<=(T const& x, T const& y) -> bool
 }
 
 template <typename T>
-requires Semiregular<remove_cv<T>>
+requires Semiregular<Remove_cv<T>>
 constexpr auto
-underlying_ref(T& x) -> underlying_type<T>&
+underlying_ref(T& x) -> Underlying_type<T>&
 {
-    return reinterpret_cast<underlying_type<T>&>(x);
+    return reinterpret_cast<Underlying_type<T>&>(x);
 }
 
 }

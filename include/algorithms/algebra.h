@@ -18,7 +18,7 @@ struct sum
 template <Additive_semigroup A>
 struct identity_element_t<A, sum<A>>
 {
-    static constexpr A value = zero<A>;
+    static constexpr A value = Zero<A>;
 };
 
 template <Additive_monoid A>
@@ -44,7 +44,7 @@ struct product
 template <Multiplicative_semigroup M>
 struct identity_element_t<M, product<M>>
 {
-    static constexpr M value = one<M>;
+    static constexpr M value = One<M>;
 };
 
 template <Multiplicative_monoid M>
@@ -53,7 +53,7 @@ struct reciprocal
     constexpr auto
     operator()(M const& a) const -> M
     {
-        return one<M> / a;
+        return One<M> / a;
     }
 };
 

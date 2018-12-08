@@ -5,7 +5,8 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/invocable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ordered_algebra.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ordering.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/position.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/position.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/search.cpp)
 
 add_executable (tests ${TEST_SOURCES})
 target_link_libraries (tests Catch)
