@@ -19,6 +19,8 @@ For `search_not`, a match is defined as the first element `y` for which the give
 
 `search_unguarded`, `search_not_unguarded`, `search_if_unguarded`, and `search_if_not_unguarded` are variations of the functions above that assume an element satisfying the applied predicate is known to exist in the given range. They take a position to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration.
 
+`search_match` and `search_mismatch` take two ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `equal`.
+
 # Appendix A: On nomenclature
 
 Concepts, types and functions in this library are named based on the following principles:
@@ -43,6 +45,8 @@ Index
 `search_not_unguarded`,
 `search_if_unguarded`
 `search_if_not_unguarded`
+`search_match`
+`search_mismatch`
 
 References
 ----------

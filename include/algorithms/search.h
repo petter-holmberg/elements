@@ -1,6 +1,7 @@
 #pragma once
 
 #include "concepts/position.h"
+#include "data_structures/tuple.h"
 
 #include "invocable.h"
 #include "position.h"
@@ -118,6 +119,45 @@ search_not_unguarded(P pos, T const& value) -> P
 //[[expects axiom: search_not(pos, _, value) != _]]
 {
     return search_if_not_unguarded(pos, equal_unary<Value_type<P>>{value});
+}
+
+template <typename P0, typename L0, typename P1, typename L1, typename Rel = equal<Value_type<P0>>>
+requires
+    Loadable<P0> and Position<P0> and
+    Limit<P0, L0> and
+    Loadable<P1> and Position<P1> and
+    Limit<P0, L1> and
+    Relation<Rel> and
+    Same<Remove_cv<Value_type<P0>>, Remove_cv<Value_type<P1>>> and
+    Same<Remove_cv<Value_type<P0>>, Domain<Rel>>
+constexpr auto
+search_match(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel = equal<Value_type<P0>>{}) -> tuple<P0, P1>
+//[[expects axiom: loadable_range(pos0, lim0)]]
+//[[expects axiom: loadable_range(pos0, lim1)]]
+{
+    while (pos0 != lim0 and pos1 != lim1) {
+        if (rel(load(pos0), load(pos1))) break;
+        increment(pos0);
+        increment(pos1);
+    }
+    return {pos0, pos1};
+}
+
+template <typename P0, typename L0, typename P1, typename L1, typename Rel = equal<Value_type<P0>>>
+requires
+    Loadable<P0> and Position<P0> and
+    Limit<P0, L0> and
+    Loadable<P1> and Position<P1> and
+    Limit<P0, L1> and
+    Relation<Rel> and
+    Same<Remove_cv<Value_type<P0>>, Remove_cv<Value_type<P1>>> and
+    Same<Remove_cv<Value_type<P0>>, Domain<Rel>>
+constexpr auto
+search_mismatch(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel = equal<Value_type<P0>>{}) -> tuple<P0, P1>
+//[[expects axiom: loadable_range(pos0, lim0)]]
+//[[expects axiom: loadable_range(pos0, lim1)]]
+{
+    return search_match(pos0, lim0, pos1, lim1, complement<Rel>{rel});
 }
 
 }

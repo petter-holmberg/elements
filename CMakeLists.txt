@@ -9,6 +9,7 @@ configure_file (
 
 include_directories ("${PROJECT_SOURCE_DIR}/include")
 include_directories ("${PROJECT_SOURCE_DIR}/include/algorithms")
+include_directories ("${PROJECT_SOURCE_DIR}/include/data_structures")
 include_directories ("${PROJECT_SOURCE_DIR}/include/concepts")
 include_directories ("${PROJECT_SOURCE_DIR}/include/type_functions")
 set (CMAKE_BUILD_TYPE Release)
@@ -27,7 +28,8 @@ add_custom_target (
     ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/concepts/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/type_functions/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/algorithms/*.h)
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/algorithms/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/data_structures/*.h)
 
 enable_testing ()
 add_subdirectory (test)
