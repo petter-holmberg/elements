@@ -3,6 +3,7 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/algebra.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/invocable.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/lexicographical.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ordered_algebra.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ordering.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/position.cpp

@@ -8,10 +8,11 @@
 #endif
 
 #include "algorithms/algebra.h"
-#include "algorithms/regular.h"
+#include "algorithms/lexicographical.h"
 #include "algorithms/ordered_algebra.h"
 #include "algorithms/ordering.h"
 #include "algorithms/position.h"
+#include "algorithms/regular.h"
 #include "algorithms/search.h"
 
 #include "data_structures/tuple.h"
