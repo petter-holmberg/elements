@@ -16,4 +16,5 @@
 #include "algorithms/search.h"
 #include "algorithms/copy.h"
 
+#include "data_structures/array_k.h"
 #include "data_structures/tuple.h"

@@ -21,7 +21,7 @@ For `search_not`, a match is defined as the first element `y` for which the give
 
 `search_match` and `search_mismatch` take two loadable ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `equal`.
 
-# Equivalence and ordering
+## Equivalence and ordering
 
 `select_0_2` takes a weak ordering and two values of its domain, and returns the minimum value. `min` uses `less` as the weak ordering.
 `select_1_2` takes a weak ordering and two values of its domain, and returns the maximum value. `max` uses `less` as the weak ordering.
@@ -34,9 +34,13 @@ For `search_not`, a match is defined as the first element `y` for which the give
 
 `lexicographical_compare` take two loadable ranges and a weak ordering, comparing them for lexicographical ordering. `lexicographical_less` uses `less` as the ordering.
 
-# Copy
+## Copying
 
 `copy` takes a loadable range as source and a storable position as destination. It performs copying from the first to the last element of the source, which implies that the range starting at the destination position can overlap with the source position, as long as no source position is read after an aliased destination position.
+
+# Data structures
+
+`array_k` implements an array of *k* elements contiguously allocated on the stack, like built-in C++ arrays, but with regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
 
 # Appendix A: On nomenclature
 
@@ -81,6 +85,10 @@ Index
 `lexicographical_less`
 
 `copy`
+
+# Data structures
+
+`array_k`
 
 References
 ----------

@@ -83,4 +83,19 @@ concept Range =
         limit(x);
     };
 
+template <typename R>
+concept Loadable_range =
+    Range<R> and
+    Loadable<Position_type<R>>;
+
+template <typename R>
+concept Storable_range =
+    Range<R> and
+    Storable<Position_type<R>>;
+
+template <typename R>
+concept Mutable_range =
+    Range<R> and
+    Mutable<Position_type<R>>;
+
 }

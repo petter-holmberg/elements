@@ -64,4 +64,14 @@ template <typename T>
 requires Semiregular<Decay<T>>
 using Position_type = typename position_type_t<T>::type;
 
+template <typename T>
+struct size_type_t;
+
+template <typename T>
+requires Semiregular<T>
+using Size_type = typename size_type_t<T>::type;
+
+template <typename T>
+constexpr auto Size_value = size_type_t<T>::value;
+
 }
