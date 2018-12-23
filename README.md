@@ -34,6 +34,10 @@ For `search_not`, a match is defined as the first element `y` for which the give
 
 `lexicographical_compare` take two loadable ranges and a weak ordering, comparing them for lexicographical ordering. `lexicographical_less` uses `less` as the ordering.
 
+# Copy
+
+`copy` takes a loadable range as source and a storable position as destination. It performs copying from the first to the last element of the source, which implies that the range starting at the destination position can overlap with the source position, as long as no source position is read after an aliased destination position.
+
 # Appendix A: On nomenclature
 
 Concepts, types and functions in this library are named based on the following principles:
@@ -75,6 +79,8 @@ Index
 `lexicographical_equal`
 `lexicographical_compare`
 `lexicographical_less`
+
+`copy`
 
 References
 ----------

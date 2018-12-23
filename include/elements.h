@@ -14,5 +14,6 @@
 #include "algorithms/position.h"
 #include "algorithms/regular.h"
 #include "algorithms/search.h"
+#include "algorithms/copy.h"
 
 #include "data_structures/tuple.h"
