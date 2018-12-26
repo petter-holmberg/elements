@@ -6,15 +6,13 @@
 
 namespace elements {
 
-template <typename P0, typename L0, typename P1, typename L1, typename Rel>
+template <
+    Loadable_position P0, Limit<P0> L0,
+    Loadable_position P1, Limit<P1> L1,
+    Relation Rel>
 requires
-    Loadable<P0> and
-    Limit<P0, L0> and
-    Loadable<P1> and
-    Limit<P1, L1> and
-    Same<Remove_cv<Value_type<P0>>, Remove_cv<Value_type<P1>>> and
-    Relation<Rel> and
-    Same<Remove_cv<Value_type<P0>>, Domain<Rel>>
+    Same<Decay<Value_type<P0>>, Decay<Value_type<P1>>> and
+    Same<Decay<Value_type<P0>>, Decay<Domain<Rel>>>
 constexpr auto
 lexicographical_equivalent(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel) -> bool
 //[[expects axiom: loadable_range(pos0, lim0)]]
@@ -25,28 +23,23 @@ lexicographical_equivalent(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel) -> bool
     return elements::get<0>(pos) == lim0 and elements::get<1>(pos) == lim1;
 }
 
-template <typename P0, typename L0, typename P1, typename L1>
-requires
-    Loadable<P0> and
-    Limit<P0, L0> and
-    Loadable<P1> and
-    Limit<P1, L1> and
-    Same<Remove_cv<Value_type<P0>>, Remove_cv<Value_type<P1>>>
+template <
+    Loadable_position P0, Limit<P0> L0,
+    Loadable_position P1, Limit<P1> L1>
+requires Same<Decay<Value_type<P0>>, Decay<Value_type<P1>>>
 constexpr auto
 lexicographical_equal(P0 pos0, L0 lim0, P1 pos1, L1 lim1) -> bool
 {
     return lexicographical_equivalent(pos0, lim0, pos1, lim1, equal<Value_type<P0>>{});
 }
 
-template <typename P0, typename L0, typename P1, typename L1, typename Rel>
+template <
+    Loadable_position P0, Limit<P0> L0,
+    Loadable_position P1, Limit<P1> L1,
+    Relation Rel>
 requires
-    Loadable<P0> and
-    Limit<P0, L0> and
-    Loadable<P1> and
-    Limit<P1, L1> and
-    Relation<Rel> and
-    Same<Remove_cv<Value_type<P0>>, Remove_cv<Value_type<P1>>> and
-    Same<Remove_cv<Value_type<P0>>, Domain<Rel>>
+    Same<Decay<Value_type<P0>>, Decay<Value_type<P1>>> and
+    Same<Decay<Value_type<P0>>, Decay<Domain<Rel>>>
 constexpr auto
 lexicographical_compare(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel) -> bool
 //[[expects axiom: loadable_range(pos0, lim0)]]
@@ -63,13 +56,10 @@ lexicographical_compare(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel) -> bool
     }
 }
 
-template <typename P0, typename L0, typename P1, typename L1>
-requires
-    Loadable<P0> and
-    Limit<P0, L0> and
-    Loadable<P1> and
-    Limit<P1, L1> and
-    Same<Remove_cv<Value_type<P0>>, Remove_cv<Value_type<P1>>>
+template <
+    Loadable_position P0, Limit<P0> L0,
+    Loadable_position P1, Limit<P1> L1>
+requires Same<Decay<Value_type<P0>>, Decay<Value_type<P1>>>
 constexpr auto
 lexicographical_less(P0 pos0, L0 lim0, P1 pos1, L1 lim1) -> bool
 {

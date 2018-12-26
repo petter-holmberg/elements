@@ -69,6 +69,23 @@ concept Contiguous_position =
     Random_access_position<P> and
     Is_contiguously_addressable<P>;
 
+// Access and traversal
+
+template <typename P>
+concept Loadable_position =
+    Loadable<P> and
+    Position<P>;
+
+template <typename P>
+concept Storable_position =
+    Storable<P> and
+    Position<P>;
+
+template <typename P>
+concept Mutable_position =
+    Mutable<P> and
+    Position<P>;
+
 // Ranges
 
 template <typename P, typename L>

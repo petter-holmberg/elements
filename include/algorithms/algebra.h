@@ -22,12 +22,22 @@ struct identity_element_t<A, sum<A>>
 };
 
 template <Additive_monoid A>
-struct inverse_operation<A, sum<A>>
+struct unary_negation
 {
     constexpr auto
     operator()(A const& a) const -> A
     {
         return -a;
+    }
+};
+
+template <Additive_monoid A>
+struct inverse_operation<A, sum<A>>
+{
+    constexpr auto
+    operator()(A const& a) const -> A
+    {
+        return unary_negation<A>()(a);
     }
 };
 

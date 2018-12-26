@@ -9,6 +9,7 @@
 
 #include "algorithms/algebra.h"
 #include "algorithms/lexicographical.h"
+#include "algorithms/map.h"
 #include "algorithms/ordered_algebra.h"
 #include "algorithms/ordering.h"
 #include "algorithms/position.h"

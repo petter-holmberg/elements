@@ -9,12 +9,8 @@
 
 namespace elements {
 
-template <typename P, typename L, typename U>
-requires
-    Loadable<P> and
-    Limit<P, L> and
-    Unary_predicate<U> and
-    Same<Remove_cv<Value_type<P>>, Domain<U>>
+template <Loadable_position P, Limit<P> L, Unary_predicate U>
+requires Same<Decay<Value_type<P>>, Decay<Domain<U>>>
 constexpr auto
 search_if(P pos, L lim, U pred) -> P
 //[[expects axiom: loadable_range(pos, lim)]]
@@ -26,12 +22,8 @@ search_if(P pos, L lim, U pred) -> P
     return pos;
 }
 
-template <typename P, typename L, typename U>
-requires
-    Loadable<P> and
-    Limit<P, L> and
-    Unary_predicate<U> and
-    Same<Remove_cv<Value_type<P>>, Domain<U>>
+template <Loadable_position P, Limit<P> L, Unary_predicate U>
+requires Same<Decay<Value_type<P>>, Decay<Domain<U>>>
 constexpr auto
 search_if_not(P pos, L lim, U pred) -> P
 //[[expects axiom: loadable_range(pos, lim)]]
@@ -39,11 +31,7 @@ search_if_not(P pos, L lim, U pred) -> P
     return search_if(pos, lim, negation<U>{pred});
 }
 
-template <typename P, typename L, typename T>
-requires
-    Loadable<P> and
-    Limit<P, L> and
-    Equality_comparable_with<Value_type<P>, T>
+template <Loadable_position P, Limit<P> L, Equality_comparable_with<Value_type<P>> T>
 constexpr auto
 search(P pos, L lim, T const& value) -> P
 //[[expects axiom: loadable_range(pos, lim)]]
@@ -51,11 +39,7 @@ search(P pos, L lim, T const& value) -> P
     return search_if(pos, lim, equal_unary<Value_type<P>>{value});
 }
 
-template <typename P, typename L, typename T>
-requires
-    Loadable<P> and
-    Limit<P, L> and
-    Equality_comparable_with<Value_type<P>, T>
+template <Loadable_position P, Limit<P> L, Equality_comparable_with<Value_type<P>> T>
 constexpr auto
 search_not(P pos, L lim, T const& value) -> P
 //[[expects axiom: loadable_range(pos, lim)]]
@@ -63,12 +47,8 @@ search_not(P pos, L lim, T const& value) -> P
     return search_if_not(pos, lim, equal_unary<Value_type<P>>{value});
 }
 
-template <typename P, typename U>
-requires
-    Loadable<P> and
-    Position<P> and
-    Unary_predicate<U> and
-    Same<Remove_cv<Value_type<P>>, Domain<U>>
+template <Loadable_position P, Unary_predicate U>
+requires Same<Decay<Value_type<P>>, Decay<Domain<U>>>
 constexpr auto
 search_if_unguarded(P pos, U pred) -> P
 //[[expects axiom: loadable_range(pos, _)]]
@@ -81,12 +61,8 @@ search_if_unguarded(P pos, U pred) -> P
     return pos;
 }
 
-template <typename P, typename U>
-requires
-    Loadable<P> and
-    Position<P> and
-    Unary_predicate<U> and
-    Same<Remove_cv<Value_type<P>>, Domain<U>>
+template <Loadable_position P, Unary_predicate U>
+requires Same<Decay<Value_type<P>>, Decay<Domain<U>>>
 constexpr auto
 search_if_not_unguarded(P pos, U pred) -> P
 //[[expects axiom: loadable_range(pos, _)]]
@@ -95,11 +71,7 @@ search_if_not_unguarded(P pos, U pred) -> P
     return search_if_unguarded(pos, negation<U>{pred});
 }
 
-template <typename P, typename T>
-requires
-    Loadable<P> and
-    Position<P> and
-    Equality_comparable_with<Value_type<P>, T>
+template <Loadable_position P, Equality_comparable_with<Value_type<P>> T>
 constexpr auto
 search_unguarded(P pos, T const& value) -> P
 //[[expects axiom: loadable_range(pos, _)]]
@@ -108,11 +80,7 @@ search_unguarded(P pos, T const& value) -> P
     return search_if_unguarded(pos, equal_unary<Value_type<P>>{value});
 }
 
-template <typename P, typename T>
-requires
-    Loadable<P> and
-    Position<P> and
-    Equality_comparable_with<Value_type<P>, T>
+template <Loadable_position P, Equality_comparable_with<Value_type<P>> T>
 constexpr auto
 search_not_unguarded(P pos, T const& value) -> P
 //[[expects axiom: loadable_range(pos, _)]]
@@ -121,15 +89,13 @@ search_not_unguarded(P pos, T const& value) -> P
     return search_if_not_unguarded(pos, equal_unary<Value_type<P>>{value});
 }
 
-template <typename P0, typename L0, typename P1, typename L1, typename Rel = equal<Value_type<P0>>>
+template <
+    Loadable_position P0, Limit<P0> L0,
+    Loadable_position P1, Limit<P1> L1,
+    Relation Rel = equal<Value_type<P0>>>
 requires
-    Loadable<P0> and Position<P0> and
-    Limit<P0, L0> and
-    Loadable<P1> and Position<P1> and
-    Limit<P0, L1> and
-    Relation<Rel> and
-    Same<Remove_cv<Value_type<P0>>, Remove_cv<Value_type<P1>>> and
-    Same<Remove_cv<Value_type<P0>>, Domain<Rel>>
+    Same<Decay<Value_type<P0>>, Decay<Value_type<P1>>> and
+    Same<Decay<Value_type<P0>>, Decay<Domain<Rel>>>
 constexpr auto
 search_match(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel = equal<Value_type<P0>>{}) -> tuple<P0, P1>
 //[[expects axiom: loadable_range(pos0, lim0)]]
@@ -143,15 +109,13 @@ search_match(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel = equal<Value_type<P0>>
     return {pos0, pos1};
 }
 
-template <typename P0, typename L0, typename P1, typename L1, typename Rel = equal<Value_type<P0>>>
+template <
+    Loadable_position P0, Limit<P0> L0,
+    Loadable_position P1, Limit<P1> L1,
+    Relation Rel = equal<Value_type<P0>>>
 requires
-    Loadable<P0> and Position<P0> and
-    Limit<P0, L0> and
-    Loadable<P1> and Position<P1> and
-    Limit<P0, L1> and
-    Relation<Rel> and
-    Same<Remove_cv<Value_type<P0>>, Remove_cv<Value_type<P1>>> and
-    Same<Remove_cv<Value_type<P0>>, Domain<Rel>>
+    Same<Decay<Value_type<P0>>, Decay<Value_type<P1>>> and
+    Same<Decay<Value_type<P0>>, Decay<Domain<Rel>>>
 constexpr auto
 search_mismatch(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel = equal<Value_type<P0>>{}) -> tuple<P0, P1>
 //[[expects axiom: loadable_range(pos0, lim0)]]

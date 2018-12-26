@@ -19,6 +19,7 @@ template <typename S>
 concept Additive_semigroup =
     Regular<S> and
     requires (S const& a) {
+        { +a } -> S;
         { a + a } -> S;
     } and
     requires (S& a) {

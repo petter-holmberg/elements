@@ -22,7 +22,14 @@ template <typename F>
 concept Unary_function =
     Functional_procedure<F> and
     Arity<F> == 1 and
-    Regular<Domain<F>>;
+    Regular<Decay<Domain<F>>>;
+
+template <typename F>
+concept Binary_function =
+    Functional_procedure<F> and
+    Arity<F> == 2 and
+    Regular<Decay<Input_type<F, 0>>> and
+    Regular<Decay<Input_type<F, 1>>>;
 
 template <typename F>
 concept Homogeneous_function =
