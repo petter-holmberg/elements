@@ -7,13 +7,6 @@
 
 namespace elements {
 
-template <typename>
-struct difference_type_t;
-
-template <typename T>
-requires Semiregular<Decay<T>>
-using Difference_type = typename difference_type_t<T>::type;
-
 // Pointers
 
 template <typename T>
@@ -24,6 +17,12 @@ requires Semiregular<Decay<T>>
 struct value_type_t<Pointer_type<T>>
 {
     using type = T;
+};
+
+template <typename T>
+struct difference_type_t<T*>
+{
+    using type = std::ptrdiff_t;
 };
 
 template <typename>

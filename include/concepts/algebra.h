@@ -286,23 +286,20 @@ concept Vector_space =
     Field<S, sum<S>, product<S>>;
 
 template <typename>
-struct vector_type_t;
+struct difference_type_t;
 
-template <typename P>
-using Vector_type = typename vector_type_t<P>::type;
+template <typename T>
+using Difference_type = typename difference_type_t<T>::type;
 
-template <typename P, typename V = Vector_type<P>, typename S = Value_type<V>>
+template <typename P, typename V = Difference_type<P>, typename S = Value_type<V>>
 concept Affine_space =
     Regular<P> and
     Vector_space<V, S> and
     requires (P const& p, V const& v) {
         { p - p } -> V;
         { p + v } -> P;
+        { v + p } -> P;
         { p - v } -> P;
-    } and
-    requires (P& p, V const& v) {
-        { p += v } -> P&;
-        { p -= v } -> P&;
     };
 
 }

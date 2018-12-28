@@ -1,7 +1,6 @@
 #pragma once
 
 #include "concepts/algebra.h"
-#include "type_functions/algebra.h"
 
 namespace elements {
 
@@ -192,6 +191,24 @@ operator/=(V const& v, Value_type<V> const& a) -> V
 {
     v = v / a;
     return v;
+}
+
+template <typename P, typename V = Difference_type<P>, typename S = Value_type<V>>
+requires Affine_space<P>
+constexpr auto
+operator+=(P& p, V const& v) -> P&
+{
+    p = p + v;
+    return p;
+}
+
+template <typename P, typename V = Difference_type<P>, typename S = Value_type<V>>
+requires Affine_space<P>
+constexpr auto
+operator-=(P& p, V const& v) -> P&
+{
+    p = p - v;
+    return p;
 }
 
 }
