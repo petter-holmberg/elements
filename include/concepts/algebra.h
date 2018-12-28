@@ -19,11 +19,7 @@ template <typename S>
 concept Additive_semigroup =
     Regular<S> and
     requires (S const& a) {
-        { +a } -> S;
         { a + a } -> S;
-    } and
-    requires (S& a) {
-        { a += a } -> S&;
     };
     // axiom associative(+) {
     //     (a + b) + c == a + (b + c);
@@ -37,9 +33,6 @@ concept Multiplicative_semigroup =
     Regular<S> and
     requires (S const& a) {
         { a * a } -> S;
-    } and
-    requires (S& a) {
-        { a *= a } -> S&;
     };
     // axiom associative(*) {
     //     (a * b) * c == a * (b * c);
@@ -65,10 +58,10 @@ concept Monoid =
     // }
 
 template <Additive_semigroup S>
-struct zero_t;
+struct zero_type;
 
 template <Additive_semigroup S>
-constexpr S Zero = zero_t<S>::value;
+constexpr S Zero = zero_type<S>::value;
 
 template <Additive_semigroup S>
 struct sum;
@@ -79,22 +72,22 @@ concept Additive_monoid =
     requires {
         M{Zero<M>};
     };
-    // axiom identity(zero<M>) {
-    //     zero<M> + a == a;
-    //     a + zero<M> == a;
+    // axiom identity(Zero<M>) {
+    //     Zero<M> + a == a;
+    //     a + Zero<M> == a;
     // }
 
 template <Additive_semigroup S>
-struct zero_t
+struct zero_type
 {
     static constexpr S value = S{0};
 };
 
 template <Multiplicative_semigroup S>
-struct one_t;
+struct one_type;
 
 template <Multiplicative_semigroup S>
-constexpr S One = one_t<S>::value;
+constexpr S One = one_type<S>::value;
 
 template <Multiplicative_semigroup S>
 struct product;
@@ -105,13 +98,13 @@ concept Multiplicative_monoid =
     requires {
         M{One<M>};
     };
-    // axiom identity(one<M>) {
-    //     one<M> * a == a;
-    //     a * one<M> == a;
+    // axiom identity(One<M>) {
+    //     One<M> * a == a;
+    //     a * One<M> == a;
     // }
 
 template <Multiplicative_semigroup S>
-struct one_t
+struct one_type
 {
     static constexpr S value = S{1};
 };
@@ -135,13 +128,10 @@ concept Additive_group =
     requires (G const& a) {
         { -a } -> G;
         { a - a } -> G;
-    } and
-    requires (G& a) {
-        { a -= a } -> G&;
     };
-    // axiom inverse(-, +, zero<G>) {
-    //     a + -a == zero<G>;
-    //     -a + a == zero<G>;
+    // axiom inverse(-, +, Zero<G>) {
+    //     a + -a == Zero<G>;
+    //     -a + a == Zero<G>;
     // }
 
 template <Multiplicative_monoid M>
@@ -153,13 +143,10 @@ concept Multiplicative_group =
     requires (G const& a) {
         { reciprocal<G>{}(a) } -> G;
         { a / a } -> G;
-    } and
-    requires (G& a) {
-        { a /= a } -> G&;
     };
-    // axiom inverse(reciprocal, product<G>, one<G>) {
-    //     a * reciprocal(a) == one<G>;
-    //     reciprocal(a) * a == one<G>;
+    // axiom inverse(reciprocal, product<G>, One<G>) {
+    //     a * reciprocal(a) == One<G>;
+    //     reciprocal(a) * a == One<G>;
     // }
 
 // Ring-like
@@ -172,9 +159,9 @@ concept Semiring =
     //     Mul_op(a, Add_op(b, c)) == Add_op(Mul_op(a, b), Mul_op(a, c));
     //     Mul_op(Add_op(a, b), c) == Add_op(Mul_op(a, c), Mul_op(b, c));
     // }
-    // axiom annihilation(Mul_op, zero<S>) {
-    //     Mul_op(zero<S>, a) == zero<S>;
-    //     Mul_op(a, zero<S>) == zero<S>;
+    // axiom annihilation(Mul_op, Zero<S>) {
+    //     Mul_op(Zero<S>, a) == Zero<S>;
+    //     Mul_op(a, Zero<S>) == Zero<S>;
     // }
 
 template <typename S, typename Add_op = sum<S>, typename Mul_op = product<S>>
@@ -210,15 +197,9 @@ concept Field =
 
 // Module-like
 
-template <typename>
-struct scalar_type_t;
-
-template <typename V>
-using Scalar_type = typename scalar_type_t<V>::type;
-
 template <
     typename V, typename V_add_op = sum<V>,
-    typename S = Scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename S = Value_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Left_semimodule =
     Monoid<V, V_add_op> and
     Commutative_semiring<S, S_add_op, S_mul_op> and
@@ -226,35 +207,56 @@ concept Left_semimodule =
         { s * v } -> V;
     };
     // axiom commutative(V_add_op) {
-    //     MulV_add_op(a, b) == V_add_op(b, a);
+    //     V_add_op(a, b) == V_add_op(b, a);
+    // }
+    // axiom distributive(V_add_op, *) {
+    //     a * V_add_op(v, w) == V_add_op(a * v, a * w);
+    // }
+    // axiom distributive(S_add_op, *) {
+    //     S_add_op(a, b) * v == a * v + b * v;
+    // }
+    // axiom compatibility(S_mul_op, *) {
+    //     S_mul_op(a, b) * v == a * (b * v);
+    // }
+    // axiom identity(One<V>) {
+    //     One<V> * a == a;
     // }
 
 template <
     typename V, typename V_add_op = sum<V>,
-    typename S = Scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename S = Value_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Right_semimodule =
     Monoid<V, V_add_op> and
     Commutative_semiring<S, S_add_op, S_mul_op> and
     requires (V const& v, S const& s) {
         { v * s } -> V;
-    } and
-    requires (V& v, S const& s) {
-        { v *= s } -> V&;
     };
     // axiom commutative(V_add_op) {
-    //     MulV_add_op(a, b) == V_add_op(b, a);
+    //     V_add_op(a, b) == V_add_op(b, a);
+    // }
+    // axiom distributive(V_add_op, *) {
+    //     V_add_op(v, w) * a == V_add_op(v * a, w * a);
+    // }
+    // axiom distributive(S_add_op, *) {
+    //     v * S_add_op(a, b) == v * a + v * b;
+    // }
+    // axiom compatibility(S_mul_op, *) {
+    //     v * S_mul_op(a, b) == (v * b) * a;
+    // }
+    // axiom identity(One<V>) {
+    //     a * One<V> == a;
     // }
 
 template <
     typename V, typename V_add_op = sum<V>,
-    typename S = Scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename S = Value_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Semimodule =
     Left_semimodule<V, V_add_op, S, S_add_op, S_mul_op> and
     Right_semimodule<V, V_add_op, S, S_add_op, S_mul_op>;
 
 template <
     typename V, typename V_add_op = sum<V>,
-    typename S = Scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename S = Value_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Left_module =
     Left_semimodule<V, V_add_op, S, S_add_op, S_mul_op> and
     Group<V, V_add_op> and
@@ -262,7 +264,7 @@ concept Left_module =
 
 template <
     typename V, typename V_add_op = sum<V>,
-    typename S = Scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename S = Value_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Right_module =
     Right_semimodule<V, V_add_op, S, S_add_op, S_mul_op> and
     Group<V, V_add_op> and
@@ -270,7 +272,7 @@ concept Right_module =
 
 template <
     typename V, typename V_add_op = sum<V>,
-    typename S = Scalar_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename S = Value_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
 concept Module =
     Left_module<V, V_add_op, S, S_add_op, S_mul_op> and
     Right_module<V, V_add_op, S, S_add_op, S_mul_op> and
@@ -278,16 +280,10 @@ concept Module =
 
 // Linear algebra
 
-template <typename V, typename S = Scalar_type<V>>
+template <typename V, typename S = Value_type<V>>
 concept Vector_space =
     Module<V, sum<V>, S, sum<S>, product<S>> and
-    Field<S, sum<S>, product<S>> and
-    requires (V const& v, S const& s) {
-        { v / s } -> V;
-    } and
-    requires (V& v, S const& s) {
-        { v /= s } -> V&;
-    };
+    Field<S, sum<S>, product<S>>;
 
 template <typename>
 struct vector_type_t;
@@ -295,7 +291,7 @@ struct vector_type_t;
 template <typename P>
 using Vector_type = typename vector_type_t<P>::type;
 
-template <typename P, typename V = Vector_type<P>, typename S = Scalar_type<V>>
+template <typename P, typename V = Vector_type<P>, typename S = Value_type<V>>
 concept Affine_space =
     Regular<P> and
     Vector_space<V, S> and

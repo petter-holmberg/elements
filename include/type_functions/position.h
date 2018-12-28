@@ -72,6 +72,6 @@ requires Semiregular<T>
 using Size_type = typename size_type_t<T>::type;
 
 template <typename T>
-constexpr auto Size_value = size_type_t<T>::value;
+constexpr auto Size = size_type_t<T>::value;
 
 }

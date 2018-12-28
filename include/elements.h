@@ -16,6 +16,8 @@
 #include "algorithms/regular.h"
 #include "algorithms/search.h"
 #include "algorithms/copy.h"
+#include "algorithms/fill.h"
 
 #include "data_structures/array_k.h"
+#include "data_structures/coordinate_vector.h"
 #include "data_structures/tuple.h"

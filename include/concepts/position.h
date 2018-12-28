@@ -115,4 +115,21 @@ concept Mutable_range =
     Range<R> and
     Mutable<Position_type<R>>;
 
+template <typename S>
+concept Sequence =
+    Range<S> and
+    Totally_ordered<S> and
+    requires (S x, Size_type<S> i) {
+        { is_empty(x) } -> bool;
+        { size(x) } -> Size_type<S>;
+        { x[i] } -> Value_type<S> const&;
+        { x[i] } -> Value_type<S>&;
+        // axiom {
+        //     is_empty(x) == limit(x) - first(x);
+        // }
+        // axiom {
+        //     size(x) == limit(x) - first(x);
+        // }
+    };
+
 }

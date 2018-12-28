@@ -8,7 +8,7 @@ SCENARIO ("Using array_k", "[array_k]")
 {
     e::array_k<int, 5> x{0, 1, 2, 3, 4};
     static_assert(e::Mutable_range<decltype(x)>);
-    static_assert(e::Size_value<decltype(x)> == 5);
+    static_assert(e::Size<decltype(x)> == 5);
 
     SECTION ("Checking elements")
     {

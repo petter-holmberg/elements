@@ -11,7 +11,7 @@ SCENARIO ("Mapping", "[map]")
 
     SECTION ("Unary mapping")
     {
-        auto pos = e::map(x, x + 5, y, e::unary_negation<int>{});
+        auto pos = e::map(x, x + 5, y, e::negative<int>{});
 
         REQUIRE(pos == y + 5);
         CHECK (y[0] == 0);

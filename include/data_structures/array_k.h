@@ -23,6 +23,7 @@ struct array_k
 
     constexpr
     array_k(std::initializer_list<T> x)
+        : data{}
     {
         copy(std::begin(x), std::end(x), data);
     }
@@ -65,6 +66,13 @@ struct position_type_t<array_k<T, k>>
 
 template <typename T, std::ptrdiff_t k>
 requires Semiregular<T>
+struct position_type_t<array_k<T, k> const>
+{
+    using type = Pointer_type<T const>;
+};
+
+template <typename T, std::ptrdiff_t k>
+requires Semiregular<T>
 struct size_type_t<array_k<T, k>>
 {
     using type = Distance_type<Pointer_type<T>>;
@@ -88,15 +96,6 @@ operator<(array_k<T, k> const& x, array_k<T, k> const& y) -> bool
 }
 
 template <typename T, std::ptrdiff_t k>
-requires Semiregular<T>
-constexpr auto
-first(array_k<T, k>& x) -> Pointer_type<T>
-{
-    return pointer_to(x.data[0]);
-}
-
-template <typename T, std::ptrdiff_t k>
-requires Semiregular<T>
 constexpr auto
 first(array_k<T, k> const& x) -> Pointer_type<T const>
 {
@@ -105,9 +104,9 @@ first(array_k<T, k> const& x) -> Pointer_type<T const>
 
 template <typename T, std::ptrdiff_t k>
 constexpr auto
-limit(array_k<T, k>& x) -> Pointer_type<T>
+first(array_k<T, k>& x) -> Pointer_type<T>
 {
-    return first(x) + k;
+    return pointer_to(x.data[0]);
 }
 
 template <typename T, std::ptrdiff_t k>
@@ -119,14 +118,21 @@ limit(array_k<T, k> const& x) -> Pointer_type<T const>
 
 template <typename T, std::ptrdiff_t k>
 constexpr auto
-last(array_k<T, k>& x) -> Pointer_type<T>
+limit(array_k<T, k>& x) -> Pointer_type<T>
+{
+    return first(x) + k;
+}
+
+template <typename T, std::ptrdiff_t k>
+constexpr auto
+last(array_k<T, k> const& x) -> Pointer_type<T const>
 {
     return limit(x) - 1;
 }
 
 template <typename T, std::ptrdiff_t k>
 constexpr auto
-last(array_k<T, k> const& x) -> Pointer_type<T const>
+last(array_k<T, k>& x) -> Pointer_type<T>
 {
     return limit(x) - 1;
 }

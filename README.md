@@ -34,6 +34,10 @@ For `search_not`, a match is defined as the first element `y` for which the give
 
 `lexicographical_compare` take two loadable ranges and a weak ordering, comparing them for lexicographical ordering. `lexicographical_less` uses `less` as the ordering.
 
+## Assigning
+
+`fill` takes a writable range and a value, filling the range with that value.
+
 ## Copying
 
 `copy` takes a loadable range as source and a storable position as destination. It performs copying from the first to the last element of the source, which implies that the range starting at the destination position can overlap with the source position, as long as no source position is read after an aliased destination position.
@@ -46,7 +50,11 @@ The second version of `map` takes a loadable range and a loadable position as so
 
 # Data structures
 
+## Linear data structures
+
 `array_k` implements an array of *k* elements contiguously allocated on the stack, like built-in C++ arrays, but with regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
+
+`coordinate_vector` implements a coordinate vector type for use in linear algebra. It is a `Vector_space` over a `Field` and a `Sequence`. By default it uses `array_k` for storage of the coordinates.
 
 # Appendix A: On nomenclature
 
@@ -90,6 +98,8 @@ Index
 `lexicographical_compare`
 `lexicographical_less`
 
+`fill`
+
 `copy`
 
 `map`
@@ -97,6 +107,7 @@ Index
 # Data structures
 
 `array_k`
+`coordinate_vector`
 
 References
 ----------
