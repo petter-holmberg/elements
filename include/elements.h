@@ -8,11 +8,13 @@
 #endif
 
 #include "algorithms/algebra.h"
+#include "algorithms/integer.h"
 #include "algorithms/lexicographical.h"
 #include "algorithms/map.h"
 #include "algorithms/ordered_algebra.h"
 #include "algorithms/ordering.h"
 #include "algorithms/position.h"
+#include "algorithms/reduce.h"
 #include "algorithms/regular.h"
 #include "algorithms/search.h"
 #include "algorithms/copy.h"

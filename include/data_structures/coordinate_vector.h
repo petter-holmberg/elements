@@ -4,6 +4,7 @@
 #include "algorithms/algebra.h"
 #include "algorithms/fill.h"
 #include "algorithms/map.h"
+#include "algorithms/reduce.h"
 
 namespace elements {
 
@@ -178,6 +179,16 @@ operator-(
     coordinate_vector<S, k, E> z;
     map(first(x), limit(x), first(y), first(z), difference<S>{});
     return z;
+}
+
+template <typename S, int32_t k, Range E>
+requires Field<S>
+constexpr auto
+operator*(coordinate_vector<S, k, E> const& x, coordinate_vector<S, k, E> const& y) -> S
+{
+    coordinate_vector<S, k, E> z;
+    map(first(x), limit(x), first(y), first(z), product<S>{});
+    return reduce(first(z), limit(z), sum<S>{}, Zero<S>);
 }
 
 template <typename S, int32_t k, Range E>

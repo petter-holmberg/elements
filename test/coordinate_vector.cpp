@@ -43,5 +43,8 @@ SCENARIO ("Using coordinate vectors", "[coordinate_vector]")
 
         REQUIRE (z[0] == 1);
         REQUIRE (z[1] == 2);
+
+        REQUIRE (x * y == 11);
+        REQUIRE (y * x == 11);
     }
 }

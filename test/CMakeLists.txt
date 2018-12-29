@@ -12,6 +12,7 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/ordered_algebra.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ordering.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/position.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/reduce.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/search.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/tuple.cpp)
 
