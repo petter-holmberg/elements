@@ -58,9 +58,9 @@ The second version of `map` takes a loadable range and a loadable position as so
 
 `array_k` implements an array of *k* elements contiguously allocated on the stack, like built-in C++ arrays, but with regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
 
-`coordinate_point` implements a coordinate point type for use in linear algebra. It is an `Affine_space` over a `Field` and a `Sequence`. By default it uses `array_k` for storage of the coordinates.
+`coordinate_point` implements a coordinate point type for use in linear algebra. It is an `Affine_space` over a `Vector_space` and a `Sequence`. By default it uses `array_k` for storage of the coordinates.
 
-`coordinate_vector` implements a coordinate vector type for use in linear algebra. It is a `Vector_space` over a `Field` and a `Sequence`. By default it uses `array_k` for storage of the elements.
+`coordinate_vector` implements a coordinate vector type for use in linear algebra. It is both a `Semimodule` over a `Semiring` and a `Sequence`. If the `Semiring` is a `Field` it supports all operations on a `Vector_space`. By default it uses `array_k` for storage of the elements. It takes two optional operators for addition and multiplication of the semiring elements.
 
 # Appendix A: On nomenclature
 
