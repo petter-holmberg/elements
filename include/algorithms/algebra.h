@@ -1,6 +1,9 @@
 #pragma once
 
 #include "concepts/algebra.h"
+#include "position.h"
+#include "map.h"
+#include "reduce.h"
 
 namespace elements {
 
@@ -155,6 +158,26 @@ operator/=(T& x, T const& y) -> T&
 {
     x = x / y;
     return x;
+}
+
+// Semirings
+
+template <
+    Loadable_position S0,
+    Limit<S0> L0,
+    Loadable_position S1,
+    Storable_position D,
+    typename S_add_op,
+    typename S_mul_op>
+requires
+    Semiring<Decay<Value_type<S0>>, S_add_op, S_mul_op> and
+    Semiring<Decay<Value_type<S1>>, S_add_op, S_mul_op> and
+    Semiring<Decay<Value_type<D>>, S_add_op, S_mul_op>
+constexpr auto
+inner_product(S0 src0, L0 lim0, S1 src1, D dst, S_add_op add_op, S_mul_op mul_op) -> Value_type<D>
+{
+    auto lim = map(src0, lim0, src1, dst, mul_op);
+    return reduce(dst, lim, add_op, Zero<Value_type<D>>);
 }
 
 // Linear algebra
