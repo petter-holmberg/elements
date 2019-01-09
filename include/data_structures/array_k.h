@@ -6,7 +6,6 @@
 #include "algorithms/copy.h"
 #include "algorithms/position.h"
 #include "algorithms/lexicographical.h"
-#include "concepts/regular.h"
 
 namespace elements {
 
