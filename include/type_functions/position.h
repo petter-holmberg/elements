@@ -52,16 +52,19 @@ struct position_type_t
     using type = Pointer_type<T>;
 };
 
-template <typename>
-constexpr bool Is_contiguously_addressable = false;
-
-template <typename T>
-requires Semiregular<Decay<T>>
-struct position_type_t;
-
 template <typename T>
 requires Semiregular<Decay<T>>
 using Position_type = typename position_type_t<T>::type;
+
+template <typename T>
+requires Semiregular<Decay<T>>
+struct position_type_t<T const>
+{
+    using type = Position_type<T const>;
+};
+
+template <typename>
+constexpr bool Is_contiguously_addressable = false;
 
 template <typename T>
 struct size_type_t;
