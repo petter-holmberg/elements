@@ -3,9 +3,7 @@
 #include <type_traits>
 #include <utility>
 
-#if __cplusplus <= 201703L
-    #define concept concept bool // Use C++20 syntax
-#endif
+ #define concept concept bool // Use C++20 syntax
 
 #include "algorithms/algebra.h"
 #include "algorithms/copy.h"

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <initializer_list>
 #include <limits>
 
@@ -9,19 +10,18 @@
 
 namespace elements {
 
-template <typename T, std::ptrdiff_t k>
-requires
-    Semiregular<T> and
-    (0 < k and k <= std::numeric_limits<std::ptrdiff_t>::max() / sizeof(T))
+template <Semiregular T, std::ptrdiff_t k>
+requires 0 < k and k <= std::numeric_limits<std::ptrdiff_t>::max() / sizeof(T)
 struct array_k
 {
-    T data[k];
+    T data[static_cast<std::size_t>(k)];
 
     constexpr
     array_k() = default;
 
     constexpr
     array_k(std::initializer_list<T> x)
+    //[[expects: x.size() == k]]
         : data{}
     {
         copy(std::begin(x), std::end(x), data);
@@ -40,54 +40,46 @@ struct array_k
     }
 };
 
-template <typename T, std::ptrdiff_t k>
-requires
-    Semiregular<T> and
-    (0 < k and k <= std::numeric_limits<std::ptrdiff_t>::max() / sizeof(T))
+template <Semiregular T, std::ptrdiff_t k>
+requires 0 < k and k <= std::numeric_limits<std::ptrdiff_t>::max() / sizeof(T)
 struct underlying_type_t<array_k<T, k>>
 {
     using type = array_k<Underlying_type<T>, k>;
 };
 
-template <typename T, std::ptrdiff_t k>
-requires Semiregular<T>
+template <Semiregular T, std::ptrdiff_t k>
 struct value_type_t<array_k<T, k>>
 {
     using type = T;
 };
 
-template <typename T, std::ptrdiff_t k>
-requires Semiregular<T>
+template <Semiregular T, std::ptrdiff_t k>
 struct position_type_t<array_k<T, k>>
 {
     using type = Pointer_type<T>;
 };
 
-template <typename T, std::ptrdiff_t k>
-requires Semiregular<T>
+template <Semiregular T, std::ptrdiff_t k>
 struct position_type_t<array_k<T, k> const>
 {
     using type = Pointer_type<T const>;
 };
 
-template <typename T, std::ptrdiff_t k>
-requires Semiregular<T>
+template <Semiregular T, std::ptrdiff_t k>
 struct size_type_t<array_k<T, k>>
 {
     using type = Distance_type<Pointer_type<T>>;
     static constexpr auto value = k;
 };
 
-template <typename T, std::ptrdiff_t k>
-requires Regular<T>
+template <Regular T, std::ptrdiff_t k>
 constexpr auto
 operator==(array_k<T, k> const& x, array_k<T, k> const& y) -> bool
 {
     return lexicographical_equal(first(x), limit(x), first(y), limit(y));
 }
 
-template <typename T, std::ptrdiff_t k>
-requires Default_totally_ordered<T>
+template <Default_totally_ordered T, std::ptrdiff_t k>
 constexpr auto
 operator<(array_k<T, k> const& x, array_k<T, k> const& y) -> bool
 {

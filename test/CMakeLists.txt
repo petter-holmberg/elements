@@ -19,11 +19,12 @@ set (TEST_SOURCES
 
 add_executable (tests ${TEST_SOURCES})
 target_link_libraries (tests Catch)
-set_property (TARGET tests PROPERTY CXX_STANDARD 17)
+#set_property (TARGET tests PROPERTY CXX_STANDARD 20)
 target_compile_options (
     tests
     PUBLIC
     -Wall
+    -Werror
     -Wextra
     -Wshadow
     -Wnon-virtual-dtor
@@ -41,6 +42,8 @@ target_compile_options (
     -Weffc++
     -Wno-unused-variable
     -pedantic
-    -fconcepts)
+    -std=c++2a
+    -fconcepts
+)
 
 add_test (elements tests)

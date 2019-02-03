@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.11)
+cmake_minimum_required (VERSION 3.12)
 
 project (Elements)
 set (ELEMENTS_VERSION_MAJOR 0)
