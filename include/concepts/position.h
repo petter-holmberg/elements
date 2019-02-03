@@ -4,47 +4,7 @@
 
 #include "regular.h"
 #include "type_functions/position.h"
-
-namespace elements {
-
-template <typename T>
-constexpr bool Is_integral = std::is_integral<T>::value;
-
-template <typename I>
-requires Is_integral<I>
-constexpr void
-increment(I& x)
-{
-    x = x + One<I>;
-}
-
-template <typename I>
-requires Is_integral<I>
-constexpr void
-decrement(I& x)
-{
-    x = x - One<I>;
-}
-
-template <typename I>
-requires Is_integral<I>
-constexpr auto
-successor(I x) -> I
-{
-    increment(x);
-    return x;
-}
-
-template <typename I>
-requires Is_integral<I>
-constexpr auto
-predecessor(I x) -> I
-{
-    decrement(x);
-    return x;
-}
-
-}
+#include "algorithms/integer.h"
 
 namespace elements {
 
@@ -267,6 +227,34 @@ concept Sequence =
         // axiom {
         //     size(x) == limit(x) - first(x);
         // }
+    };
+
+template <Sequence S>
+struct front
+{
+    Pointer_type<S> sequence;
+
+    constexpr front(S& sequence_)
+        : sequence{&sequence_}
+    {}
+};
+
+template <Sequence S>
+struct back
+{
+    Pointer_type<S> sequence;
+
+    back(S& sequence_)
+        : sequence{&sequence_}
+    {}
+};
+
+template <typename T>
+concept Dynamic_sequence =
+    Sequence<T> and
+    requires (back<T> t, Value_type<T> x) {
+        { insert(t, x) } -> back<T>;
+        { erase(t) } -> back<T>;
     };
 
 }

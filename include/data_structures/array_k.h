@@ -21,7 +21,7 @@ struct array_k
 
     constexpr
     array_k(std::initializer_list<T> x)
-    //[[expects: x.size() == k]]
+        //[[expects: x.size() == k]]
         : data{}
     {
         copy(std::begin(x), std::end(x), data);

@@ -17,7 +17,9 @@
 #include "algorithms/position.h"
 #include "algorithms/regular.h"
 #include "algorithms/search.h"
+#include "algorithms/swap.h"
 
+#include "data_structures/array.h"
 #include "data_structures/array_k.h"
 #include "data_structures/coordinate_point.h"
 #include "data_structures/coordinate_vector.h"
