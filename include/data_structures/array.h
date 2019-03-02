@@ -7,6 +7,7 @@
 #include "algorithms/algebra.h"
 #include "algorithms/copy.h"
 #include "algorithms/lexicographical.h"
+#include "algorithms/map.h"
 #include "algorithms/ordering.h"
 #include "algorithms/swap.h"
 #include "concepts/invocable.h"
@@ -139,6 +140,30 @@ struct array
     operator[](std::ptrdiff_t i) const -> T const&
     {
         return at(first(at(this)) + i);
+    }
+
+    template <Unary_function Fun>
+    requires
+        Same<Decay<T>, Decay<Domain<Fun>>> and
+        Same<Decay<T>, Decay<Codomain<Fun>>>
+    constexpr auto
+    map(Fun fun) -> array<T>&
+    {
+        using elements::map;
+        map(first(*this), limit(*this), first(*this), fun);
+        return *this;
+    }
+
+    template <Unary_function Fun>
+    requires Same<Decay<T>, Decay<Domain<Fun>>>
+    constexpr auto
+    map(Fun fun) -> array<Decay<Codomain<Fun>>>
+    {
+        using elements::map;
+        array<Decay<Codomain<Fun>>> x;
+        reserve(x, size(*this));
+        map(first(*this), limit(*this), first(x), fun);
+        return x;
     }
 };
 

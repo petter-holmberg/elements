@@ -4,9 +4,11 @@
 #include <initializer_list>
 #include <limits>
 
+#include "concepts/invocable.h"
 #include "algorithms/copy.h"
-#include "algorithms/position.h"
 #include "algorithms/lexicographical.h"
+#include "algorithms/map.h"
+#include "algorithms/position.h"
 
 namespace elements {
 
@@ -17,7 +19,9 @@ struct array_k
     T data[static_cast<std::size_t>(k)];
 
     constexpr
-    array_k() = default;
+    array_k()
+        : data{}
+    {}
 
     constexpr
     array_k(std::initializer_list<T> x)
@@ -37,6 +41,29 @@ struct array_k
     operator[](std::ptrdiff_t i) -> T&
     {
         return data[i];
+    }
+
+    template <Unary_function Fun>
+    requires
+        Same<Decay<T>, Decay<Domain<Fun>>> and
+        Same<Decay<T>, Decay<Codomain<Fun>>>
+    constexpr auto
+    map(Fun fun) -> array_k<T, k>&
+    {
+        using elements::map;
+        map(first(*this), limit(*this), first(*this), fun);
+        return *this;
+    }
+
+    template <Unary_function Fun>
+    requires Same<Decay<T>, Decay<Domain<Fun>>>
+    constexpr auto
+    map(Fun fun) -> array_k<Decay<Codomain<Fun>>, k>
+    {
+        using elements::map;
+        array_k<Decay<Codomain<Fun>>, k> x;
+        map(first(*this), limit(*this), first(x), fun);
+        return x;
     }
 };
 

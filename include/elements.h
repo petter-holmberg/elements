@@ -19,6 +19,8 @@
 #include "algorithms/search.h"
 #include "algorithms/swap.h"
 
+#include "concepts/functional.h"
+
 #include "data_structures/array.h"
 #include "data_structures/array_k.h"
 #include "data_structures/coordinate_point.h"

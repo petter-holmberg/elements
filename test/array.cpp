@@ -158,4 +158,21 @@ SCENARIO ("Using array", "[array]")
         CHECK (x0[5] == 5);
         REQUIRE (e::capacity(x0) == 10);
     }
+
+    SECTION ("Functor mapping")
+    {
+        auto fn0 = [](int const& i){ return i + 1; };
+        auto fn1 = [](int const& i){ return i + 0.5; };
+
+        static_assert(e::Functor<decltype(x), decltype(fn0)>);
+        static_assert(e::Functor<decltype(x), decltype(fn1)>);
+
+        auto y = x.map(fn0).map(fn1);
+
+        REQUIRE (y[0] == 1.5);
+        REQUIRE (y[1] == 2.5);
+        REQUIRE (y[2] == 3.5);
+        REQUIRE (y[3] == 4.5);
+        REQUIRE (y[4] == 5.5);
+    }
 }
