@@ -9,6 +9,7 @@
 #include "algorithms/lexicographical.h"
 #include "algorithms/map.h"
 #include "algorithms/ordering.h"
+#include "algorithms/position.h"
 #include "algorithms/swap.h"
 #include "concepts/invocable.h"
 #include "concepts/position.h"

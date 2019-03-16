@@ -20,7 +20,7 @@ lexicographical_equivalent(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel) -> bool
 //[[expects axiom: equivalence(rel)]]
 {
     auto pos{search_mismatch(pos0, lim0, pos1, lim1, rel)};
-    return elements::get<0>(pos) == lim0 and elements::get<1>(pos) == lim1;
+    return !precedes(elements::get<0>(pos), lim0) and !precedes(elements::get<1>(pos), lim1);
 }
 
 template <
@@ -47,8 +47,8 @@ lexicographical_compare(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel) -> bool
 //[[expects axiom: weak_ordering(rel)]]
 {
     while (true) {
-        if (pos1 == lim1) return false;
-        if (pos0 == lim0) return true;
+        if (!precedes(pos1, lim1)) return false;
+        if (!precedes(pos0, lim0)) return true;
         if (rel(load(pos0), load(pos1))) return true;
         if (rel(load(pos1), load(pos0))) return false;
         increment(pos0);

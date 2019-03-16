@@ -1,3 +1,161 @@
 #pragma once
 
+#include "concepts/regular.h"
 #include "concepts/position.h"
+#include "type_functions/position.h"
+
+#include "integer.h"
+
+namespace elements {
+
+// Access
+
+template <typename T>
+constexpr auto
+pointer_to(T& x) -> Pointer_type<T>
+{
+    return &x;
+}
+
+template <typename L>
+requires Movable<Decay<L>>
+constexpr auto
+load(L const& x) -> Value_type<L> const&
+{
+    return x;
+}
+
+template <typename T>
+requires Movable<Decay<T>>
+constexpr auto
+load(Pointer_type<T> x) -> T const&
+{
+    return *x;
+}
+
+template <Semiregular T>
+constexpr void
+store(T& x, Value_type<T> const& v)
+{
+    x = v;
+}
+
+template <Semiregular T>
+constexpr void
+store(Pointer_type<T> x, Value_type<T> const& v)
+{
+    *x = v;
+}
+
+template <Semiregular T>
+constexpr auto
+at(T& x) -> T&
+{
+    return x;
+}
+
+template <Semiregular T>
+constexpr auto
+at(Pointer_type<T> x) -> T&
+{
+    return *x;
+}
+
+// Linear traversal
+
+template <typename P>
+requires Movable<Decay<P>>
+constexpr void
+increment(P& x)
+{
+    ++x;
+}
+
+template <typename P>
+requires Movable<Decay<P>>
+constexpr void
+increment(Pointer_type<P>& x)
+{
+    x = x + Distance_type<Pointer_type<P>>{1};
+}
+
+template <typename T>
+requires Semiregular<Decay<T>>
+constexpr void
+decrement(Pointer_type<T>& x)
+{
+    x = x - Distance_type<Pointer_type<T>>{1};
+}
+
+template <typename T>
+requires Position<T>
+constexpr auto
+successor(T x) -> T
+{
+    increment(x);
+    return x;
+}
+
+template <typename T>
+requires Semiregular<Decay<T>>
+constexpr auto
+successor(Pointer_type<T> x) -> Pointer_type<T>
+{
+    increment(x);
+    return x;
+}
+
+template <typename T>
+requires Semiregular<Decay<T>>
+constexpr auto
+predecessor(Pointer_type<T> x) -> Pointer_type<T>
+{
+    decrement(x);
+    return x;
+}
+
+// Ranges
+
+template <Position P, Movable L>
+constexpr auto
+precedes(P const&, L const&) -> bool
+{
+    return false;
+}
+
+template <Binary_integer I>
+constexpr auto
+precedes(I const& i0, I const& i1) -> bool
+{
+    return i0 < i1;
+}
+
+template <typename T>
+requires Movable<Decay<T>>
+constexpr auto
+precedes(Pointer_type<T> const& pos0, Pointer_type<T> const& pos1) -> bool
+{
+    return pos0 != pos1;
+}
+
+template <Sequence S>
+struct front
+{
+    Pointer_type<S> sequence;
+
+    constexpr front(S& sequence_)
+        : sequence{&sequence_}
+    {}
+};
+
+template <Sequence S>
+struct back
+{
+    Pointer_type<S> sequence;
+
+    back(S& sequence_)
+        : sequence{&sequence_}
+    {}
+};
+
+}

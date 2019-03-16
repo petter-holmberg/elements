@@ -20,7 +20,7 @@ constexpr auto
 copy(S src, L lim, D dst) -> D
 //[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (lim - src))]]
 {
-    while (src != lim) copy_step(src, dst);
+    while (precedes(src, lim)) copy_step(src, dst);
     return dst;
 }
 

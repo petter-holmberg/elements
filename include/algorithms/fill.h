@@ -9,7 +9,7 @@ constexpr void
 fill(P pos, L lim, T const& value)
 //[[expects axiom: storable_range(pos, lim)]]
 {
-    while (pos != lim) {
+    while (precedes(pos, lim)) {
         store(pos, value);
         increment(pos);
     }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "invocable.h"
+#include "integer.h"
 #include "position.h"
 
 namespace elements {
@@ -12,12 +13,12 @@ requires
 constexpr auto
 reduce_nonempty(P pos, L lim, Op op, Fun fun) -> Domain<Op>
 //[[expects axiom: loadable_range(pos, lim)]]
-//[[expects: pos != lim]]
+//[[expects: precedes(pos, lim)]]
 //[[expects axiom: partially_associative(op)]]
 {
     auto x = fun(pos);
     increment(pos);
-    while (pos != lim) {
+    while (precedes(pos, lim)) {
         x = op(x, fun(pos));
         increment(pos);
     }
@@ -29,7 +30,7 @@ requires Same<Decay<Value_type<P>>, Domain<Op>>
 constexpr auto
 reduce_nonempty(P pos, L lim, Op op) -> Domain<Op>
 //[[expects axiom: loadable_range(pos, lim)]]
-//[[expects: pos != lim]]
+//[[expects: precedes(pos, lim)]]
 //[[expects axiom: partially_associative(op)]]
 {
     return reduce_nonempty(pos, lim, op, [](P const& x){ return load(x); });
@@ -44,7 +45,7 @@ reduce(P pos, L lim, Op op, Fun fun, Domain<Op> const& zero) -> Domain<Op>
 //[[expects axiom: loadable_range(pos, lim)]]
 //[[expects axiom: partially_associative(op)]]
 {
-    if (pos == lim) return zero;
+    if (!precedes(pos, lim)) return zero;
     return reduce_nonempty(pos, lim, op, fun);
 }
 
@@ -55,7 +56,7 @@ reduce(P pos, L lim, Op op, Domain<Op> const& zero) -> Domain<Op>
 //[[expects axiom: loadable_range(pos, lim)]]
 //[[expects axiom: partially_associative(op)]]
 {
-    if (pos == lim) return zero;
+    if (!precedes(pos, lim)) return zero;
     return reduce_nonempty(pos, lim, op);
 }
 

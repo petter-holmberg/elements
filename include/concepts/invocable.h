@@ -9,7 +9,6 @@ namespace elements {
 template <typename P>
 concept Procedure =
     requires (Domain<P> const& x) {
-        Domain<P>(x);
         Same<Arity<P>, std::size_t>;
     };
 

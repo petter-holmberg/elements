@@ -17,14 +17,14 @@ requires Semiregular<Remove_cv<Remove_ref<T>>>
 using Decay = typename std::decay<T>::type;
 
 template <typename T>
-requires Semiregular<Decay<T>>
+requires Movable<Decay<T>>
 struct value_type_t
 {
     using type = T;
 };
 
 template <typename T>
-requires Semiregular<Decay<T>>
+requires Movable<Decay<T>>
 using Value_type = typename value_type_t<T>::type;
 
 template <typename T>

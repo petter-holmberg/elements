@@ -10,12 +10,12 @@
 namespace elements {
 
 template <Loadable_position P, Limit<P> L, Unary_predicate U>
-requires Same<Decay<Value_type<P>>, Decay<Domain<U>>>
+requires Same<Value_type<P>, Domain<U>>
 constexpr auto
 search_if(P pos, L lim, U pred) -> P
 //[[expects axiom: loadable_range(pos, lim)]]
 {
-    while (pos != lim) {
+    while (precedes(pos, lim)) {
         if (pred(load(pos))) break;
         increment(pos);
     }
@@ -101,7 +101,7 @@ search_match(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel = equal<Value_type<P0>>
 //[[expects axiom: loadable_range(pos0, lim0)]]
 //[[expects axiom: loadable_range(pos0, lim1)]]
 {
-    while (pos0 != lim0 and pos1 != lim1) {
+    while (precedes(pos0, lim0) and precedes(pos1, lim1)) {
         if (rel(load(pos0), load(pos1))) break;
         increment(pos0);
         increment(pos1);

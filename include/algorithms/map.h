@@ -15,7 +15,7 @@ constexpr auto
 map(S src, L lim, D dst, Fun fun) -> D
 //[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (lim - src))]]
 {
-    while (src != lim) {
+    while (precedes(src, lim)) {
         store(dst, fun(load(src)));
         increment(dst);
         increment(src);
@@ -37,7 +37,7 @@ map(S0 src0, L0 lim0, S1 src1, D dst, Fun fun) -> D
 //[[expects axiom: not_overlapped_forward(src0, lim0, dst, dst + (lim0 - src0))]]
 //[[expects axiom: not_overlapped_forward(src1, _, dst, dst + (_ - src1))]]
 {
-    while (src0 != lim0) {
+    while (precedes(src0, lim0)) {
         store(dst, fun(load(src0), load(src1)));
         increment(dst);
         increment(src1);

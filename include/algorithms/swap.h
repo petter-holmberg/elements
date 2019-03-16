@@ -1,11 +1,10 @@
 #pragma once
 
 #include "regular.h"
-#include "position.h"
 
 namespace elements {
 
-template <Semiregular T>
+template <Movable T>
 constexpr void
 swap(T& x, T& y)
 {
