@@ -164,6 +164,26 @@ struct array
         array<Decay<Codomain<Fun>>> x;
         reserve(x, size(*this));
         map(first(*this), limit(*this), first(x), fun);
+        at(x.header).limit = at(x.header).limit_of_storage;
+        return x;
+    }
+
+    template <Unary_function Fun>
+    requires Same<Decay<T>, Decay<Domain<Fun>>>
+    constexpr auto
+    bind(Fun fun) -> Decay<Codomain<Fun>>
+    {
+        Decay<Codomain<Fun>> x;
+        auto src = first(*this);
+        auto lim = limit(*this);
+        while (precedes(src, lim)) {
+            auto y = fun(load(src));
+            reserve(x, size(x) + size(y));
+            auto dst = first(x) + size(x);
+            copy(first(y), limit(y), dst);
+            at(x.header).limit = at(x.header).limit_of_storage;
+            increment(src);
+        }
         return x;
     }
 };

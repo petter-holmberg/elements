@@ -65,6 +65,23 @@ struct array_k
         map(first(*this), limit(*this), first(x), fun);
         return x;
     }
+
+    template <Unary_function Fun>
+    requires Same<Decay<T>, Decay<Domain<Fun>>>
+    constexpr auto
+    bind(Fun fun) -> array_k<Value_type<Decay<Codomain<Fun>>>, k * Size<Decay<Codomain<Fun>>>>
+    {
+        array_k<Value_type<Decay<Codomain<Fun>>>, k * Size<Decay<Codomain<Fun>>>> x;
+        auto src = first(*this);
+        auto lim = limit(*this);
+        auto dst = first(x);
+        while (precedes(src, lim)) {
+            auto y = fun(load(src));
+            dst = copy(first(y), limit(y), dst);
+            increment(src);
+        }
+        return x;
+    }
 };
 
 template <Semiregular T, std::ptrdiff_t k>

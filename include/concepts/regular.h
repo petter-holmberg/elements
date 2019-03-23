@@ -151,8 +151,8 @@ concept Default_totally_ordered =
     requires (T const& x, T const& y) {
         { less<T>{}(x, y) } -> bool;
         // axiom total_ordering {
-        //    std::less<T>{}(x, y) and std::less<T>{}(y, z) => std::less<T>{}(x, z);
-        //    std::less<T>{}(x, y) or std::less<T>{}(y, x) or x == y;
+        //    less<T>{}(x, y) and less<T>{}(y, z) => less<T>{}(x, z);
+        //    less<T>{}(x, y) or less<T>{}(y, x) or x == y;
         // }
         // complexity {
         //     O(areaof(x));

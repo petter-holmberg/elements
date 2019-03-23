@@ -38,21 +38,26 @@ SCENARIO ("Using array_k", "[array_k]")
         REQUIRE (!(x < y));
     }
 
-    SECTION ("Functor mapping")
+    SECTION ("Monadic interface")
     {
-        auto fn0 = [](int const& i){ return i + 1; };
+        auto fn0 = [](int const& i){ return e::array_k<int, 2>{i, -i}; };
         auto fn1 = [](int const& i){ return i + 0.5; };
 
-        static_assert(e::Functor<decltype(x), decltype(fn0)>);
+        static_assert(e::Monad<decltype(x), decltype(fn0)>);
         static_assert(e::Functor<decltype(x), decltype(fn1)>);
 
-        auto y = x.map(fn0).map(fn1);
+        auto y = x.bind(fn0).map(fn1);
 
-        REQUIRE (y[0] == 1.5);
-        REQUIRE (y[1] == 2.5);
-        REQUIRE (y[2] == 3.5);
-        REQUIRE (y[3] == 4.5);
-        REQUIRE (y[4] == 5.5);
+        REQUIRE (e::size(y) == 10);
+        REQUIRE (y[0] == 0.5);
+        REQUIRE (y[1] == 0.5);
+        REQUIRE (y[2] == 1.5);
+        REQUIRE (y[3] == -0.5);
+        REQUIRE (y[4] == 2.5);
+        REQUIRE (y[5] == -1.5);
+        REQUIRE (y[6] == 3.5);
+        REQUIRE (y[7] == -2.5);
+        REQUIRE (y[8] == 4.5);
+        REQUIRE (y[9] == -3.5);
     }
-
 }
