@@ -4,6 +4,7 @@
 #include "algorithms/algebra.h"
 #include "algorithms/fill.h"
 #include "algorithms/map.h"
+#include "algorithms/regular.h"
 
 namespace elements {
 
@@ -90,13 +91,16 @@ operator==(
 
 template <typename S, int32_t k, Default_totally_ordered E, typename S_add_op, typename S_mul_op>
 requires Semiring<S, S_add_op, S_mul_op>
-constexpr auto
-operator<(
-    coordinate_vector<S, k, E, S_add_op, S_mul_op> const& x,
-    coordinate_vector<S, k, E, S_add_op, S_mul_op> const& y) -> bool
+struct less<coordinate_vector<S, k, E, S_add_op, S_mul_op>>
 {
-    return x.elements < y.elements;
-}
+    constexpr auto
+    operator()(
+        coordinate_vector<S, k, E, S_add_op, S_mul_op> const& x,
+        coordinate_vector<S, k, E, S_add_op, S_mul_op> const& y) -> bool
+    {
+        return less<E>()(x.elements, y.elements);
+    }
+};
 
 template <typename S, int32_t k, Range E, typename S_add_op, typename S_mul_op>
 requires Semiring<S, S_add_op, S_mul_op>

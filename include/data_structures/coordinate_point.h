@@ -5,6 +5,7 @@
 #include "algorithms/algebra.h"
 #include "algorithms/fill.h"
 #include "algorithms/map.h"
+#include "algorithms/regular.h"
 
 namespace elements {
 
@@ -120,11 +121,14 @@ operator==(coordinate_point<S, k, C, V> const& x, coordinate_point<S, k, C, V> c
 }
 
 template <typename S, int32_t k, typename C, Default_totally_ordered V>
-constexpr auto
-operator<(coordinate_point<S, k, C, V> const& x, coordinate_point<S, k, C, V> const& y) -> bool
+struct less<coordinate_point<S, k, C, V>>
 {
-    return x.coordinates < y.coordinates;
-}
+    constexpr auto
+    operator()(coordinate_point<S, k, C, V> const& x, coordinate_point<S, k, C, V> const& y) -> bool
+    {
+        return less<C>()(x.coordinates, y.coordinates);
+    }
+};
 
 template <typename S, int32_t k, Range C, typename V>
 constexpr auto

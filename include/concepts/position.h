@@ -102,7 +102,7 @@ concept Mutable_range =
 template <typename S>
 concept Sequence =
     Range<S> and
-    Totally_ordered<S> and
+    Default_totally_ordered<S> and
     requires (S x, Size_type<S> i) {
         { is_empty(x) } -> bool;
         { size(x) } -> Size_type<S>;
