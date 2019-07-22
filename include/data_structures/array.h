@@ -189,6 +189,41 @@ struct array
 };
 
 template <typename T>
+requires Semiregular<Remove_cv<T>>
+struct underlying_type_t<array<T>>
+{
+    using type = struct { Pointer_type<array_prefix<T>> header; };
+};
+
+template <typename T>
+requires Semiregular<Remove_cv<T>>
+struct value_type_t<array<T>>
+{
+    using type = T;
+};
+
+template <typename T>
+requires Semiregular<Remove_cv<T>>
+struct position_type_t<array<T>>
+{
+    using type = Pointer_type<T>;
+};
+
+template <typename T>
+requires Semiregular<Remove_cv<T>>
+struct position_type_t<array<T> const>
+{
+    using type = Pointer_type<T const>;
+};
+
+template <typename T>
+requires Semiregular<Remove_cv<T>>
+struct size_type_t<array<T>>
+{
+    using type = std::ptrdiff_t;
+};
+
+template <typename T>
 requires Regular<Remove_cv<T>>
 constexpr auto
 operator==(array<T> const& x, array<T> const& y) -> bool
@@ -203,34 +238,6 @@ operator<(array<T> const& x, array<T> const& y) -> bool
 {
     return linearizable_less(x, y);
 }
-
-template <typename T>
-requires Semiregular<Remove_cv<T>>
-struct underlying_type_t<array<T>>
-{
-    using type = struct { Pointer_type<array_prefix<T>> header; };
-};
-
-template <typename T>
-requires Semiregular<Remove_cv<T>>
-struct position_type_t<array<T>>
-{
-    using type = Pointer_type<T>;
-};
-
-template <typename T>
-requires Semiregular<Remove_cv<T>>
-struct value_type_t<array<T>>
-{
-    using type = T;
-};
-
-template <typename T>
-requires Semiregular<Remove_cv<T>>
-struct size_type_t<array<T>>
-{
-    using type = std::ptrdiff_t;
-};
 
 template <typename T>
 requires Semiregular<Remove_cv<T>>
@@ -347,6 +354,14 @@ limit(array<T> const& x) -> Position_type<array<T>>
 {
     if (x.header == Pointer_type<array_prefix<T>>{nullptr}) return Pointer_type<T>{nullptr};
     return at(x.header).limit;
+}
+
+template <typename T>
+requires Semiregular<Remove_cv<T>>
+constexpr auto
+last(array<T> const& x) -> Position_type<array<T>>
+{
+    return limit(x) - 1;
 }
 
 template <typename T>

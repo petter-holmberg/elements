@@ -3,7 +3,9 @@
 #include <type_traits>
 #include <utility>
 
- #define concept concept bool // Use C++20 syntax
+#define concept concept bool // Use C++20 syntax
+
+#include "adapters/reverse_position.h"
 
 #include "algorithms/algebra.h"
 #include "algorithms/copy.h"
@@ -25,5 +27,6 @@
 #include "data_structures/array_k.h"
 #include "data_structures/coordinate_point.h"
 #include "data_structures/coordinate_vector.h"
+#include "data_structures/polynomial.h"
 #include "data_structures/rational.h"
 #include "data_structures/tuple.h"

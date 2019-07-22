@@ -98,7 +98,7 @@ struct less<coordinate_vector<S, k, E, S_add_op, S_mul_op>>
         coordinate_vector<S, k, E, S_add_op, S_mul_op> const& x,
         coordinate_vector<S, k, E, S_add_op, S_mul_op> const& y) -> bool
     {
-        return less<E>()(x.elements, y.elements);
+        return less<E>{}(x.elements, y.elements);
     }
 };
 

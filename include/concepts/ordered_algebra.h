@@ -25,6 +25,11 @@ concept Ordered_additive_group =
     Ordered_additive_semigroup<G> and
     Additive_monoid<G>;
 
+template <typename R>
+concept Ordered_ring =
+    Ring<R> and
+    Totally_ordered<R>;
+
 template <typename I>
 concept Ordered_integral_domain =
     Integral_domain<I> and

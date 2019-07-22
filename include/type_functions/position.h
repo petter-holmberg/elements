@@ -26,12 +26,6 @@ struct difference_type_t<T*>
 };
 
 template <typename>
-constexpr bool Is_forward_position = false;
-
-template <typename T>
-constexpr bool Is_forward_position<Pointer_type<T>> = true;
-
-template <typename>
 struct distance_type_t;
 
 template <typename T>

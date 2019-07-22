@@ -9,6 +9,7 @@ SCENARIO ("Using array", "[array]")
     static_assert(e::Dynamic_sequence<e::array<int>>);
 
     e::array<int> x{0, 1, 2, 3, 4};
+    REQUIRE (e::axiom_Regular(x));
 
     SECTION ("Checking elements")
     {

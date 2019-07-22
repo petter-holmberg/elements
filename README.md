@@ -3,6 +3,10 @@ Library contents
 
 # Algorithms
 
+## Algebra
+
+`choose` selects the n choose k binomial coefficent.
+
 ## Searching
 
 ### Linear search
@@ -67,9 +71,39 @@ to the array elements. `array` has regular semantics, lexicographic comparison o
 
 `coordinate_vector` implements a coordinate vector type for use in linear algebra. It is both a `Semimodule` over a `Semiring` and a `Sequence`. If the `Semiring` is a `Field` it supports all operations on a `Vector_space`. By default it uses `array_k` for storage of the elements. It takes two optional operators for addition and multiplication of the semiring elements.
 
+## Algebra
+
+`rational` implements a rational number type, forming a `Field` over any `Integral_domain`.
+
+`polynomial` implements a polynomial type, forming an `Integral_domain` over any `Ring`. `degree` returns the degree of the polynomial, where an empty polynomial has degree -1. `evaluate` evaluates the polynomial at a given value, and `subderivative` calculates the k:th subderivate of a given polynomial and value k.
+
 # Concepts
 
 The concepts in this library are largely based on definitions in [StepanovMcJones](#StepanovMcJones), with some name changes and adaptations to modern C++ features, such as move semantics.
+
+### Regular types
+
+`Same` describes a pair of types that are the same.
+
+`Weakly_equality_comparable` describes a type with equality comparison operators that may not necessarily be callable twice.
+`Equality_comparable` describes a type with equality comparison operators that can be called multiple times.
+`Equality_comparable_with` describes two types with equality comparison operators defined between them.
+
+`Destructible` describes a type with a destructor.
+`Constructible` describes a type with a constructor.
+`Default_constructible` describes a type with a default constructor.
+`Move_constructible` describes a type with a move constructor.
+`Copy_constructible` describes a type with a copy constructor.
+`Assignable` describes a type with assignment operator.
+`Movable` describes a `Move_constructible` type with a move assignment operator.
+`Copyable` describes a `Copy_constructible` type with a copy assignment operator.
+`Semiregular` describes a type that is both `Default_constructible`and `Copyable`.
+`Regular` describes a type that is `Semiregular` and `Equality_comparable`.
+`axiom_Regular` checks the concept for one given value.
+`Default_totally_ordered` describes a type that is `Regular` and implements a function object `less` that provides a default total ordering for the type.
+`axiom_Default_totally_ordered` checks the concept for one given value.
+`Totally_ordered` describes a type where the relational operators provide the natural total ordering for the type.
+`axiom_Totally_ordered` checks the concept for two given values where the first must be less than the second.
 
 ## Algebra
 
@@ -77,22 +111,30 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 `Semigroup` describes a `Regular` type together with an associative binary operation.
 `Additive_semigroup` describes a commutative `Semigroup` where the binary operation is `operator+`.
+`axiom_Additive_semigroup` checks the concept for three given values.
 `Multiplicative_semigroup` describes a `Semigroup` where the binary operation is `operator*`.
+`axiom_Multiplicative_semigroup` checks the concept for three given values.
 
 `Monoid` describes a `Semigroup` with an identity element, returned by the type function `Identity_element`.
 `Additive_monoid` describes an `Additive_semigroup` with an identity element, returned by the type function `Zero`.
+`axiom_Additive_monoid` checks the concept for three given values.
 `Multiplicative_monoid` describes an `Multiplicative_semigroup` with an identity element, returned by the type function `One`.
+`axiom_Multiplicative_monoid` checks the concept for three given values.
 
 `Group` describes a `Monoid` with a `Unary_operation` `inverse_operation` that when invoked returns the inverse of an object.
 `Additive_group` describes an `Additive_monoid` where the inverse of an object is returned by the unary `operator-`, and subtraction is implemented by the binary `operator-`.
+`axiom_Additive_group` checks the concept for three given values.
 `Multiplicative_group` describes a `Multiplicative_monoid` where the inverse of an object is returned by inoking the `Unary_operation` `reciprocal`, and division is implemented by `operator/`.
+`axiom_Multiplicative_group` checks the concept for three given values.
 
 ### Ring-like
 
 `Semiring` describes a type that is a `Monoid` in two operations `Add_op` and `Mul_op`, defaulted to the operators returned by the `Binary_operation`s `sum` and `product`, which unless specialized invoke `operator+` and `operator*`. `Add_op` is expected to be commutative, and `Mul_op` is expected to distribute over `Add_op`.
+`axiom_Semiring` checks the concept for three given values.
 `Commutative_semiring` descrivbes a `Semiring` where `Mul_op` is commutative.
 
 `Ring` describes a `Semiring` where `Add_op` forms a `Group`.
+`axiom_Ring` checks the concept for three given values.
 `Commutative_ring` describes a `Ring` where `Mul_op` is commutative.
 
 `Integral_domain` describes a `Commutative_ring` where there are no non-zero divisors.
@@ -149,6 +191,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 `Ordered_additive_semigroup` describes an `Additive_semigroup` that is also `Totally_ordered`.
 `Ordered_additive_monoid` describes an `Additive_monoid` that is also `Totally_ordered`.
 `Ordered_additive_group` describes an `Additive_group` that is also `Totally_ordered`.
+`Ordered_ring` describes a `Ring` that is also `Totally_ordered`.
 `Ordered_integral_domain` describes an `Integral_domain` that is also `Totally_ordered`.
 
 ## Positions
@@ -175,26 +218,51 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 `Sequence` describes a `Range` that is `Totally_ordered`, and represents a composite object whose range of elements are its parts. It has functions `is_empty`. `size` and `operator[]` for element access.
 `Dynamic_sequence` describes a `Sequence` that can change size at runtime. It has functions `insert` and `erase` to change elements at the back of the range.
 
-### Regular types
+# Adapters
 
-`Same` describes a pair of types that are the same.
+`reverse_position` takes a `Bidirectional_position` and implements a `Bidirectional_position` where `increment` decrements and `decrement` increments. Loading and storing is done from the predecessor of the original position. It is used for traversing ranges in reverse.
 
-`Weakly_equality_comparable` describes a type with equality comparison operators that may not necessarily be callable twice.
-`Equality_comparable` describes a type with equality comparison operators that can be called multiple times.
-`Equality_comparable_with` describes two types with equality comparison operators defined between them.
+# Type functions
 
-`Destructible` describes a type with a destructor.
-`Constructible` describes a type with a constructor.
-`Default_constructible` describes a type with a default constructor.
-`Move_constructible` describes a type with a move constructor.
-`Copy_constructible` describes a type with a copy constructor.
-`Assignable` describes a type with assignment operator.
-`Movable` describes a `Move_constructible` type with a move assignment operator.
-`Copyable` describes a `Copy_constructible` type with a copy assignment operator.
-`Semiregular` describes a type that is both `Default_constructible`and `Copyable`.
-`Regular` describes a type that is `Semiregular` and `Equality_comparable`.
-`Default_totally_ordered` describes a type that is `Regular` and implements a function object `less` that provides a default total ordering for the type.
-`Totally_ordered` describes a type where the relational operators provide the natural total ordering for the type.
+`Remove_cv` is a type stripped of const and volatile qualifiers.
+
+`Remove_ref` is a type stripped of reference qualifiers.
+
+`Decay` is a type stripped of const, volatile, and reference qualifiers.
+
+`Underlying_type` is the type describing the data storage of a given type.
+
+## Invocable
+
+`Codomain` is the return type of an invocable type.
+
+`Input_type` is the type of an invocable's parameter at a given index.
+
+`Arity` is the number of parameters of an invocable.
+
+`Domain` is the type of a homogeneous invocable's parameters.
+
+## Positions
+
+`Pointer_type` is the type of a pointer to an object of a given type.
+
+`Value_type` is either a type directly, or, in the case of a `Position` type, or a `Range` type, the type it is parameterized on.
+
+`Difference_type` is a type capable of storing the (signed) difference between two objects of the given type.
+
+`Distance_type` is a type capable of storing the (unsigned) distance between two objects of the given type.
+
+`Position_type` is the type of an object describing a position to the given type.
+
+`Size_type` is the type used to describe the size of an object of a given type.
+
+`Size` is the size of a given type (when known at compile time).
+
+## Algebra
+
+`Zero` is the additive identity element of a given type.
+
+`One` is the multiplicative identity element of a given type.
 
 # Appendix A: On nomenclature
 
@@ -211,6 +279,8 @@ Index
 -----
 
 # Algorithms
+
+`choose`
 
 `search`
 `search_not`
@@ -300,6 +370,7 @@ Index
 `Ordered_additive_semigroup`
 `Ordered_additive_monoid`
 `Ordered_additive_group`
+`Ordered_ring`
 `Ordered_integral_domain`
 
 `Loadable`
@@ -329,6 +400,33 @@ Index
 `Regular`
 `Default_totally_ordered`
 `Totally_ordered`
+
+# Adapters
+
+`reverse_position`
+
+# Type functions
+
+`Remove_cv`
+`Remove_ref`
+`Decay`
+`Underlying_type`
+
+`Codomain`
+`Input_type`
+`Arity`
+`Domain`
+
+`Pointer_type`
+`Value_type`
+`Difference_type`
+`Distance_type`
+`Position_type`
+`Size_type`
+`Size`
+
+`Zero`
+`One`
 
 References
 ----------

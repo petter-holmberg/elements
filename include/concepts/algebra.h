@@ -28,6 +28,19 @@ concept Additive_semigroup =
     //     a + b == b + a;
     // }
 
+template <Additive_semigroup S>
+constexpr auto
+axiom_Additive_semigroup(S const& a, S const& b, S const& c) noexcept -> bool
+{
+    // Associative
+    if ((a + b) + c != a + (b + c)) return false;
+
+    // Commutative
+    if (a + b != b + a) return false;
+
+    return true;
+}
+
 template <typename S>
 concept Multiplicative_semigroup =
     Regular<S> and
@@ -38,13 +51,23 @@ concept Multiplicative_semigroup =
     //     (a * b) * c == a * (b * c);
     // }
 
+template <Multiplicative_semigroup S>
+constexpr auto
+axiom_Multiplicative_semigroup(S const& a, S const& b, S const& c) noexcept -> bool
+{
+    // Associative
+    if ((a * b) * c != a * (b * c)) return false;
+
+    return true;
+}
+
 template <typename S, typename Op>
 requires Semigroup<S, Op>
 struct identity_element_t;
 
 template <typename S, typename Op>
 requires Semigroup<S, Op>
-constexpr S Identity_element = identity_element_t<S, Op>::value;
+S const Identity_element = identity_element_t<S, Op>::value;
 
 template <typename M, typename Op>
 concept Monoid =
@@ -58,10 +81,10 @@ concept Monoid =
     // }
 
 template <Additive_semigroup S>
-struct zero_type;
+struct zero_type_t;
 
 template <Additive_semigroup S>
-constexpr S Zero = zero_type<S>::value;
+S const Zero = zero_type_t<S>::value;
 
 template <Additive_semigroup S>
 struct sum;
@@ -77,17 +100,33 @@ concept Additive_monoid =
     //     a + Zero<M> == a;
     // }
 
-template <Additive_semigroup S>
-struct zero_type
+template <Additive_monoid M>
+constexpr auto
+axiom_Additive_monoid(M const& a, M const& b, M const& c) noexcept -> bool
 {
-    static constexpr S value = S{0};
+    if (!axiom_Additive_semigroup(a, b, c)) return false;
+
+    // Identity
+    if (a + Zero<M> != a) return false;
+    if (a + Zero<M> != Zero<M> + a) return false;
+
+    return true;
+}
+
+template <Additive_semigroup S>
+struct zero_type_t
+{
+    static S const value;
 };
 
-template <Multiplicative_semigroup S>
-struct one_type;
+template <Additive_semigroup S>
+S const zero_type_t<S>::value = S(0);
 
 template <Multiplicative_semigroup S>
-constexpr S One = one_type<S>::value;
+struct one_type_t;
+
+template <Multiplicative_semigroup S>
+S const One = one_type_t<S>::value;
 
 template <Multiplicative_semigroup S>
 struct product;
@@ -103,11 +142,27 @@ concept Multiplicative_monoid =
     //     a * One<M> == a;
     // }
 
-template <Multiplicative_semigroup S>
-struct one_type
+template <Multiplicative_monoid M>
+constexpr auto
+axiom_Multiplicative_monoid(M const& a, M const& b, M const& c) noexcept -> bool
 {
-    static constexpr S value = S{1};
+    if (!(axiom_Multiplicative_semigroup(a, b, c))) return false;
+
+    // Identity
+    if (a * One<M> != a) return false;
+    if (a * One<M> != One<M> * a) return false;
+
+    return true;
+}
+
+template <Multiplicative_semigroup S>
+struct one_type_t
+{
+    static S const value;
 };
+
+template <Multiplicative_semigroup S>
+S const one_type_t<S>::value = S(1);
 
 template <typename M, typename Op>
 requires Monoid<M, Op>
@@ -134,6 +189,26 @@ concept Additive_group =
     //     -a + a == Zero<G>;
     // }
 
+template <Additive_group G>
+constexpr auto
+axiom_Additive_group(G const& a, G const& b, G const& c) noexcept -> bool
+    //[[expects: a != Zero<G> && b != Zero<G> && c != Zero<G>]]
+{
+    if (!axiom_Additive_monoid(a, b, c)) return false;
+
+    // Cancellation
+    if (a + (-a) != Zero<G>) return false;
+    if (a + (-a) != -a + a) return false;
+    if (-(-a) != a) return false;
+
+    // Subtraction
+    if (a - Zero<G> != a) return false;
+    if (Zero<G> - a != -a) return false;
+    if (a - b != a + (-b)) return false;
+
+    return true;
+}
+
 template <Multiplicative_monoid M>
 struct reciprocal;
 
@@ -148,6 +223,21 @@ concept Multiplicative_group =
     //     a * reciprocal(a) == One<G>;
     //     reciprocal(a) * a == One<G>;
     // }
+
+template <Multiplicative_group G>
+constexpr auto
+axiom_Multiplicative_group(G const& a, G const& b, G const& c) noexcept -> bool
+    //[[expects: a != Zero<G> && b != Zero<G> && c != Zero<G>]]
+    //[[expects: a != One<G> && b != One<G> && c != One<G>]]
+{
+    if (!axiom_Multiplicative_monoid(a, b, c)) return false;
+
+    // Division
+    if (a / One<G> != a) return false;
+    if (a / a != One<G>) return false;
+
+    return true;
+}
 
 // Ring-like
 
@@ -164,6 +254,23 @@ concept Semiring =
     //     Mul_op(a, Zero<S>) == Zero<S>;
     // }
 
+template <typename S>
+requires Semiring<S>
+constexpr auto
+axiom_Semiring(S const& a, S const& b, S const& c) noexcept -> bool
+    //[[expects: a != Zero<S> && b != Zero<S> && c != Zero<S>]]
+    //[[expects: a != One<S> && b != One<S> && c != One<S>]]
+{
+    if (!axiom_Additive_monoid(a, b, c)) return false;
+    if (!axiom_Multiplicative_monoid(a, b, c)) return false;
+
+    // Distributive
+    if (a * (b + c) != a * b + a * c) return false;
+    if ((a + b) * c != a * c + b * c) return false;
+
+    return true;
+}
+
 template <typename S, typename Add_op = sum<S>, typename Mul_op = product<S>>
 concept Commutative_semiring =
     Semiring<S, Add_op, Mul_op>;
@@ -175,6 +282,19 @@ template <typename R, typename Add_op = sum<R>, typename Mul_op = product<R>>
 concept Ring =
     Semiring<R, Add_op, Mul_op> and
     Group<R, Add_op>;
+
+template <typename R>
+requires Ring<R>
+constexpr auto
+axiom_Ring(R const& a, R const& b, R const& c) noexcept -> bool
+    //[[expects: a != Zero<R> && b != Zero<R> && c != Zero<R>]]
+    //[[expects: a != One<R> && b != One<R> && c != One<R>]]
+{
+    if (!axiom_Semiring(a, b, c)) return false;
+    if (!axiom_Additive_group(a, b, c)) return false;
+
+    return true;
+}
 
 template <typename R, typename Add_op = sum<R>, typename Mul_op = product<R>>
 concept Commutative_ring =

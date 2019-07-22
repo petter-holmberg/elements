@@ -56,7 +56,21 @@ at(T& x) -> T&
 
 template <Semiregular T>
 constexpr auto
+at(T const& x) -> T const&
+{
+    return x;
+}
+
+template <Semiregular T>
+constexpr auto
 at(Pointer_type<T> x) -> T&
+{
+    return *x;
+}
+
+template <Semiregular T>
+constexpr auto
+at(Pointer_type<T const> x) -> T const&
 {
     return *x;
 }
@@ -79,12 +93,20 @@ increment(Pointer_type<P>& x)
     x = x + Distance_type<Pointer_type<P>>{1};
 }
 
-template <typename T>
-requires Semiregular<Decay<T>>
+template <typename P>
+requires Movable<Decay<P>>
 constexpr void
-decrement(Pointer_type<T>& x)
+decrement(P& x)
 {
-    x = x - Distance_type<Pointer_type<T>>{1};
+    --x;
+}
+
+template <typename P>
+requires Movable<Decay<P>>
+constexpr void
+decrement(Pointer_type<P>& x)
+{
+    x = x - Distance_type<Pointer_type<P>>{1};
 }
 
 template <typename T>
@@ -105,10 +127,24 @@ successor(Pointer_type<T> x) -> Pointer_type<T>
     return x;
 }
 
+constexpr auto
+successor(ptrdiff_t x) -> ptrdiff_t
+{
+    increment(x);
+    return x;
+}
+
 template <typename T>
 requires Semiregular<Decay<T>>
 constexpr auto
 predecessor(Pointer_type<T> x) -> Pointer_type<T>
+{
+    decrement(x);
+    return x;
+}
+
+constexpr auto
+predecessor(ptrdiff_t x) -> ptrdiff_t
 {
     decrement(x);
     return x;

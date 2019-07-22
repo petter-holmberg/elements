@@ -4,6 +4,7 @@
 #include "position.h"
 #include "map.h"
 #include "reduce.h"
+#include "swap.h"
 
 namespace elements {
 
@@ -52,8 +53,11 @@ operator*=(M& a, M const& b) -> M&
 template <Additive_semigroup A>
 struct identity_element_t<A, sum<A>>
 {
-    static constexpr A value = Zero<A>;
+    static A const value;
 };
+
+template <Additive_semigroup A>
+A const identity_element_t<A, sum<A>>::value = Zero<A>;
 
 template <Additive_monoid A>
 constexpr auto
@@ -97,8 +101,11 @@ struct inverse_operation<A, sum<A>>
 template <Multiplicative_semigroup M>
 struct identity_element_t<M, product<M>>
 {
-    static constexpr M value = One<M>;
+    static M const value;
 };
+
+template <Multiplicative_semigroup M>
+M const identity_element_t<M, product<M>>::value = One<M>;
 
 template <Multiplicative_monoid M>
 struct reciprocal
@@ -232,6 +239,26 @@ operator-=(P& p, V const& v) -> P&
 {
     p = p - v;
     return p;
+}
+
+// Combinatorics
+
+template <Binary_integer I>
+constexpr auto
+choose(I n, I k) -> I
+{
+    if (n < k) return Zero<I>;
+    n = n - k;
+    if (n < k) swap(n, k);
+    I r{One<I>};
+    I i{Zero<I>};
+    while (i < k) {
+        increment(i);
+        increment(n);
+        r = r * n;
+        r = r / i;
+    }
+    return r;
 }
 
 }

@@ -55,10 +55,27 @@ constexpr void
 increment(Pointer_type<P>& x);
 
 template <typename P>
+requires Movable<Decay<P>>
+constexpr void
+decrement(P& x);
+
+template <typename P>
+requires Movable<Decay<P>>
+constexpr void
+decrement(Pointer_type<P>& x);
+
+template <typename P>
 concept Position =
     Movable<P> and
     requires (P& x) {
         increment(x);
+    };
+
+template <typename P>
+concept Bidirectional_position =
+    Position<P> and
+    requires (P& x) {
+        decrement(x);
     };
 
 // Access and linear traversal
@@ -72,6 +89,22 @@ template <typename P>
 concept Storable_position =
     Storable<P> and
     Position<P>;
+
+template <typename P>
+concept Loadable_bidirectional_position =
+    Loadable<P> and
+    Bidirectional_position<P>;
+
+template <typename P>
+concept Storable_bidirectional_position =
+    Storable<P> and
+    Bidirectional_position<P>;
+
+template <typename P>
+concept Mutable_bidirectional_position =
+    Loadable<P> and
+    Storable<P> and
+    Bidirectional_position<P>;
 
 // Ranges
 

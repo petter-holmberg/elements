@@ -126,7 +126,7 @@ struct less<coordinate_point<S, k, C, V>>
     constexpr auto
     operator()(coordinate_point<S, k, C, V> const& x, coordinate_point<S, k, C, V> const& y) -> bool
     {
-        return less<C>()(x.coordinates, y.coordinates);
+        return less<C>{}(x.coordinates, y.coordinates);
     }
 };
 

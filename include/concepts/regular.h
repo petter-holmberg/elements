@@ -141,6 +141,38 @@ concept Regular =
     //     O(1);
     // }
 
+template <Regular T>
+constexpr auto
+axiom_Regular(T const& x) noexcept -> bool
+{
+    // Default constructor
+    T y;
+    T z;
+
+    // Equality
+    if (!(x == x)) return false;
+    if (x != x) return false;
+
+    // Copy assignment
+    y = x;
+    if (y != x) return false;
+
+    // Move assignment
+    z = std::move(y);
+    if (z != x) return false;
+
+    // Copy constructor
+    T w(x);
+    if (w != x) return false;
+
+    // Move constructor
+    T v(std::move(w));
+    if (v != x) return false;
+
+    // Destructor
+    return true;
+}
+
 template <typename T>
 requires Equality_comparable<T>
 struct less;
@@ -158,6 +190,18 @@ concept Default_totally_ordered =
         //     O(areaof(x));
         // }
     };
+
+template <Regular T>
+constexpr auto
+axiom_Default_totally_ordered(T const& x) noexcept -> bool
+{
+    if (!axiom_Regular(x)) return false;
+
+    // Default total ordering
+    if (!less<T>{}(x, x)) return false;
+
+    return true;
+}
 
 template <typename T>
 concept Totally_ordered =
@@ -180,5 +224,26 @@ concept Totally_ordered =
         //     O(areaof(x));
         // }
     };
+
+template <Totally_ordered T>
+constexpr auto
+axiom_Totally_ordered(T const& x, T const& y) noexcept -> bool
+    //[[expects: x < y]]
+{
+    if (!axiom_Regular(x)) return false;
+
+    // Natural total ordering
+    if (x < x) return false;
+    if (!(x < y)) return false;
+    if (!(y > x)) return false;
+    if (!(x <= y)) return false;
+    if (!(y >= x)) return false;
+    if (y < x) return false;
+    if (x > y) return false;
+    if (y <= x) return false;
+    if (x >= y) return false;
+
+    return true;
+}
 
 }

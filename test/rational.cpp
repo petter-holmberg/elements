@@ -10,8 +10,6 @@ SCENARIO ("Using rational numbers", "[rational]")
     e::rational<int32_t> y{2, 4};
     e::rational<int32_t> z{3, 4};
 
-    static_assert(e::Additive_group<decltype(x)>);
-    static_assert(e::Multiplicative_group<decltype(x)>);
     static_assert(e::Field<decltype(x)>);
 
     SECTION ("Algebra")

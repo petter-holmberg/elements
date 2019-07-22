@@ -8,6 +8,7 @@ configure_file (
     "${PROJECT_BINARY_DIR}/include/config.h")
 
 include_directories ("${PROJECT_SOURCE_DIR}/include")
+include_directories ("${PROJECT_SOURCE_DIR}/include/adapters")
 include_directories ("${PROJECT_SOURCE_DIR}/include/algorithms")
 include_directories ("${PROJECT_SOURCE_DIR}/include/data_structures")
 include_directories ("${PROJECT_SOURCE_DIR}/include/concepts")
