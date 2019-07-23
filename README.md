@@ -60,6 +60,9 @@ The second version of `map` takes a loadable range and a loadable position as so
 
 ## Linear data structures
 
+`pair` implements a structure of two elements (that may differ in type) allocated on the stack. They can be accessed through the function `get`, either by position or by type. If the two elements
+are of the same type, `pair` also provides a functor interface through the member function `.map`.
+
 `array` implements an array of elements contiguously allocated on the free store, like `std::vector`. It stores a single pointer on the stack, keeping the array size and capacity in a header
 to the array elements. `array` has regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
 `array` also provides a monadic interface through the member functions `.map` and `.bind`.
@@ -67,11 +70,11 @@ to the array elements. `array` has regular semantics, lexicographic comparison o
 `array_k` implements an array of *k* elements contiguously allocated on the stack, like built-in C++ arrays, but with regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
 `array_k` also provides a monadic interface through the member functions `.map` and `.bind`.
 
+## Algebra
+
 `coordinate_point` implements a coordinate point type for use in linear algebra. It is an `Affine_space` over a `Vector_space` and a `Sequence`. By default it uses `array_k` for storage of the coordinates.
 
 `coordinate_vector` implements a coordinate vector type for use in linear algebra. It is both a `Semimodule` over a `Semiring` and a `Sequence`. If the `Semiring` is a `Field` it supports all operations on a `Vector_space`. By default it uses `array_k` for storage of the elements. It takes two optional operators for addition and multiplication of the semiring elements.
-
-## Algebra
 
 `rational` implements a rational number type, forming a `Field` over any `Integral_domain`.
 
@@ -198,15 +201,20 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 ### Access
 
-`Loadable` describes a type with a function `load` that returns a constant reference to its `Value_type`. For an object that represents the position of another object, `load` returns a reference to the other object. For other objects, load returns a reference to the object itself.
+`Loadable` describes a type with a function `load` that returns a constant reference to its held object. For an object that represents the position of another object, `load` returns a reference to the other object. For other objects, load returns a reference to the object itself.
 
 `Storable` describes a type with a function `store` that stores a given value at at a given position. If the object given as a position does not represent a position, it stores the value at the position of the object itself.
 
+`Mutable` describes a type that is both `Loadable` and `Storable`, and defines a function `at` that
+returns either a reference or a constant reference to its held object.
+
 ### Linear traversal
 
-`Position` describes a type with a function `increment` that moves it to the next position in a range.
-`Loadable_position` describes a `Position` that is also `Loadable`.
-`Storable_position` describes a `Position` that is also `Storable`.
+`Position` describes a `Movable` object representing the position in a range, with a function `increment` that moves it to the next position in a range. Elements in the range are not necessarily visitable more than once.
+
+`Forward_position` describes a `Regular` `Position` object where elements in the range may be visited multiple times.
+
+`Bidirectional_position` describes a `Forward_position` type with a function `decrement` that moves it to the previous position in a range.
 
 ### Ranges
 
@@ -219,6 +227,8 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 `Dynamic_sequence` describes a `Sequence` that can change size at runtime. It has functions `insert` and `erase` to change elements at the back of the range.
 
 # Adapters
+
+`loadable_position` takes a `Loadable` `Position` and provides the minimal interface required.
 
 `reverse_position` takes a `Bidirectional_position` and implements a `Bidirectional_position` where `increment` decrements and `decrement` increments. Loading and storing is done from the predecessor of the original position. It is used for traversing ranges in reverse.
 
@@ -317,10 +327,14 @@ Index
 
 # Data structures
 
+`pair`
 `array`
 `array_k`
+
 `coordinate_point`
 `coordinate_vector`
+`rational`
+`polynomial`
 
 # Concepts
 
@@ -375,9 +389,10 @@ Index
 
 `Loadable`
 `Storable`
+`Mutable`
 `Position`
-`Loadable_position`
-`Storable_position`
+`Forward_position`
+`Bidirectional_position`
 `Limit`
 `Range`
 `Mutable_range`
@@ -403,6 +418,7 @@ Index
 
 # Adapters
 
+`loadable_position`
 `reverse_position`
 
 # Type functions

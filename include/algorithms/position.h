@@ -33,18 +33,36 @@ load(Pointer_type<T> x) -> T const&
     return *x;
 }
 
-template <Semiregular T>
+template <typename T>
+requires Movable<T>
 constexpr void
 store(T& x, Value_type<T> const& v)
 {
     x = v;
 }
 
-template <Semiregular T>
+template <typename T>
+requires Movable<T>
+constexpr void
+store(T& x, Value_type<T>&& v)
+{
+    x = std::forward<Value_type<T>>(v);
+}
+
+template <typename T>
+requires Movable<T>
 constexpr void
 store(Pointer_type<T> x, Value_type<T> const& v)
 {
     *x = v;
+}
+
+template <typename T>
+requires Movable<T>
+constexpr void
+store(Pointer_type<T> x, Value_type<T>&& v)
+{
+    *x = std::forward<Value_type<T>>(v);
 }
 
 template <Semiregular T>
@@ -90,7 +108,7 @@ requires Movable<Decay<P>>
 constexpr void
 increment(Pointer_type<P>& x)
 {
-    x = x + Distance_type<Pointer_type<P>>{1};
+    x = x + One<Distance_type<Pointer_type<P>>>;
 }
 
 template <typename P>
@@ -106,11 +124,11 @@ requires Movable<Decay<P>>
 constexpr void
 decrement(Pointer_type<P>& x)
 {
-    x = x - Distance_type<Pointer_type<P>>{1};
+    x = x - One<Distance_type<Pointer_type<P>>>;
 }
 
 template <typename T>
-requires Position<T>
+requires Semiregular<Decay<T>>
 constexpr auto
 successor(T x) -> T
 {
@@ -127,10 +145,12 @@ successor(Pointer_type<T> x) -> Pointer_type<T>
     return x;
 }
 
+template <typename T>
+requires Semiregular<Decay<T>>
 constexpr auto
-successor(ptrdiff_t x) -> ptrdiff_t
+predecessor(T x) -> T
 {
-    increment(x);
+    decrement(x);
     return x;
 }
 
@@ -138,13 +158,6 @@ template <typename T>
 requires Semiregular<Decay<T>>
 constexpr auto
 predecessor(Pointer_type<T> x) -> Pointer_type<T>
-{
-    decrement(x);
-    return x;
-}
-
-constexpr auto
-predecessor(ptrdiff_t x) -> ptrdiff_t
 {
     decrement(x);
     return x;

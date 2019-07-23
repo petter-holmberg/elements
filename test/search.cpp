@@ -13,8 +13,8 @@ SCENARIO ("Linear search", "[search]")
     {
         SECTION ("Searcing for an existing element")
         {
-            auto pos = e::search(x, x + 5, 2);
-            REQUIRE (pos == x + 2);
+            auto pos = e::search(e::loadable_position(x), x + 5, 2);
+            REQUIRE (!e::precedes(pos, x + 2));
         }
 
         SECTION ("Searching for a non-existing element")
@@ -25,8 +25,8 @@ SCENARIO ("Linear search", "[search]")
 
         SECTION ("Searching for the absence of an existing element")
         {
-            auto pos = e::search_not(x, x + 5, 0);
-            REQUIRE (pos == x + 1);
+            auto pos = e::search_not(e::loadable_position(x), x + 5, 0);
+            REQUIRE (!e::precedes(pos, x + 1));
         }
 
         SECTION ("Searching for the absence of a non-existing element")
@@ -40,8 +40,8 @@ SCENARIO ("Linear search", "[search]")
     {
         SECTION ("Searcing for an even element")
         {
-            auto pos = e::search_if(x, x + 5, is_even);
-            REQUIRE (pos == x);
+            auto pos = e::search_if(e::loadable_position(x), x + 5, is_even);
+            REQUIRE (!e::precedes(pos, x + 0));
         }
 
         SECTION ("Searcing for an odd element")
@@ -55,14 +55,14 @@ SCENARIO ("Linear search", "[search]")
     {
         SECTION ("Searcing for an existing element")
         {
-            auto pos = e::search_unguarded(x, 2);
-            REQUIRE (pos == x + 2);
+            auto pos = e::search_unguarded(e::loadable_position(x), 2);
+            REQUIRE (!e::precedes(pos, x + 2));
         }
 
         SECTION ("Searching for the absence of an existing element")
         {
-            auto pos = e::search_not_unguarded(x, 0);
-            REQUIRE (pos == x + 1);
+            auto pos = e::search_not_unguarded(e::loadable_position(x), 0);
+            REQUIRE (!e::precedes(pos, x + 1));
         }
 
         SECTION ("Searching for the absence of a non-existing element")
@@ -76,14 +76,14 @@ SCENARIO ("Linear search", "[search]")
     {
         SECTION ("Searcing for an even element")
         {
-            auto pos = e::search_if_unguarded(x, is_even);
-            REQUIRE (pos == x);
+            auto pos = e::search_if_unguarded(e::loadable_position(x), is_even);
+            REQUIRE (!e::precedes(pos, x + 0));
         }
 
         SECTION ("Searcing for an odd element")
         {
-            auto pos = e::search_if_not_unguarded(x, is_even);
-            REQUIRE (pos == x + 1);
+            auto pos = e::search_if_not_unguarded(e::loadable_position(x), is_even);
+            REQUIRE (!e::precedes(pos, x + 1));
         }
     }
 
@@ -91,9 +91,9 @@ SCENARIO ("Linear search", "[search]")
     {
         SECTION ("Searcing for a match between two empty ranges")
         {
-            auto pos = e::search_match(x, x, x, x);
-            REQUIRE (e::get<0>(pos) == x);
-            REQUIRE (e::get<1>(pos) == x);
+            auto pos = e::search_match(e::loadable_position(x), x, x, x);
+            REQUIRE (!e::precedes(e::get<0>(pos), x + 0));
+            REQUIRE (!e::precedes(e::get<1>(pos), x + 0));
         }
 
         SECTION ("Searcing for a match between two arrays of equal length where there is a match")
@@ -145,9 +145,9 @@ SCENARIO ("Linear search", "[search]")
     {
         SECTION ("Searcing for a mismatch between two empty ranges")
         {
-            auto pos = e::search_mismatch(x, x, x, x);
-            REQUIRE (e::get<0>(pos) == x);
-            REQUIRE (e::get<1>(pos) == x);
+            auto pos = e::search_mismatch(e::loadable_position(x), x, x, x);
+            REQUIRE (!e::precedes(e::get<0>(pos), x + 0));
+            REQUIRE (!e::precedes(e::get<1>(pos), x + 0));
         }
 
         SECTION ("Searcing for a mismatch between two arrays of equal length where there is a mismatch")

@@ -170,21 +170,27 @@ operator/=(T& x, T const& y) -> T&
 // Semirings
 
 template <
-    Loadable_position S0,
+    typename S0,
     Limit<S0> L0,
-    Loadable_position S1,
-    Storable_position D,
+    typename S1,
+    typename D,
     typename S_add_op,
     typename S_mul_op>
 requires
+    Loadable<S0> and Position<S0> and
+    Loadable<S0> and Position<S1> and
+    Storable<D> and Forward_position<D> and
     Semiring<Decay<Value_type<S0>>, S_add_op, S_mul_op> and
     Semiring<Decay<Value_type<S1>>, S_add_op, S_mul_op> and
     Semiring<Decay<Value_type<D>>, S_add_op, S_mul_op>
 constexpr auto
 inner_product(S0 src0, L0 lim0, S1 src1, D dst, S_add_op add_op, S_mul_op mul_op) -> Value_type<D>
 {
-    auto lim = map(src0, lim0, src1, dst, mul_op);
-    return reduce(dst, lim, add_op, Zero<Value_type<D>>);
+    return reduce(
+        dst,
+        map(mv(src0), mv(lim0), mv(src1), dst, mul_op),
+        add_op,
+        Zero<Value_type<D>>);
 }
 
 // Linear algebra

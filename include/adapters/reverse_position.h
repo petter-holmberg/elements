@@ -40,7 +40,17 @@ struct underlying_type_t<reverse_position<P>>
 };
 
 template <typename P>
-requires Loadable_bidirectional_position<P>
+requires Bidirectional_position<P>
+constexpr auto
+operator==(reverse_position<P> const& x, reverse_position<P> const& y) -> bool
+{
+    return x.pos == y.pos;
+}
+
+template <typename P>
+requires
+    Loadable<P> and
+    Bidirectional_position<P>
 constexpr void
 increment(reverse_position<P>& pos)
 {
@@ -48,7 +58,9 @@ increment(reverse_position<P>& pos)
 }
 
 template <typename P>
-requires Loadable_bidirectional_position<P>
+requires
+    Loadable<P> and
+    Bidirectional_position<P>
 constexpr void
 decrement(reverse_position<P>& pos)
 {
@@ -56,7 +68,9 @@ decrement(reverse_position<P>& pos)
 }
 
 template <typename P>
-requires Loadable_bidirectional_position<P>
+requires
+    Loadable<P> and
+    Bidirectional_position<P>
 constexpr auto
 successor(reverse_position<P> const& pos) -> reverse_position<P>
 {
@@ -64,7 +78,9 @@ successor(reverse_position<P> const& pos) -> reverse_position<P>
 }
 
 template <typename P>
-requires Loadable_bidirectional_position<P>
+requires
+    Loadable<P> and
+    Bidirectional_position<P>
 constexpr auto
 predecessor(reverse_position<P> const& pos) -> reverse_position<P>
 {
@@ -72,7 +88,9 @@ predecessor(reverse_position<P> const& pos) -> reverse_position<P>
 }
 
 template <typename P>
-requires Loadable_bidirectional_position<P>
+requires
+    Loadable<P> and
+    Bidirectional_position<P>
 constexpr auto
 load(reverse_position<P> const& pos) -> Value_type<P> const&
 {
@@ -80,7 +98,9 @@ load(reverse_position<P> const& pos) -> Value_type<P> const&
 }
 
 template <typename P>
-requires Storable_bidirectional_position<P>
+requires
+    Storable<P> and
+    Bidirectional_position<P>
 constexpr void
 store(reverse_position<P>& pos, Value_type<P> const& value)
 {
@@ -88,7 +108,9 @@ store(reverse_position<P>& pos, Value_type<P> const& value)
 }
 
 template <typename P>
-requires Storable_bidirectional_position<P>
+requires
+    Storable<P> and
+    Bidirectional_position<P>
 constexpr void
 store(reverse_position<P>& pos, Value_type<P>&& value)
 {
@@ -96,7 +118,9 @@ store(reverse_position<P>& pos, Value_type<P>&& value)
 }
 
 template <typename P>
-requires Mutable_bidirectional_position<P>
+requires
+    Mutable<P> and
+    Bidirectional_position<P>
 constexpr auto
 at(reverse_position<P>& pos) -> Underlying_type<Value_type<P>>&
 {
@@ -104,7 +128,7 @@ at(reverse_position<P>& pos) -> Underlying_type<Value_type<P>>&
 }
 
 template <typename P>
-requires Movable<Decay<P>>
+requires Loadable<P> and Position<P>
 constexpr auto
 precedes(reverse_position<P> const& pos0, reverse_position<P> const& pos1) -> bool
 {

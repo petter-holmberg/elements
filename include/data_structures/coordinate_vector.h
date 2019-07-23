@@ -24,7 +24,7 @@ struct coordinate_vector
     coordinate_vector()
         : elements{}
     {
-        fill(first(elements), last(elements), Zero<S>);
+        fill(first(elements), limit(elements), Zero<S>);
     }
 
     constexpr
@@ -132,22 +132,6 @@ constexpr auto
 limit(coordinate_vector<S, k, E, S_add_op, S_mul_op>& x) -> Position_type<E>
 {
     return limit(x.elements);
-}
-
-template <typename S, int32_t k, Range E, typename S_add_op, typename S_mul_op>
-requires Semiring<S, S_add_op, S_mul_op>
-constexpr auto
-last(coordinate_vector<S, k, E, S_add_op, S_mul_op> const& x) -> Position_type<E const>
-{
-    return last(x.elements);
-}
-
-template <typename S, int32_t k, Range E, typename S_add_op, typename S_mul_op>
-requires Semiring<S, S_add_op, S_mul_op>
-constexpr auto
-last(coordinate_vector<S, k, E, S_add_op, S_mul_op>& x) -> Position_type<E>
-{
-    return last(x.elements);
 }
 
 template <typename S, int32_t k, Range E, typename S_add_op, typename S_mul_op>

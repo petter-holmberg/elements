@@ -5,10 +5,13 @@
 namespace elements {
 
 template <
-    Loadable_position S, Limit<S> L,
-    Storable_position D,
+    typename S,
+    Limit<S> L,
+    typename D,
     Unary_function Fun>
 requires
+    Loadable<S> and Position<S> and
+    Storable<D> and Position<D> and
     Same<Decay<Value_type<S>>, Decay<Domain<Fun>>> and
     Same<Decay<Value_type<D>>, Decay<Codomain<Fun>>>
 constexpr auto
@@ -24,11 +27,15 @@ map(S src, L lim, D dst, Fun fun) -> D
 }
 
 template <
-    Loadable_position S0, Limit<S0> L0,
-    Loadable_position S1,
-    Storable_position D,
+    typename S0,
+    Limit<S0> L0,
+    typename S1,
+    typename D,
     Binary_function Fun>
 requires
+    Loadable<S0> and Position<S0> and
+    Loadable<S1> and Position<S1> and
+    Storable<D> and Position<D> and
     Same<Decay<Value_type<S0>>, Decay<Input_type<Fun, 0>>> and
     Same<Decay<Value_type<S1>>, Decay<Input_type<Fun, 1>>> and
     Same<Decay<Value_type<D>>, Decay<Codomain<Fun>>>

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <utility>
 #include "concepts/regular.h"
 #include "type_functions/regular.h"
 
@@ -71,9 +72,30 @@ operator<=(T const& x, T const& y) -> bool
 template <typename T>
 requires Semiregular<Remove_cv<T>>
 constexpr auto
-underlying_ref(T& x) -> Underlying_type<T>&
+underlying_ref(T& x) noexcept -> Underlying_type<T>&
 {
     return reinterpret_cast<Underlying_type<T>&>(x);
+}
+
+template <typename T>
+constexpr auto
+fw(Remove_ref<T>& x) noexcept -> T&&
+{
+    return std::forward<T>(x);
+}
+
+template<typename T>
+constexpr auto
+fw(Remove_ref<T>&& x) noexcept -> T&&
+{
+    return std::forward<T>(x);
+}
+
+template <typename T>
+constexpr auto
+mv(T&& x) noexcept -> Remove_ref<T>&&
+{
+    return std::move(x);
 }
 
 }

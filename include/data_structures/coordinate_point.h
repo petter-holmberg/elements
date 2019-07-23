@@ -27,7 +27,7 @@ struct coordinate_point
     coordinate_point()
         : coordinates{}
     {
-        fill(first(coordinates), last(coordinates), Zero<Value_type<V>>);
+        fill(first(coordinates), limit(coordinates), Zero<Value_type<V>>);
     }
 
     constexpr
@@ -156,20 +156,6 @@ constexpr auto
 limit(coordinate_point<S, k, C, V>& x) -> Position_type<V>
 {
     return limit(x.coordinates);
-}
-
-template <typename S, int32_t k, Range C, typename V>
-constexpr auto
-last(coordinate_point<S, k, C, V> const& x) -> Position_type<V const>
-{
-    return last(x.coordinates);
-}
-
-template <typename S, int32_t k, Range C, typename V>
-constexpr auto
-last(coordinate_point<S, k, C, V>& x) -> Position_type<V>
-{
-    return last(x.coordinates);
 }
 
 template <typename S, int32_t k, Range C, typename V>

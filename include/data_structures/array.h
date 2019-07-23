@@ -359,14 +359,6 @@ limit(array<T> const& x) -> Position_type<array<T>>
 template <typename T>
 requires Semiregular<Remove_cv<T>>
 constexpr auto
-last(array<T> const& x) -> Position_type<array<T>>
-{
-    return limit(x) - 1;
-}
-
-template <typename T>
-requires Semiregular<Remove_cv<T>>
-constexpr auto
 limit_of_storage(array<T> const& x) -> Position_type<array<T>>
 {
     if (x.header == Pointer_type<array_prefix<T>>{nullptr}) return Pointer_type<T>{nullptr};

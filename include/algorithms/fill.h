@@ -4,7 +4,9 @@
 
 namespace elements {
 
-template <Storable_position P, Limit<P> L, typename T>
+template <typename P, Limit<P> L, typename T>
+requires
+    Storable<P> and Position<P>
 constexpr void
 fill(P pos, L lim, T const& value)
 //[[expects axiom: storable_range(pos, lim)]]

@@ -160,13 +160,6 @@ limit(array_k<T, k>& x) -> Pointer_type<T>
 
 template <typename T, std::ptrdiff_t k>
 constexpr auto
-last(array_k<T, k> const& x) -> Pointer_type<T const>
-{
-    return limit(x) - 1;
-}
-
-template <typename T, std::ptrdiff_t k>
-constexpr auto
 last(array_k<T, k>& x) -> Pointer_type<T>
 {
     return limit(x) - 1;

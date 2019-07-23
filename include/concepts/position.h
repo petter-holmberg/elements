@@ -27,19 +27,42 @@ concept Loadable =
         { load(x) } -> Value_type<L> const&;
     };
 
-template <Semiregular T>
+template <typename T>
+requires Movable<T>
 constexpr void
 store(T& x, Value_type<T> const& v);
 
-template <Semiregular T>
+template <typename T>
+requires Movable<T>
+constexpr void
+store(T& x, Value_type<T>&& v);
+
+template <typename T>
+requires Movable<T>
 constexpr void
 store(Pointer_type<T> x, Value_type<T> const& v);
 
+template <typename T>
+requires Movable<T>
+constexpr void
+store(Pointer_type<T> x, Value_type<T>&& v);
+
 template <typename S>
 concept Storable =
-    Regular<S> and
+    Movable<S> and
     requires (S& x, Value_type<S>&& v) {
         store(x, v);
+    };
+
+template <typename M>
+concept Mutable =
+    Loadable<M> and
+    Storable<M> and
+    requires (M& x) {
+        { at(x) } -> Value_type<M>&;
+    } and
+    requires (M const& x) {
+        { at(x) } -> Value_type<M> const&;
     };
 
 // Linear traversal
@@ -72,39 +95,16 @@ concept Position =
     };
 
 template <typename P>
+concept Forward_position =
+    Regular<P> and
+    Position<P>;
+
+template <typename P>
 concept Bidirectional_position =
-    Position<P> and
+    Forward_position<P> and
     requires (P& x) {
         decrement(x);
     };
-
-// Access and linear traversal
-
-template <typename P>
-concept Loadable_position =
-    Loadable<P> and
-    Position<P>;
-
-template <typename P>
-concept Storable_position =
-    Storable<P> and
-    Position<P>;
-
-template <typename P>
-concept Loadable_bidirectional_position =
-    Loadable<P> and
-    Bidirectional_position<P>;
-
-template <typename P>
-concept Storable_bidirectional_position =
-    Storable<P> and
-    Bidirectional_position<P>;
-
-template <typename P>
-concept Mutable_bidirectional_position =
-    Loadable<P> and
-    Storable<P> and
-    Bidirectional_position<P>;
 
 // Ranges
 

@@ -4,50 +4,98 @@
 
 namespace e = elements;
 
-struct loadable_position
+struct storable_position
 {
     int value;
 
-    loadable_position() = delete;
+    storable_position() = delete;
 
-    explicit loadable_position(int value_) : value{value_} {};
+    explicit storable_position(int value_) : value{value_} {}
 
-    loadable_position(loadable_position const&) = delete;
+    storable_position(storable_position const&) = delete;
 
-    loadable_position(loadable_position&&) = default;
+    storable_position(storable_position&&) = default;
 
-    loadable_position& operator=(loadable_position const&) = delete;
+    storable_position& operator=(storable_position const&) = delete;
 
-    loadable_position& operator=(loadable_position&&) = default;
+    storable_position& operator=(storable_position&&) = default;
 
-    ~loadable_position() = default;
+    ~storable_position() = default;
+};
+
+struct forward_position
+{
+    int value = 0;
+
+    forward_position() = default;
+
+    explicit forward_position(int value_) : value{value_} {}
 };
 
 namespace elements {
 
 template <>
-struct value_type_t<loadable_position>
+struct value_type_t<storable_position>
 {
     using type = int;
 };
 
 template <>
+struct value_type_t<forward_position>
+{
+    using type = int;
+};
+
 constexpr auto
-load(loadable_position const& x) -> int const&
+operator==(forward_position const& x, forward_position const& y) -> bool
+{
+    return x.value == y.value;
+}
+
+template <>
+constexpr void
+store(storable_position& x, Value_type<storable_position> const& value)
+{
+    x.value = value;
+}
+
+template <>
+constexpr void
+store(storable_position& x, Value_type<storable_position>&& value)
+{
+    x.value = std::forward<Value_type<storable_position>>(value);
+}
+
+template <>
+constexpr auto
+load(forward_position const& x) -> int const&
 {
     return x.value;
 }
 
 template <>
 constexpr void
-increment(loadable_position& x)
+increment(storable_position& x)
 {
     ++x.value;
 }
 
 template <>
+constexpr void
+increment(forward_position& x)
+{
+    ++x.value;
+}
+
 constexpr auto
-precedes(loadable_position const& pos, int const& lim) -> bool
+precedes(storable_position const& pos, int const& lim) -> bool
+{
+    return pos.value < lim;
+}
+
+template <>
+constexpr auto
+precedes(forward_position const& pos, int const& lim) -> bool
 {
     return pos.value < lim;
 }
@@ -61,7 +109,6 @@ precedes(int const& pos, int const& lim) -> bool
 
 }
 
-
 SCENARIO ("Using access functions", "[position]")
 {
     int x = 0;
@@ -69,12 +116,18 @@ SCENARIO ("Using access functions", "[position]")
 
     SECTION ("Loadable")
     {
-        static_assert(e::Loadable<loadable_position>);
+        static_assert(e::Loadable<e::loadable_position<int>>);
+        static_assert(e::Loadable<forward_position>);
         static_assert(e::Loadable<int>);
         static_assert(e::Loadable<int*>);
 
-        loadable_position p{0};
-        REQUIRE(e::load(p) == 0);
+        e::loadable_position lp{0};
+        REQUIRE(lp.pos == 0);
+        REQUIRE(e::predecessor(lp).pos == -1);
+        REQUIRE(e::load(lp) == 0);
+
+        forward_position fp{0};
+        REQUIRE(e::load(fp) == 0);
 
         REQUIRE (e::load(x) == x);
 
@@ -86,6 +139,14 @@ SCENARIO ("Using access functions", "[position]")
 
     SECTION ("Storable")
     {
+        static_assert(e::Storable<storable_position>);
+        static_assert(e::Storable<int>);
+        static_assert(e::Storable<int*>);
+
+        storable_position sp{0};
+        e::store(sp, 1);
+        REQUIRE (sp.value == 1);
+
         e::store(x, 1);
         REQUIRE (x == 1);
 
@@ -108,13 +169,20 @@ SCENARIO ("Using linear traversal functions", "[position]")
 {
     SECTION ("Position")
     {
-        static_assert(e::Position<loadable_position>);
         static_assert(e::Position<int>);
         static_assert(e::Position<int*>);
 
-        loadable_position p0{0};
-        loadable_position p1{0};
+        e::loadable_position p0{0};
+        e::loadable_position p1{0};
         e::increment(p0);
-        REQUIRE (p0.value == e::successor(std::move(p1)).value);
+        REQUIRE (p0.pos == e::successor(std::move(p1)).pos);
+    }
+
+    SECTION ("Forward_position")
+    {
+        static_assert(e::Forward_position<forward_position>);
+        static_assert(e::Forward_position<int>);
+        static_assert(e::Forward_position<int*>);
+
     }
 }

@@ -4,8 +4,11 @@
 
 namespace elements {
 
-template <Loadable_position S, Storable_position D>
-requires Same<Decay<Value_type<S>>, Decay<Value_type<D>>>
+template <typename S, typename D>
+requires
+    Loadable<S> and Position<S> and
+    Storable<D> and Position<D> and
+    Same<Decay<Value_type<S>>, Decay<Value_type<D>>>
 constexpr void
 copy_step(S& src, D& dst)
 {
@@ -14,8 +17,11 @@ copy_step(S& src, D& dst)
     increment(src);
 }
 
-template <Loadable_position S, Limit<S> L, Storable_position D>
-requires Same<Decay<Value_type<S>>, Decay<Value_type<D>>>
+template <typename S, Limit<S> L, typename D>
+requires
+    Loadable<S> and Position<S> and
+    Storable<D> and Position<D> and
+    Same<Decay<Value_type<S>>, Decay<Value_type<D>>>
 constexpr auto
 copy(S src, L lim, D dst) -> D
 //[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (lim - src))]]
