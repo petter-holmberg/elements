@@ -108,16 +108,16 @@ struct array
         while (!is_zero(size)) { push(at(this), x); decrement(size); }
     }
 
-    constexpr array&
-    operator=(array const& x)
+    constexpr auto
+    operator=(array const& x) -> array&
     {
         array temp(x);
         swap(at(this), temp);
         return at(this);
     }
 
-    constexpr array&
-    operator=(array&& x)
+    constexpr auto
+    operator=(array&& x) -> array&
     {
         if (this != pointer_to(x)) {
             erase_all(at(this));
@@ -158,7 +158,7 @@ struct array
     template <Unary_function Fun>
     requires Same<Decay<T>, Decay<Domain<Fun>>>
     constexpr auto
-    map(Fun fun) -> array<Decay<Codomain<Fun>>>
+    map(Fun fun) const -> array<Decay<Codomain<Fun>>>
     {
         using elements::map;
         array<Decay<Codomain<Fun>>> x;
@@ -237,36 +237,6 @@ constexpr auto
 operator<(array<T> const& x, array<T> const& y) -> bool
 {
     return linearizable_less(x, y);
-}
-
-template <typename T>
-requires Semiregular<Remove_cv<T>>
-constexpr void
-construct(T& raw)
-    //[[expects axiom: raw_memory(raw)]]
-    //[[ensures axiom: partially_formed(raw)]]
-{
-    new (&raw) T();
-}
-
-template <typename T, typename U>
-requires Semiregular<Remove_cv<T>>
-constexpr void
-construct(T& raw, U const& initializer)
-    //[[expects axiom: raw_memory(raw)]]
-    //[[ensures axiom: raw == initializer]]
-{
-    new (&raw) T(initializer);
-}
-
-template <typename T>
-requires Semiregular<Remove_cv<T>>
-constexpr void
-destroy(T& x)
-    //[[expects axiom: partially_formed(x)]]
-    //[[ensures axiom: raw_memory(x)]]
-{
-    x.~T();
 }
 
 template <typename T>

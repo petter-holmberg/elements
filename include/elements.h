@@ -28,6 +28,7 @@
 #include "data_structures/array_k.h"
 #include "data_structures/coordinate_point.h"
 #include "data_structures/coordinate_vector.h"
+#include "data_structures/expected.h"
 #include "data_structures/pair.h"
 #include "data_structures/polynomial.h"
 #include "data_structures/rational.h"

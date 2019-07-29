@@ -41,7 +41,7 @@ struct pair
         Same<T0, T1> and
         Same<Decay<T0>, Decay<Domain<Fun>>>
     constexpr auto
-    map(Fun fun) -> pair<Decay<Codomain<Fun>>>
+    map(Fun fun) const -> pair<Decay<Codomain<Fun>>>
     {
         return {fun(m0), fun(m1)};
     }
@@ -59,7 +59,7 @@ struct value_type_t<pair<T, T>>
     using type = T;
 };
 
-template <typename T, int i>
+template <typename, int>
 struct element_type_t;
 
 template <typename T, int i>

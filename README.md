@@ -80,6 +80,12 @@ to the array elements. `array` has regular semantics, lexicographic comparison o
 
 `polynomial` implements a polynomial type, forming an `Integral_domain` over any `Ring`. `degree` returns the degree of the polynomial, where an empty polynomial has degree -1. `evaluate` evaluates the polynomial at a given value, and `subderivative` calculates the k:th subderivate of a given polynomial and value k.
 
+## Sum types
+
+`expected` implements a type that carries either a value or an error. The presence of a value can be checked by boolean evaluation. An expected object is `Mutable` if its `Value_type` is.
+`make_unexpected` constructs an `expected` carrying an error.
+`expected` also provides a monadic interface through the member functions `.map` and `.bind`.
+
 # Concepts
 
 The concepts in this library are largely based on definitions in [StepanovMcJones](#StepanovMcJones), with some name changes and adaptations to modern C++ features, such as move semantics.
@@ -242,6 +248,10 @@ returns either a reference or a constant reference to its held object.
 
 `Underlying_type` is the type describing the data storage of a given type.
 
+`Element_type` is the type of an element in a `pair` with a given index.
+
+`Error_type` is the type of the error that can be stored in an `expected`.
+
 ## Invocable
 
 `Codomain` is the return type of an invocable type.
@@ -336,6 +346,8 @@ Index
 `rational`
 `polynomial`
 
+`expected`
+
 # Concepts
 
 `Semigroup`
@@ -427,6 +439,8 @@ Index
 `Remove_ref`
 `Decay`
 `Underlying_type`
+`Element_type`
+`Error_type`
 
 `Codomain`
 `Input_type`

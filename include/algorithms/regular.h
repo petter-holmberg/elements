@@ -98,4 +98,44 @@ mv(T&& x) noexcept -> Remove_ref<T>&&
     return std::move(x);
 }
 
+template <typename T>
+requires Semiregular<Remove_cv<T>>
+constexpr void
+construct(T& raw)
+    //[[expects axiom: raw_memory(raw)]]
+    //[[ensures axiom: partially_formed(raw)]]
+{
+    new (&raw) T();
+}
+
+template <typename T, typename U>
+requires Semiregular<Remove_cv<T>>
+constexpr void
+construct(T& raw, U const& initializer)
+    //[[expects axiom: raw_memory(raw)]]
+    //[[ensures axiom: raw == initializer]]
+{
+    new (&raw) T(initializer);
+}
+
+template <typename T, typename U>
+requires Semiregular<Remove_cv<T>>
+constexpr void
+construct(T& raw, U&& initializer)
+    //[[expects axiom: raw_memory(raw)]]
+    //[[ensures axiom: raw == initializer]]
+{
+    new (&raw) T(fw<U>(initializer));
+}
+
+template <typename T>
+requires Semiregular<Remove_cv<T>>
+constexpr void
+destroy(T& x)
+    //[[expects axiom: partially_formed(x)]]
+    //[[ensures axiom: raw_memory(x)]]
+{
+    x.~T();
+}
+
 }

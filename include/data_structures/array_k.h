@@ -58,7 +58,7 @@ struct array_k
     template <Unary_function Fun>
     requires Same<Decay<T>, Decay<Domain<Fun>>>
     constexpr auto
-    map(Fun fun) -> array_k<Decay<Codomain<Fun>>, k>
+    map(Fun fun) const -> array_k<Decay<Codomain<Fun>>, k>
     {
         using elements::map;
         array_k<Decay<Codomain<Fun>>, k> x;
