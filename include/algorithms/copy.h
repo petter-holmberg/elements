@@ -4,10 +4,10 @@
 
 namespace elements {
 
-template <typename S, typename D>
+template <Position S, Position D>
 requires
-    Loadable<S> and Position<S> and
-    Storable<D> and Position<D> and
+    Loadable<S> and
+    Storable<D> and
     Same<Decay<Value_type<S>>, Decay<Value_type<D>>>
 constexpr void
 copy_step(S& src, D& dst)
@@ -17,10 +17,10 @@ copy_step(S& src, D& dst)
     increment(src);
 }
 
-template <typename S, Limit<S> L, typename D>
+template <Position S, Limit<S> L, Position D>
 requires
-    Loadable<S> and Position<S> and
-    Storable<D> and Position<D> and
+    Loadable<S> and
+    Storable<D> and
     Same<Decay<Value_type<S>>, Decay<Value_type<D>>>
 constexpr auto
 copy(S src, L lim, D dst) -> D

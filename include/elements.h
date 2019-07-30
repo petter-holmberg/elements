@@ -26,6 +26,7 @@
 
 #include "data_structures/array.h"
 #include "data_structures/array_k.h"
+#include "data_structures/binary_counter.h"
 #include "data_structures/coordinate_point.h"
 #include "data_structures/coordinate_vector.h"
 #include "data_structures/expected.h"

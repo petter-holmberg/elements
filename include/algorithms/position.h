@@ -33,60 +33,56 @@ load(Pointer_type<T> x) -> T const&
     return *x;
 }
 
-template <typename T>
-requires Movable<T>
+template <Movable T>
 constexpr void
 store(T& x, Value_type<T> const& v)
 {
     x = v;
 }
 
-template <typename T>
-requires Movable<T>
+template <Movable T>
 constexpr void
 store(T& x, Value_type<T>&& v)
 {
     x = std::forward<Value_type<T>>(v);
 }
 
-template <typename T>
-requires Movable<T>
+template <Movable T>
 constexpr void
 store(Pointer_type<T> x, Value_type<T> const& v)
 {
     *x = v;
 }
 
-template <typename T>
-requires Movable<T>
+template <Movable T>
 constexpr void
 store(Pointer_type<T> x, Value_type<T>&& v)
 {
     *x = std::forward<Value_type<T>>(v);
 }
 
-template <Semiregular T>
+template <Movable T>
 constexpr auto
 at(T& x) -> T&
 {
     return x;
 }
 
-template <Semiregular T>
+template <Movable T>
 constexpr auto
 at(T const& x) -> T const&
 {
     return x;
 }
 
-template <Semiregular T>
+template <Movable T>
 constexpr auto
 at(Pointer_type<T> x) -> T&
 {
     return *x;
 }
 
-template <Semiregular T>
+template <Movable T>
 constexpr auto
 at(Pointer_type<T const> x) -> T const&
 {

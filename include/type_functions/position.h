@@ -12,6 +12,8 @@ namespace elements {
 template <typename T>
 using Pointer_type = T*;
 
+using pointer_diff = std::ptrdiff_t;
+
 template <typename T>
 requires Movable<Decay<T>>
 struct value_type_t<Pointer_type<T>>
@@ -22,7 +24,7 @@ struct value_type_t<Pointer_type<T>>
 template <typename T>
 struct difference_type_t<T*>
 {
-    using type = std::ptrdiff_t;
+    using type = pointer_diff;
 };
 
 template <typename>
@@ -32,7 +34,7 @@ template <typename T>
 requires Movable<Decay<T>>
 struct distance_type_t<Pointer_type<T>>
 {
-    using type = std::ptrdiff_t;
+    using type = pointer_diff;
 };
 
 template <typename T>

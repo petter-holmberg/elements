@@ -8,7 +8,7 @@ template <typename T, typename Fun>
 concept Functor =
     Movable<T> and
     Unary_function<Fun> and
-    Same<Decay<Value_type<T>>, Decay<Domain<Fun>>> and
+    Same<Decay<Value_type<T>>, Domain<Fun>> and
     requires (T x, Fun fun) {
         x.map(fun);
     };

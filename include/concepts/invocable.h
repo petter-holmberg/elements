@@ -21,7 +21,7 @@ template <typename F>
 concept Unary_function =
     Functional_procedure<F> and
     Arity<F> == 1 and
-    Regular<Decay<Domain<F>>>;
+    Regular<Domain<F>>;
 
 template <typename F>
 concept Binary_function =

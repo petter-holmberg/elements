@@ -79,4 +79,19 @@ struct complement_of_converse
     }
 };
 
+template <Binary_operation Op>
+struct transpose_op
+{
+    Op op;
+
+    explicit constexpr
+    transpose_op(Op op_) : op{op_} {}
+
+    constexpr auto
+    operator()(Domain<Op> const& x, Domain<Op> const& y) -> Domain<Op>
+    {
+        return op(y, x);
+    }
+};
+
 }

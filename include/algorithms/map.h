@@ -4,16 +4,12 @@
 
 namespace elements {
 
-template <
-    typename S,
-    Limit<S> L,
-    typename D,
-    Unary_function Fun>
+template <Position S, Limit<S> L, Position D, Unary_function Fun>
 requires
-    Loadable<S> and Position<S> and
-    Storable<D> and Position<D> and
-    Same<Decay<Value_type<S>>, Decay<Domain<Fun>>> and
-    Same<Decay<Value_type<D>>, Decay<Codomain<Fun>>>
+    Loadable<S> and
+    Storable<D> and
+    Same<Decay<Value_type<S>>, Domain<Fun>> and
+    Same<Decay<Value_type<D>>, Codomain<Fun>>
 constexpr auto
 map(S src, L lim, D dst, Fun fun) -> D
 //[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (lim - src))]]
@@ -26,19 +22,14 @@ map(S src, L lim, D dst, Fun fun) -> D
     return dst;
 }
 
-template <
-    typename S0,
-    Limit<S0> L0,
-    typename S1,
-    typename D,
-    Binary_function Fun>
+template <Position S0, Limit<S0> L0, Position S1, Position D, Binary_function Fun>
 requires
-    Loadable<S0> and Position<S0> and
-    Loadable<S1> and Position<S1> and
-    Storable<D> and Position<D> and
+    Loadable<S0> and
+    Loadable<S1> and
+    Storable<D> and
     Same<Decay<Value_type<S0>>, Decay<Input_type<Fun, 0>>> and
     Same<Decay<Value_type<S1>>, Decay<Input_type<Fun, 1>>> and
-    Same<Decay<Value_type<D>>, Decay<Codomain<Fun>>>
+    Same<Decay<Value_type<D>>, Codomain<Fun>>
 constexpr auto
 map(S0 src0, L0 lim0, S1 src1, D dst, Fun fun) -> D
 //[[expects axiom: not_overlapped_forward(src0, lim0, dst, dst + (lim0 - src0))]]

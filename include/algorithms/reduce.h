@@ -4,12 +4,13 @@
 #include "integer.h"
 #include "position.h"
 #include "regular.h"
+#include "data_structures/binary_counter.h"
 
 namespace elements {
 
-template <typename P, Limit<P> L, Binary_operation Op, Unary_function Fun>
+template <Position P, Limit<P> L, Binary_operation Op, Unary_function Fun>
 requires
-    Loadable<P> and Position<P> and
+    Loadable<P> and
     Same<P, Domain<Fun>> and
     Same<Domain<Op>, Codomain<Fun>>
 constexpr auto
@@ -21,15 +22,15 @@ reduce_nonempty(P pos, L lim, Op op, Fun fun) -> Domain<Op>
     auto x = fun(pos);
     increment(pos);
     while (precedes(pos, lim)) {
-        x = op(x, fun(pos));
+        store(x, op(x, fun(pos)));
         increment(pos);
     }
     return x;
 }
 
-template <typename P, Limit<P> L, Binary_operation Op>
+template <Position P, Limit<P> L, Binary_operation Op>
 requires
-    Loadable<P> and Position<P> and
+    Loadable<P> and
     Same<Decay<Value_type<P>>, Domain<Op>>
 constexpr auto
 reduce_nonempty(P pos, L lim, Op op) -> Domain<Op>
@@ -40,9 +41,9 @@ reduce_nonempty(P pos, L lim, Op op) -> Domain<Op>
     return reduce_nonempty(mv(pos), mv(lim), op, [](P const& x){ return load(x); });
 }
 
-template <typename P, Limit<P> L, Binary_operation Op, Unary_function Fun>
+template <Position P, Limit<P> L, Binary_operation Op, Unary_function Fun>
 requires
-    Loadable<P> and Position<P> and
+    Loadable<P> and
     Same<P, Domain<Fun>> and
     Same<Domain<Op>, Codomain<Fun>>
 constexpr auto
@@ -54,17 +55,78 @@ reduce(P pos, L lim, Op op, Fun fun, Domain<Op> const& zero) -> Domain<Op>
     return reduce_nonempty(mv(pos), mv(lim), op, fun);
 }
 
-template <typename P, Limit<P> L, Binary_operation Op>
+template <Position P, Limit<P> L, Binary_operation Op>
 requires
-    Loadable<P> and Position<P> and
+    Loadable<P> and
     Same<Decay<Value_type<P>>, Domain<Op>>
 constexpr auto
 reduce(P pos, L lim, Op op, Domain<Op> const& zero) -> Domain<Op>
 //[[expects axiom: loadable_range(pos, lim)]]
 //[[expects axiom: partially_associative(op)]]
 {
-    if (!precedes(pos, lim)) return zero;
-    return reduce_nonempty(mv(pos), mv(lim), op);
+    return reduce(mv(pos), mv(lim), op, [](P const& x){ return load(x); }, zero);
+}
+
+template <Position P, Limit<P> L, Binary_operation Op, Unary_function Fun>
+requires
+    Same<P, Domain<Fun>> and
+    Same<Domain<Op>, Codomain<Fun>>
+constexpr auto
+reduce_nonzeroes(P pos, L lim, Op op, Fun fun, Domain<Op> const& zero) -> Domain<Op>
+//[[expects axiom: loadable_range(pos, lim)]]
+//[[expects axiom: partially_associative(op)]]
+{
+    Domain<Op> x;
+    do {
+        if (!(precedes(pos, lim))) return zero;
+        store(x, fun(pos));
+        increment(pos);
+    } while (x == zero);
+    while (precedes(pos, lim)) {
+        auto y = fun(pos);
+        if (y != zero) store(x, op(x, y));
+        increment(pos);
+    }
+    return x;
+}
+
+template <Position P, Limit<P> L, Binary_operation Op>
+requires Same<Decay<Value_type<P>>, Domain<Op>>
+constexpr auto
+reduce_nonzeroes(P pos, L lim, Op op, Domain<Op> const& zero) -> Domain<Op>
+//[[expects axiom: loadable_range(pos, lim)]]
+//[[expects axiom: partially_associative(op)]]
+{
+    return reduce_nonzeroes(mv(pos), mv(lim), op, [](P const& x){ return load(x); }, zero);
+}
+
+template <Position P, Limit<P> L, Binary_operation Op, Unary_function Fun>
+requires
+    Loadable<P> and
+    Same<P, Domain<Fun>> and
+    Same<Domain<Op>, Codomain<Fun>>
+constexpr auto
+reduce_balanced(P pos, L lim, Op op, Fun fun, Domain<Op> const& zero) -> Domain<Op>
+//[[expects axiom: loadable_range(pos, lim)]]
+//[[expects axiom: partially_associative(op)]]
+{
+    binary_counter<Op> counter(op, zero);
+    while (precedes(pos, lim)) {
+        counter(fun(pos));
+        increment(pos);
+    }
+    transpose_op<Op> transposed_op(op);
+    return reduce_nonzeroes(first(counter), limit(counter), transposed_op, zero);
+}
+
+template <Position P, Limit<P> L, Binary_operation Op>
+requires Loadable<P>
+constexpr auto
+reduce_balanced(P pos, L lim, Op op, Domain<Op> const& zero) -> Domain<Op>
+//[[expects axiom: loadable_range(pos, lim)]]
+//[[expects axiom: partially_associative(op)]]
+{
+    return reduce_balanced(mv(pos), mv(lim), op, [](P const& x){ return load(x); }, zero);
 }
 
 }

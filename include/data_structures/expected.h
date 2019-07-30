@@ -146,7 +146,7 @@ struct expected
     }
 
     template <Unary_operation Op>
-    requires Same<Decay<T>, Decay<Domain<Op>>>
+    requires Same<Decay<T>, Domain<Op>>
     constexpr auto
     map(Op op) -> expected<T, E>&
     {
@@ -155,7 +155,7 @@ struct expected
     }
 
     template <Unary_function Fun>
-    requires Same<Decay<T>, Decay<Domain<Fun>>>
+    requires Same<Decay<T>, Domain<Fun>>
     constexpr auto
     map(Fun fun) const -> expected<Codomain<Fun>, E>
     {
@@ -168,15 +168,15 @@ struct expected
 
     template <Unary_function Fun>
     requires
-        Same<Decay<T>, Decay<Domain<Fun>>> and
-        Same<Decay<E>, Error_type<Decay<Codomain<Fun>>>>
+        Same<Decay<T>, Domain<Fun>> and
+        Same<Decay<E>, Error_type<Codomain<Fun>>>
     constexpr auto
-    bind(Fun fun) const -> Decay<Codomain<Fun>>
+    bind(Fun fun) const -> Codomain<Fun>
     {
         if (has_value) {
             return fun(data.value);
         } else {
-            return Decay<Codomain<Fun>>(unexpected<E>(data.error));
+            return Codomain<Fun>(unexpected<E>(data.error));
         }
     }
 };

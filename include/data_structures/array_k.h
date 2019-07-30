@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstddef>
 #include <initializer_list>
 #include <limits>
 
@@ -12,8 +11,8 @@
 
 namespace elements {
 
-template <Semiregular T, std::ptrdiff_t k>
-requires 0 < k and k <= std::numeric_limits<std::ptrdiff_t>::max() / sizeof(T)
+template <Semiregular T, pointer_diff k>
+requires 0 < k and k <= std::numeric_limits<pointer_diff>::max() / sizeof(T)
 struct array_k
 {
     T data[static_cast<std::size_t>(k)];
@@ -32,21 +31,21 @@ struct array_k
     }
 
     constexpr auto
-    operator[](std::ptrdiff_t i) const -> T const&
+    operator[](pointer_diff i) const -> T const&
     {
         return data[i];
     }
 
     constexpr auto
-    operator[](std::ptrdiff_t i) -> T&
+    operator[](pointer_diff i) -> T&
     {
         return data[i];
     }
 
     template <Unary_function Fun>
     requires
-        Same<Decay<T>, Decay<Domain<Fun>>> and
-        Same<Decay<T>, Decay<Codomain<Fun>>>
+        Same<Decay<T>, Domain<Fun>> and
+        Same<Decay<T>, Codomain<Fun>>
     constexpr auto
     map(Fun fun) -> array_k<T, k>&
     {
@@ -56,22 +55,22 @@ struct array_k
     }
 
     template <Unary_function Fun>
-    requires Same<Decay<T>, Decay<Domain<Fun>>>
+    requires Same<Decay<T>, Domain<Fun>>
     constexpr auto
-    map(Fun fun) const -> array_k<Decay<Codomain<Fun>>, k>
+    map(Fun fun) const -> array_k<Codomain<Fun>, k>
     {
         using elements::map;
-        array_k<Decay<Codomain<Fun>>, k> x;
+        array_k<Codomain<Fun>, k> x;
         map(first(*this), limit(*this), first(x), fun);
         return x;
     }
 
     template <Unary_function Fun>
-    requires Same<Decay<T>, Decay<Domain<Fun>>>
+    requires Same<Decay<T>, Domain<Fun>>
     constexpr auto
-    bind(Fun fun) -> array_k<Value_type<Decay<Codomain<Fun>>>, k * Size<Decay<Codomain<Fun>>>>
+    bind(Fun fun) -> array_k<Value_type<Codomain<Fun>>, k * Size<Codomain<Fun>>>
     {
-        array_k<Value_type<Decay<Codomain<Fun>>>, k * Size<Decay<Codomain<Fun>>>> x;
+        array_k<Value_type<Codomain<Fun>>, k * Size<Codomain<Fun>>> x;
         auto src = first(*this);
         auto lim = limit(*this);
         auto dst = first(x);
@@ -84,95 +83,95 @@ struct array_k
     }
 };
 
-template <Semiregular T, std::ptrdiff_t k>
-requires 0 < k and k <= std::numeric_limits<std::ptrdiff_t>::max() / sizeof(T)
+template <Semiregular T, pointer_diff k>
+requires 0 < k and k <= std::numeric_limits<pointer_diff>::max() / sizeof(T)
 struct underlying_type_t<array_k<T, k>>
 {
     using type = array_k<Underlying_type<T>, k>;
 };
 
-template <Semiregular T, std::ptrdiff_t k>
+template <Semiregular T, pointer_diff k>
 struct value_type_t<array_k<T, k>>
 {
     using type = T;
 };
 
-template <Semiregular T, std::ptrdiff_t k>
+template <Semiregular T, pointer_diff k>
 struct position_type_t<array_k<T, k>>
 {
     using type = Pointer_type<T>;
 };
 
-template <Semiregular T, std::ptrdiff_t k>
+template <Semiregular T, pointer_diff k>
 struct position_type_t<array_k<T, k> const>
 {
     using type = Pointer_type<T const>;
 };
 
-template <Semiregular T, std::ptrdiff_t k>
+template <Semiregular T, pointer_diff k>
 struct size_type_t<array_k<T, k>>
 {
     using type = Distance_type<Pointer_type<T>>;
     static constexpr auto value = k;
 };
 
-template <Regular T, std::ptrdiff_t k>
+template <Regular T, pointer_diff k>
 constexpr auto
 operator==(array_k<T, k> const& x, array_k<T, k> const& y) -> bool
 {
     return lexicographical_equal(first(x), limit(x), first(y), limit(y));
 }
 
-template <Default_totally_ordered T, std::ptrdiff_t k>
+template <Default_totally_ordered T, pointer_diff k>
 constexpr auto
 operator<(array_k<T, k> const& x, array_k<T, k> const& y) -> bool
 {
     return lexicographical_less(first(x), limit(x), first(y), limit(y));
 }
 
-template <typename T, std::ptrdiff_t k>
+template <typename T, pointer_diff k>
 constexpr auto
 first(array_k<T, k> const& x) -> Pointer_type<T const>
 {
     return pointer_to(x.data[0]);
 }
 
-template <typename T, std::ptrdiff_t k>
+template <typename T, pointer_diff k>
 constexpr auto
 first(array_k<T, k>& x) -> Pointer_type<T>
 {
     return pointer_to(x.data[0]);
 }
 
-template <typename T, std::ptrdiff_t k>
+template <typename T, pointer_diff k>
 constexpr auto
 limit(array_k<T, k> const& x) -> Pointer_type<T const>
 {
     return first(x) + k;
 }
 
-template <typename T, std::ptrdiff_t k>
+template <typename T, pointer_diff k>
 constexpr auto
 limit(array_k<T, k>& x) -> Pointer_type<T>
 {
     return first(x) + k;
 }
 
-template <typename T, std::ptrdiff_t k>
+template <typename T, pointer_diff k>
 constexpr auto
 last(array_k<T, k>& x) -> Pointer_type<T>
 {
     return limit(x) - 1;
 }
 
-template <typename T, std::ptrdiff_t k>
+template <typename T, pointer_diff k>
 constexpr auto
 is_empty(array_k<T, k> const&) -> bool
 {
     return false;
 }
 
-template <typename T, std::ptrdiff_t k>
+template <typename T, pointer_diff k>
 constexpr auto
 size(array_k<T, k> const&) -> Size_type<array_k<T, k>>
 {

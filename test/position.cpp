@@ -157,6 +157,9 @@ SCENARIO ("Using access functions", "[position]")
 
     SECTION ("Mutable")
     {
+        static_assert(e::Mutable<int>);
+        static_assert(e::Mutable<int*>);
+
         auto y = e::at(x);
         REQUIRE (e::at(y) == 0);
 

@@ -56,6 +56,12 @@ The second version of `map` takes a loadable range and a loadable position as so
 
 `reduce_nonempty` takes a nonempty loadable range, a binary operation, and optionally a unary function. It starts with the result of applying the unary function on the first element of the range as the result, and, for each element in the rest of the range, applies the binary operation on the result and the return value of the unary function applied on the element. The default function is `load`.
 
+`reduce_nonzeroes` takes a loadable range, a binary operation, optionally a unary function, and a zero value. It works the same as `reduce` except that the binary function is not applied when the
+function applied on an element of the range returns the zero value. The default function is `load`.
+
+`reduce_balanced` takes a loadable range, a binary operation, optionally a unary function, and a zero value. It performs balanced reduction, storing intermediate reductions in a `binary_counter`. The default function is `load`.
+This algorithm minimizes the cost of applying the operation if the size of a reduced object is the sum of the sizes of the original objects and the complexity of applying the reduction operation grows linearly with the sizes of its arguments.
+
 # Data structures
 
 ## Linear data structures
@@ -79,6 +85,8 @@ to the array elements. `array` has regular semantics, lexicographic comparison o
 `rational` implements a rational number type, forming a `Field` over any `Integral_domain`.
 
 `polynomial` implements a polynomial type, forming an `Integral_domain` over any `Ring`. `degree` returns the degree of the polynomial, where an empty polynomial has degree -1. `evaluate` evaluates the polynomial at a given value, and `subderivative` calculates the k:th subderivate of a given polynomial and value k.
+
+`binary counter` implements a binary counter of k elements, using a given binary operation and identity element. When calling it with an object, if the object is not equal to the identity element of the counter, it will be reduced with the existing elements in the counter, resetting each element to the identity element until either an identity element is found or the end of the elements are reached. If an identity element is found, the reduced value replaces it. If the end of the elements are reached, it is appended as the new last element.
 
 ## Sum types
 
@@ -334,6 +342,9 @@ Index
 
 `map`
 `reduce`
+`reduce_nonempty`
+`reduce_nonzeroes`
+`reduce_balanced`
 
 # Data structures
 

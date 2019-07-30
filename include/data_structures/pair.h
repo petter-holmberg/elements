@@ -26,8 +26,8 @@ struct pair
     template <Unary_function Fun>
     requires
         Same<T0, T1> and
-        Same<Decay<T0>, Decay<Domain<Fun>>> and
-        Same<Decay<T0>, Decay<Codomain<Fun>>>
+        Same<Decay<T0>, Domain<Fun>> and
+        Same<Decay<T0>, Codomain<Fun>>
     constexpr auto
     map(Fun fun) -> pair<T0>&
     {
@@ -39,9 +39,9 @@ struct pair
     template <Unary_function Fun>
     requires
         Same<T0, T1> and
-        Same<Decay<T0>, Decay<Domain<Fun>>>
+        Same<Decay<T0>, Domain<Fun>>
     constexpr auto
-    map(Fun fun) const -> pair<Decay<Codomain<Fun>>>
+    map(Fun fun) const -> pair<Codomain<Fun>>
     {
         return {fun(m0), fun(m1)};
     }

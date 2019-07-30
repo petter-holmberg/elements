@@ -27,23 +27,19 @@ concept Loadable =
         { load(x) } -> Value_type<L> const&;
     };
 
-template <typename T>
-requires Movable<T>
+template <Movable T>
 constexpr void
 store(T& x, Value_type<T> const& v);
 
-template <typename T>
-requires Movable<T>
+template <Movable T>
 constexpr void
 store(T& x, Value_type<T>&& v);
 
-template <typename T>
-requires Movable<T>
+template <Movable T>
 constexpr void
 store(Pointer_type<T> x, Value_type<T> const& v);
 
-template <typename T>
-requires Movable<T>
+template <Movable T>
 constexpr void
 store(Pointer_type<T> x, Value_type<T>&& v);
 
@@ -53,6 +49,22 @@ concept Storable =
     requires (S& x, Value_type<S>&& v) {
         store(x, v);
     };
+
+template <Movable T>
+constexpr auto
+at(T& x) -> T&;
+
+template <Movable T>
+constexpr auto
+at(T const& x) -> T const&;
+
+template <Movable T>
+constexpr auto
+at(Pointer_type<T> x) -> T&;
+
+template <Movable T>
+constexpr auto
+at(Pointer_type<T const> x) -> T const&;
 
 template <typename M>
 concept Mutable =

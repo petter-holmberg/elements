@@ -51,7 +51,7 @@ allocate_array(Distance_type<Pointer_type<T>> n) -> Pointer_type<array_prefix<T>
         std::malloc(
             sizeof(array_prefix<T>) +
             static_cast<std::size_t>(
-                (predecessor(n) * static_cast<std::ptrdiff_t>(sizeof(T))))))};
+                (predecessor(n) * static_cast<pointer_diff>(sizeof(T))))))};
     Pointer_type<T> first{pointer_to(at(remote).x)};
     at(remote).limit = first;
     at(remote).limit_of_storage = first + n;
@@ -91,7 +91,7 @@ struct array
 
     constexpr
     array(std::initializer_list<T> x)
-        : header{allocate_array<T>(Size_type<array<T>>{static_cast<std::ptrdiff_t>(std::size(x))})}
+        : header{allocate_array<T>(Size_type<array<T>>{static_cast<pointer_diff>(std::size(x))})}
     {
         at(header).limit = copy(std::begin(x), std::end(x), first(at(this)));
     }
@@ -132,21 +132,21 @@ struct array
     }
 
     constexpr auto
-    operator[](std::ptrdiff_t i) -> T&
+    operator[](pointer_diff i) -> T&
     {
         return at(first(at(this)) + i);
     }
 
     constexpr auto
-    operator[](std::ptrdiff_t i) const -> T const&
+    operator[](pointer_diff i) const -> T const&
     {
         return at(first(at(this)) + i);
     }
 
     template <Unary_function Fun>
     requires
-        Same<Decay<T>, Decay<Domain<Fun>>> and
-        Same<Decay<T>, Decay<Codomain<Fun>>>
+        Same<Decay<T>, Domain<Fun>> and
+        Same<Decay<T>, Codomain<Fun>>
     constexpr auto
     map(Fun fun) -> array<T>&
     {
@@ -156,12 +156,12 @@ struct array
     }
 
     template <Unary_function Fun>
-    requires Same<Decay<T>, Decay<Domain<Fun>>>
+    requires Same<Decay<T>, Domain<Fun>>
     constexpr auto
-    map(Fun fun) const -> array<Decay<Codomain<Fun>>>
+    map(Fun fun) const -> array<Codomain<Fun>>
     {
         using elements::map;
-        array<Decay<Codomain<Fun>>> x;
+        array<Codomain<Fun>> x;
         reserve(x, size(*this));
         map(first(*this), limit(*this), first(x), fun);
         at(x.header).limit = at(x.header).limit_of_storage;
@@ -169,11 +169,11 @@ struct array
     }
 
     template <Unary_function Fun>
-    requires Same<Decay<T>, Decay<Domain<Fun>>>
+    requires Same<Decay<T>, Domain<Fun>>
     constexpr auto
-    bind(Fun fun) -> Decay<Codomain<Fun>>
+    bind(Fun fun) -> Codomain<Fun>
     {
-        Decay<Codomain<Fun>> x;
+        Codomain<Fun> x;
         auto src = first(*this);
         auto lim = limit(*this);
         while (precedes(src, lim)) {
@@ -220,7 +220,7 @@ template <typename T>
 requires Semiregular<Remove_cv<T>>
 struct size_type_t<array<T>>
 {
-    using type = std::ptrdiff_t;
+    using type = pointer_diff;
 };
 
 template <typename T>

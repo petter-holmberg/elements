@@ -170,16 +170,16 @@ operator/=(T& x, T const& y) -> T&
 // Semirings
 
 template <
-    typename S0,
+    Position S0,
     Limit<S0> L0,
-    typename S1,
-    typename D,
+    Position S1,
+    Forward_position D,
     typename S_add_op,
     typename S_mul_op>
 requires
-    Loadable<S0> and Position<S0> and
-    Loadable<S0> and Position<S1> and
-    Storable<D> and Forward_position<D> and
+    Loadable<S0> and
+    Loadable<S1> and
+    Storable<D> and
     Semiring<Decay<Value_type<S0>>, S_add_op, S_mul_op> and
     Semiring<Decay<Value_type<S1>>, S_add_op, S_mul_op> and
     Semiring<Decay<Value_type<D>>, S_add_op, S_mul_op>

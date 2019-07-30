@@ -11,7 +11,7 @@ requires
     Loadable<P0> and Position<P0> and
     Loadable<P1> and Position<P1> and
     Same<Decay<Value_type<P0>>, Decay<Value_type<P1>>> and
-    Same<Decay<Value_type<P0>>, Decay<Domain<Rel>>>
+    Same<Decay<Value_type<P0>>, Domain<Rel>>
 constexpr auto
 lexicographical_equivalent(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel) -> bool
 //[[expects axiom: loadable_range(pos0, lim0)]]
@@ -38,7 +38,7 @@ requires
     Loadable<P0> and Position<P0> and
     Loadable<P1> and Position<P1> and
     Same<Decay<Value_type<P0>>, Decay<Value_type<P1>>> and
-    Same<Decay<Value_type<P0>>, Decay<Domain<Rel>>>
+    Same<Decay<Value_type<P0>>, Domain<Rel>>
 constexpr auto
 lexicographical_compare(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel) -> bool
 //[[expects axiom: loadable_range(pos0, lim0)]]

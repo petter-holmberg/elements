@@ -20,3 +20,13 @@ SCENARIO ("Reduction", "[reduce]")
         REQUIRE (e::reduce_nonempty(x, x + 5, e::sum<int>{}) == 10);
     }
 }
+
+SCENARIO ("Balanced reduction", "[reduce]")
+{
+    int x[]{0, 1, 2, 3, 4};
+
+    SECTION ("Balanced reduction of array")
+    {
+        REQUIRE(e::reduce_balanced(x, x + 5, e::sum<int>(), 0) == 10);
+    }
+}

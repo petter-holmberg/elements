@@ -67,7 +67,7 @@ struct invocable_t
             using type = typename call_type::template parameter_t<n + 1>::type;
         };
 
-        using domain_type = Remove_cv<Remove_ref<typename parameter_t<0>::type>>;
+        using domain_type = Decay<typename parameter_t<0>::type>;
 };
 
 // Lvalue reference
