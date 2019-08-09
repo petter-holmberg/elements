@@ -111,7 +111,7 @@ struct position_type_t<array_k<T, k> const>
 template <Semiregular T, pointer_diff k>
 struct size_type_t<array_k<T, k>>
 {
-    using type = Distance_type<Pointer_type<T>>;
+    using type = Difference_type<Pointer_type<T>>;
     static constexpr auto value = k;
 };
 

@@ -104,7 +104,7 @@ requires Movable<Decay<P>>
 constexpr void
 increment(Pointer_type<P>& x)
 {
-    x = x + One<Distance_type<Pointer_type<P>>>;
+    x = x + One<Difference_type<Pointer_type<P>>>;
 }
 
 template <typename P>
@@ -120,7 +120,7 @@ requires Movable<Decay<P>>
 constexpr void
 decrement(Pointer_type<P>& x)
 {
-    x = x - One<Distance_type<Pointer_type<P>>>;
+    x = x - One<Difference_type<Pointer_type<P>>>;
 }
 
 template <typename T>

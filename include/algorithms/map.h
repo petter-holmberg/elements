@@ -16,8 +16,8 @@ map(S src, L lim, D dst, Fun fun) -> D
 {
     while (precedes(src, lim)) {
         store(dst, fun(load(src)));
-        increment(dst);
         increment(src);
+        increment(dst);
     }
     return dst;
 }
@@ -37,9 +37,9 @@ map(S0 src0, L0 lim0, S1 src1, D dst, Fun fun) -> D
 {
     while (precedes(src0, lim0)) {
         store(dst, fun(load(src0), load(src1)));
-        increment(dst);
-        increment(src1);
         increment(src0);
+        increment(src1);
+        increment(dst);
     }
     return dst;
 }

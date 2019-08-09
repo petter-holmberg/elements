@@ -61,10 +61,7 @@ search_if_unguarded(P pos, U pred) -> P
 //[[expects axiom: loadable_range(pos, _)]]
 //[[expects axiom: any_of(pos, _, pred)]]
 {
-    do {
-        if (pred(load(pos))) break;
-        increment(pos);
-    } while (true);
+    while (!pred(load(pos))) increment(pos);
     return pos;
 }
 

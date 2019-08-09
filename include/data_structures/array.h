@@ -43,7 +43,7 @@ struct array_prefix
 template <typename T>
 requires Semiregular<Remove_cv<T>>
 constexpr auto
-allocate_array(Distance_type<Pointer_type<T>> n) -> Pointer_type<array_prefix<T>>
+allocate_array(Difference_type<Pointer_type<T>> n) -> Pointer_type<array_prefix<T>>
 {
     using P = Pointer_type<array_prefix<T>>;
     if (is_zero(n)) return P{nullptr};

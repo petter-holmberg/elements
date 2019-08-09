@@ -27,20 +27,6 @@ struct difference_type_t<T*>
     using type = pointer_diff;
 };
 
-template <typename>
-struct distance_type_t;
-
-template <typename T>
-requires Movable<Decay<T>>
-struct distance_type_t<Pointer_type<T>>
-{
-    using type = pointer_diff;
-};
-
-template <typename T>
-requires Movable<Decay<T>>
-using Distance_type = typename distance_type_t<T>::type;
-
 template <typename T>
 requires Movable<Decay<T>>
 struct position_type_t

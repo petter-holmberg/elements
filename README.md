@@ -7,24 +7,6 @@ Library contents
 
 `choose` selects the n choose k binomial coefficent.
 
-## Searching
-
-### Linear search
-
-The functions in `search.h` implement algorithms based on linear search, as described in [Knuth3](#Knuth3), Chapter 6.1.
-
-`search` and `search_not` take a loadable range and a value that is equality-comparable with the elements of the range, stopping at the position of the first matching element, or at the limit of the range if no matching element is found.
-For `search`, a match is defined as the first element `y` in the range for which the given element `x` equals `y`.
-For `search_not`, a match is defined as the first element `y` in the range for which the given element `x` differs from `y`.
-
-`search_if` and `search_if_not` take a unary predicate instead of an element.
-For `search_if`, a match is defined as the first element `x` for which the given predicate is true.
-For `search_not`, a match is defined as the first element `y` for which the given predicate is false.
-
-`search_unguarded`, `search_not_unguarded`, `search_if_unguarded`, and `search_if_not_unguarded` are variations of the functions above that assume an element satisfying the applied predicate is known to exist in the given range. They take a position to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration.
-
-`search_match` and `search_mismatch` take two loadable ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `equal`.
-
 ## Equivalence and ordering
 
 `select_0_2` takes a weak ordering and two values of its domain, and returns the minimum value. `min` uses `less` as the weak ordering.
@@ -62,19 +44,25 @@ function applied on an element of the range returns the zero value. The default 
 `reduce_balanced` takes a loadable range, a binary operation, optionally a unary function, and a zero value. It performs balanced reduction, storing intermediate reductions in a `binary_counter`. The default function is `load`.
 This algorithm minimizes the cost of applying the operation if the size of a reduced object is the sum of the sizes of the original objects and the complexity of applying the reduction operation grows linearly with the sizes of its arguments.
 
+## Searching
+
+### Linear search
+
+The functions in `search.h` implement algorithms based on linear search, as described in [Knuth3](#Knuth3), Chapter 6.1.
+
+`search` and `search_not` take a loadable range and a value that is equality-comparable with the elements of the range, stopping at the position of the first matching element, or at the limit of the range if no matching element is found.
+For `search`, a match is defined as the first element `y` in the range for which the given element `x` equals `y`.
+For `search_not`, a match is defined as the first element `y` in the range for which the given element `x` differs from `y`.
+
+`search_if` and `search_if_not` take a unary predicate instead of an element.
+For `search_if`, a match is defined as the first element `x` for which the given predicate is true.
+For `search_not`, a match is defined as the first element `y` for which the given predicate is false.
+
+`search_unguarded`, `search_not_unguarded`, `search_if_unguarded`, and `search_if_not_unguarded` are variations of the functions above that assume an element satisfying the applied predicate is known to exist in the given range. They take a position to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration.
+
+`search_match` and `search_mismatch` take two loadable ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `equal`.
+
 # Data structures
-
-## Linear data structures
-
-`pair` implements a structure of two elements (that may differ in type) allocated on the stack. They can be accessed through the function `get`, either by position or by type. If the two elements
-are of the same type, `pair` also provides a functor interface through the member function `.map`.
-
-`array` implements an array of elements contiguously allocated on the free store, like `std::vector`. It stores a single pointer on the stack, keeping the array size and capacity in a header
-to the array elements. `array` has regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
-`array` also provides a monadic interface through the member functions `.map` and `.bind`.
-
-`array_k` implements an array of *k* elements contiguously allocated on the stack, like built-in C++ arrays, but with regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
-`array_k` also provides a monadic interface through the member functions `.map` and `.bind`.
 
 ## Algebra
 
@@ -87,6 +75,18 @@ to the array elements. `array` has regular semantics, lexicographic comparison o
 `polynomial` implements a polynomial type, forming an `Integral_domain` over any `Ring`. `degree` returns the degree of the polynomial, where an empty polynomial has degree -1. `evaluate` evaluates the polynomial at a given value, and `subderivative` calculates the k:th subderivate of a given polynomial and value k.
 
 `binary counter` implements a binary counter of k elements, using a given binary operation and identity element. When calling it with an object, if the object is not equal to the identity element of the counter, it will be reduced with the existing elements in the counter, resetting each element to the identity element until either an identity element is found or the end of the elements are reached. If an identity element is found, the reduced value replaces it. If the end of the elements are reached, it is appended as the new last element.
+
+## Linear data structures
+
+`pair` implements a structure of two elements (that may differ in type) allocated on the stack. They can be accessed through the function `get`, either by position or by type. If the two elements
+are of the same type, `pair` also provides a functor interface through the member function `.map`.
+
+`array` implements an array of elements contiguously allocated on the free store, like `std::vector`. It stores a single pointer on the stack, keeping the array size and capacity in a header
+to the array elements. `array` has regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
+`array` also provides a monadic interface through the member functions `.map` and `.bind`.
+
+`array_k` implements an array of *k* elements contiguously allocated on the stack, like built-in C++ arrays, but with regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
+`array_k` also provides a monadic interface through the member functions `.map` and `.bind`.
 
 ## Sum types
 
@@ -203,7 +203,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 `Homogeneous_predicate` describes a `Predicate` that is also a `Homogeneous_function`.
 `Relation` describes a `Homogeneous_predicate` of `Arity` 2.
 
-## Ordered algebraic concpets
+## Ordered algebraic concepts
 
 `Ordered_additive_semigroup` describes an `Additive_semigroup` that is also `Totally_ordered`.
 `Ordered_additive_monoid` describes an `Additive_monoid` that is also `Totally_ordered`.
@@ -274,11 +274,9 @@ returns either a reference or a constant reference to its held object.
 
 `Pointer_type` is the type of a pointer to an object of a given type.
 
-`Value_type` is either a type directly, or, in the case of a `Position` type, or a `Range` type, the type it is parameterized on.
+`Value_type` is either a type directly, or, in the case of a `Position` type or a `Range` type, the type it is parameterized on.
 
-`Difference_type` is a type capable of storing the (signed) difference between two objects of the given type.
-
-`Distance_type` is a type capable of storing the (unsigned) distance between two objects of the given type.
+`Difference_type` is a type capable of storing the (signed) difference between two positions of the given type.
 
 `Position_type` is the type of an object describing a position to the given type.
 
@@ -348,14 +346,14 @@ Index
 
 # Data structures
 
-`pair`
-`array`
-`array_k`
-
 `coordinate_point`
 `coordinate_vector`
 `rational`
 `polynomial`
+
+`pair`
+`array`
+`array_k`
 
 `expected`
 
@@ -461,7 +459,6 @@ Index
 `Pointer_type`
 `Value_type`
 `Difference_type`
-`Distance_type`
 `Position_type`
 `Size_type`
 `Size`
