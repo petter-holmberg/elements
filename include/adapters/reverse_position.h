@@ -97,9 +97,9 @@ store(reverse_position<P>& pos, Value_type<P>&& value)
 template <Bidirectional_position P>
 requires Mutable<P>
 constexpr auto
-at(reverse_position<P>& pos) -> Underlying_type<Value_type<P>>&
+at(reverse_position<P>& pos) -> Value_type<P>&
 {
-    return (at(predecessor(pos.pos)));
+    return at(predecessor(pos.pos));
 }
 
 template <Bidirectional_position P>

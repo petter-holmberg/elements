@@ -1,6 +1,18 @@
 Library contents
 ----------------
 
+# Adapters
+
+Adapters are type constructors that provide a different behavior and/or different interface than the given type.
+
+## Position adapters
+
+`counted_position` takes a `Position` and optionally a count of the `Difference_type` of the position, constructing a position type that can be compared against a limit that is `Equality_comparable_with` the count. `increment` increments both the position and the count, `decrement` decrements both the position and the count.
+
+`loadable_position` takes a `Loadable` `Position` and provides the minimal interface required.
+
+`reverse_position` takes a `Bidirectional_position` and implements a `Bidirectional_position` where `increment` decrements and `decrement` increments. Loading and storing is done from the predecessor of the original position. It is used for traversing ranges in reverse.
+
 # Algorithms
 
 ## Algebra
@@ -213,6 +225,17 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 ## Positions
 
+Positions are types representing a point in a space, such as a number in a numeric type or a memory address to an element in a data structure.
+When defined, positions have successors and predecessors that can be accessed with the functions `increment` and `decrement`. The point value the position refers to can often be accessed via the position with the functions `load` and `store`.
+
+### Linear traversal
+
+`Position` describes a `Movable` object representing a point in a space, with a function `increment` that moves it to the next point. Points are not necessarily visitable more than once.
+
+`Forward_position` describes a `Regular` `Position` type where points may be visited multiple times.
+
+`Bidirectional_position` describes a `Forward_position` type with a function `decrement` that moves it to the previous point.
+
 ### Access
 
 `Loadable` describes a type with a function `load` that returns a constant reference to its held object. For an object that represents the position of another object, `load` returns a reference to the other object. For other objects, load returns a reference to the object itself.
@@ -221,14 +244,6 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 `Mutable` describes a type that is both `Loadable` and `Storable`, and defines a function `at` that
 returns either a reference or a constant reference to its held object.
-
-### Linear traversal
-
-`Position` describes a `Movable` object representing the position in a range, with a function `increment` that moves it to the next position in a range. Elements in the range are not necessarily visitable more than once.
-
-`Forward_position` describes a `Regular` `Position` object where elements in the range may be visited multiple times.
-
-`Bidirectional_position` describes a `Forward_position` type with a function `decrement` that moves it to the previous position in a range.
 
 ### Ranges
 
@@ -239,12 +254,6 @@ returns either a reference or a constant reference to its held object.
 
 `Sequence` describes a `Range` that is `Totally_ordered`, and represents a composite object whose range of elements are its parts. It has functions `is_empty`. `size` and `operator[]` for element access.
 `Dynamic_sequence` describes a `Sequence` that can change size at runtime. It has functions `insert` and `erase` to change elements at the back of the range.
-
-# Adapters
-
-`loadable_position` takes a `Loadable` `Position` and provides the minimal interface required.
-
-`reverse_position` takes a `Bidirectional_position` and implements a `Bidirectional_position` where `increment` decrements and `decrement` increments. Loading and storing is done from the predecessor of the original position. It is used for traversing ranges in reverse.
 
 # Type functions
 
@@ -303,6 +312,12 @@ Short names are deemed desirable, but abbreviations are generally avoided.
 
 Index
 -----
+
+# Adapters
+
+`counted_position`
+`loadable_position`
+`reverse_position`
 
 # Algorithms
 
@@ -408,12 +423,12 @@ Index
 `Ordered_ring`
 `Ordered_integral_domain`
 
-`Loadable`
-`Storable`
-`Mutable`
 `Position`
 `Forward_position`
 `Bidirectional_position`
+`Loadable`
+`Storable`
+`Mutable`
 `Limit`
 `Range`
 `Mutable_range`
@@ -436,11 +451,6 @@ Index
 `Regular`
 `Default_totally_ordered`
 `Totally_ordered`
-
-# Adapters
-
-`loadable_position`
-`reverse_position`
 
 # Type functions
 

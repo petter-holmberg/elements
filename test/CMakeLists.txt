@@ -7,6 +7,7 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/copy.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/coordinate_point.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/coordinate_vector.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/counted_position.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/expected.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/invocable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lexicographical.cpp
