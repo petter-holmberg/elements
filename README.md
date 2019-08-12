@@ -11,6 +11,8 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 `loadable_position` takes a `Loadable` `Position` and provides the minimal interface required.
 
+`loadable_forward_position` takes a `Loadable` `Forward_position` and provides the minimal interface required.
+
 `reverse_position` takes a `Bidirectional_position` and implements a `Bidirectional_position` where `increment` decrements and `decrement` increments. Loading and storing is done from the predecessor of the original position. It is used for traversing ranges in reverse.
 
 # Algorithms
@@ -56,7 +58,25 @@ function applied on an element of the range returns the zero value. The default 
 `reduce_balanced` takes a loadable range, a binary operation, optionally a unary function, and a zero value. It performs balanced reduction, storing intermediate reductions in a `binary_counter`. The default function is `load`.
 This algorithm minimizes the cost of applying the operation if the size of a reduced object is the sum of the sizes of the original objects and the complexity of applying the reduction operation grows linearly with the sizes of its arguments.
 
+## Partitioning
+
+`is_partitioned` takes a loadable range and a unary predicate. It checks if the range is partitioned according to the predicate, with all elements not satisfying the predicate preceding the elements satisfying the predicate.
+
+`partition_point_counted` takes a forward position, a distance, and a unary predicate, assuming that the range from the position to the position + distance is partitioned according to the predicate. Using bisection, it returns the position of the first element satisfying the predicate.
+
+`partition_point` takes a loadable forward range and a unary predicate, assuming that the range is partitioned according to the predicate. Using bisection, it returns the position of the first element satisfying the predicate.
+
 ## Searching
+
+### Binary search
+
+The functions in `search.h` implement algorithms based on binary search, as described in [Knuth3](#Knuth3), Chapter 6.2.
+
+`search_binary_lower` takes a loadable forward range and a relation defaulting to `less`, assuming that the range is ordered in accordance with the relation. It returns the position of the first element satisfying the relation.
+
+`search_binary_upper` takes a loadable forward range and a relation defaulting to `less`, assuming that the range is ordered in accordance with the relation. It returns the successor to the position of the last element satisfying the relation.
+
+`search_binary` takes a loadable forward range and a relation defaulting to `less`, assuming that the range is ordered in accordance with the relation. It finds the `bounded_range` of elements satisfying the relation.
 
 ### Linear search
 
@@ -99,6 +119,8 @@ to the array elements. `array` has regular semantics, lexicographic comparison o
 
 `array_k` implements an array of *k* elements contiguously allocated on the stack, like built-in C++ arrays, but with regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
 `array_k` also provides a monadic interface through the member functions `.map` and `.bind`.
+
+`bounded_range` implements a `Range` consisting of two `Loadable` positions.
 
 ## Sum types
 
@@ -317,22 +339,12 @@ Index
 
 `counted_position`
 `loadable_position`
+`loadable_forward_position`
 `reverse_position`
 
 # Algorithms
 
 `choose`
-
-`search`
-`search_not`
-`search_if`
-`search_if_not`.
-`search_unguarded`,
-`search_not_unguarded`,
-`search_if_unguarded`
-`search_if_not_unguarded`
-`search_match`
-`search_mismatch`
 
 `select_0_2`
 `min`
@@ -359,6 +371,25 @@ Index
 `reduce_nonzeroes`
 `reduce_balanced`
 
+`is_partitioned`
+`partition_point_counted`
+`partition_point`
+
+`search_binary_lower`
+`search_binary_upper`
+`search_binary`
+
+`search`
+`search_not`
+`search_if`
+`search_if_not`.
+`search_unguarded`,
+`search_not_unguarded`,
+`search_if_unguarded`
+`search_if_not_unguarded`
+`search_match`
+`search_mismatch`
+
 # Data structures
 
 `coordinate_point`
@@ -369,6 +400,8 @@ Index
 `pair`
 `array`
 `array_k`
+
+`bounded_range`
 
 `expected`
 

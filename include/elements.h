@@ -7,6 +7,7 @@
 
 #include "adapters/counted_position.h"
 #include "adapters/loadable_position.h"
+#include "adapters/loadable_forward_position.h"
 #include "adapters/reverse_position.h"
 
 #include "algorithms/algebra.h"
@@ -18,9 +19,11 @@
 #include "algorithms/map.h"
 #include "algorithms/ordered_algebra.h"
 #include "algorithms/ordering.h"
+#include "algorithms/partition.h"
 #include "algorithms/position.h"
 #include "algorithms/regular.h"
 #include "algorithms/search.h"
+#include "algorithms/search_binary.h"
 #include "algorithms/swap.h"
 
 #include "concepts/functional.h"
@@ -33,4 +36,5 @@
 #include "data_structures/expected.h"
 #include "data_structures/pair.h"
 #include "data_structures/polynomial.h"
+#include "data_structures/bounded_range.h"
 #include "data_structures/rational.h"

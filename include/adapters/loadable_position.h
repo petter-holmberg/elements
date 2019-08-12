@@ -11,8 +11,6 @@ struct loadable_position
 {
     P pos;
 
-    loadable_position() = delete;
-
     explicit loadable_position(P pos_) : pos{pos_} {}
 
     loadable_position(loadable_position const&) = delete;

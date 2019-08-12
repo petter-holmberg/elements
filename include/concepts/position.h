@@ -126,6 +126,7 @@ precedes(P const&, L const&) -> bool;
 
 template <typename L, typename P>
 concept Limit =
+    Regular<L> and
     Position<P> and
     requires (P const& pos, L const& lim) {
         { precedes(pos, lim) } -> bool;

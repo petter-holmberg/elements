@@ -183,6 +183,19 @@ precedes(Pointer_type<T> const& pos0, Pointer_type<T> const& pos1) -> bool
     return pos0 != pos1;
 }
 
+template <Position P, Limit<P> L>
+constexpr auto
+operator-(P pos, L lim) -> Difference_type<P>
+//[[expects axiom: is_bounded_range(range)]]
+{
+    auto n(Zero<Difference_type<P>>);
+    while (precedes(pos, lim)) {
+        increment(n);
+        increment(pos);
+    }
+    return n;
+}
+
 template <Sequence S>
 struct front
 {

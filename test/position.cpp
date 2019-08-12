@@ -174,6 +174,7 @@ SCENARIO ("Using linear traversal functions", "[position]")
     {
         static_assert(e::Position<int>);
         static_assert(e::Position<int*>);
+        static_assert(e::Position<e::loadable_position<int>>);
 
         e::loadable_position p0{0};
         e::loadable_position p1{0};
@@ -183,9 +184,8 @@ SCENARIO ("Using linear traversal functions", "[position]")
 
     SECTION ("Forward_position")
     {
-        static_assert(e::Forward_position<forward_position>);
         static_assert(e::Forward_position<int>);
         static_assert(e::Forward_position<int*>);
-
+        static_assert(e::Forward_position<e::loadable_forward_position<int>>);
     }
 }

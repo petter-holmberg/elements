@@ -15,12 +15,14 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/ordered_algebra.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ordering.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pair.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/partition.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/polynomial.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/position.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/rational.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/reduce.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/reverse_position.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/search.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/search.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/search_binary.cpp)
 
 add_executable (tests ${TEST_SOURCES})
 target_link_libraries (tests Catch)
