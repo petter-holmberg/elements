@@ -68,7 +68,7 @@ struct array_k
     template <Unary_function Fun>
     requires Same<Decay<T>, Domain<Fun>>
     constexpr auto
-    bind(Fun fun) -> array_k<Value_type<Codomain<Fun>>, k * Size<Codomain<Fun>>>
+    flat_map(Fun fun) -> array_k<Value_type<Codomain<Fun>>, k * Size<Codomain<Fun>>>
     {
         array_k<Value_type<Codomain<Fun>>, k * Size<Codomain<Fun>>> x;
         auto src = first(*this);

@@ -168,7 +168,7 @@ SCENARIO ("Using array", "[array]")
         static_assert(e::Monad<decltype(x), decltype(fn0)>);
         static_assert(e::Functor<decltype(x), decltype(fn1)>);
 
-        auto y = x.bind(fn0).map(fn1);
+        auto y = x.flat_map(fn0).map(fn1);
 
         REQUIRE (e::size(y) == 10);
         REQUIRE (y[0] == 0.5);

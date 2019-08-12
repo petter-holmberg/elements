@@ -8,7 +8,6 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/coordinate_point.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/coordinate_vector.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/counted_position.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/expected.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/invocable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lexicographical.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/map.cpp
@@ -20,6 +19,7 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/position.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/rational.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/reduce.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/result.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/reverse_position.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/search.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/search_binary.cpp)

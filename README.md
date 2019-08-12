@@ -115,18 +115,18 @@ are of the same type, `pair` also provides a functor interface through the membe
 
 `array` implements an array of elements contiguously allocated on the free store, like `std::vector`. It stores a single pointer on the stack, keeping the array size and capacity in a header
 to the array elements. `array` has regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
-`array` also provides a monadic interface through the member functions `.map` and `.bind`.
+`array` also provides a monadic interface through the member functions `.map` and `.flat_map`.
 
 `array_k` implements an array of *k* elements contiguously allocated on the stack, like built-in C++ arrays, but with regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
-`array_k` also provides a monadic interface through the member functions `.map` and `.bind`.
+`array_k` also provides a monadic interface through the member functions `.map` and `.flat_map`.
 
 `bounded_range` implements a `Range` consisting of two `Loadable` positions.
 
 ## Sum types
 
-`expected` implements a type that carries either a value or an error. The presence of a value can be checked by boolean evaluation. An expected object is `Mutable` if its `Value_type` is.
-`make_unexpected` constructs an `expected` carrying an error.
-`expected` also provides a monadic interface through the member functions `.map` and `.bind`.
+`result` implements a type that carries either a value or an error. The presence of a value can be checked by boolean evaluation. An expected object is `Mutable` if its `Value_type` is.
+`fail` constructs a `result` carrying an error.
+`result` also provides a monadic interface through the member functions `.map` and `.flat_map`.
 
 # Concepts
 
@@ -212,7 +212,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 `Functor` describes a `Movable` type together with a `Unary_function` type, where the `Value_type` of the type is the same as the `Domain` of the function type, and a member function `.map` is defined and applies the function onto the element(s) it contains, returning an object of the same type.
 
-`Monad` describes a `Functor` that is also default constructible, and where the member function `.bind` is defined and takes a `Unary_function` returning an object of the same type.
+`Monad` describes a `Functor` that is also default constructible, and where the member function `.flat_map` is defined and takes a `Unary_function` returning an object of the same type.
 
 ## Integers
 
@@ -289,7 +289,7 @@ returns either a reference or a constant reference to its held object.
 
 `Element_type` is the type of an element in a `pair` with a given index.
 
-`Error_type` is the type of the error that can be stored in an `expected`.
+`Error_type` is the type of the error that can be stored in a `result`.
 
 ## Invocable
 
@@ -403,7 +403,7 @@ Index
 
 `bounded_range`
 
-`expected`
+`result`
 
 # Concepts
 

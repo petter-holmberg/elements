@@ -18,7 +18,7 @@ concept Monad =
     Functor<T, Fun> and
     Default_constructible<T> and
     requires (T x, Fun fun) {
-        x.bind(fun);
+        x.flat_map(fun);
     };
 
 }

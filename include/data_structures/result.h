@@ -4,32 +4,32 @@
 
 namespace elements {
 
-template <Movable E>
-struct unexpected
+template <Movable F>
+struct failure
 {
-    E value;
+    F value;
 
     explicit
-    unexpected(E const& value_)
+    failure(F const& value_)
         : value(value_)
     {}
 };
 
 template <Movable, Movable>
-struct expected;
+struct result;
 
 template <Movable T, Movable E>
 constexpr auto
-make_unexpected(E const& error) -> expected<T, E>
+fail(E const& error) -> result<T, E>
 {
-    return expected<T, E>(unexpected(error));
+    return result<T, E>(failure(error));
 }
 
 template <Movable T, Movable E>
 constexpr auto
-make_unexpected(E&& error) -> expected<T, E>
+fail(E&& error) -> result<T, E>
 {
-    return expected<T, E>(unexpected(fw<E>(error)));
+    return result<T, E>(failure(fw<E>(error)));
 }
 
 template <typename>
@@ -40,7 +40,7 @@ requires Movable<Decay<T>>
 using Error_type = typename error_type_t<T>::type;
 
 template <Movable T, Movable E>
-struct expected
+struct result
 {
     union {
         T value;
@@ -49,13 +49,13 @@ struct expected
     bool has_value = true;
 
     constexpr
-    expected() noexcept
+    result() noexcept
     {
         construct(data.value);
     }
 
     constexpr
-    expected(expected const& x) noexcept
+    result(result const& x) noexcept
         : has_value(x.has_value)
     {
         if (has_value) {
@@ -66,7 +66,7 @@ struct expected
     }
 
     constexpr
-    expected (expected&& x) noexcept
+    result (result&& x) noexcept
         : has_value(x.has_value)
     {
         if (has_value) {
@@ -77,32 +77,32 @@ struct expected
     }
 
     explicit
-    expected(T const& value)
+    result(T const& value)
     {
         construct(data.value, value);
     }
 
     explicit
-    expected(T&& value)
+    result(T&& value)
     {
         construct(data.value, fw<T>(value));
     }
 
     explicit
-    expected(unexpected<E> const& error)
+    result(failure<E> const& error)
         : has_value(false)
     {
         construct(data.error, error.value);
     }
 
     explicit
-    expected(unexpected<E>&& error)
+    result(failure<E>&& error)
         : has_value(false)
     {
         construct(data.error, fw<E>(error.value));
     }
 
-    ~expected()
+    ~result()
     {
         if (has_value) {
             destroy(data.value);
@@ -112,15 +112,15 @@ struct expected
     }
 
     constexpr auto
-    operator=(expected<T, E> const& x) -> expected<T, E>&
+    operator=(result<T, E> const& x) -> result<T, E>&
     {
-        expected<T, E> temp(x);
+        result<T, E> temp(x);
         swap(at(this), temp);
         return at(this);
     }
 
     constexpr auto
-    operator=(expected<T, E>&& x) noexcept -> expected<T, E>&
+    operator=(result<T, E>&& x) noexcept -> result<T, E>&
     {
         has_value = x.has_value;
         if (has_value) {
@@ -132,9 +132,9 @@ struct expected
     }
 
     constexpr auto
-    operator=(unexpected<E> const& x) -> expected<T, E>&
+    operator=(failure<E> const& x) -> result<T, E>&
     {
-        expected<T, E> temp(x);
+        result<T, E> temp(x);
         swap(at(this), temp);
         return at(this);
     }
@@ -148,7 +148,7 @@ struct expected
     template <Unary_operation Op>
     requires Same<Decay<T>, Domain<Op>>
     constexpr auto
-    map(Op op) -> expected<T, E>&
+    map(Op op) -> result<T, E>&
     {
         if (has_value) data.value = op(data.value);
         return at(this);
@@ -157,12 +157,12 @@ struct expected
     template <Unary_function Fun>
     requires Same<Decay<T>, Domain<Fun>>
     constexpr auto
-    map(Fun fun) const -> expected<Codomain<Fun>, E>
+    map(Fun fun) const -> result<Codomain<Fun>, E>
     {
         if (has_value) {
-            return expected<Codomain<Fun>, E>(fun(data.value));
+            return result<Codomain<Fun>, E>(fun(data.value));
         } else {
-            return expected<Codomain<Fun>, E>(unexpected<E>(data.error));
+            return result<Codomain<Fun>, E>(failure<E>(data.error));
         }
     }
 
@@ -171,38 +171,38 @@ struct expected
         Same<Decay<T>, Domain<Fun>> and
         Same<Decay<E>, Error_type<Codomain<Fun>>>
     constexpr auto
-    bind(Fun fun) const -> Codomain<Fun>
+    flat_map(Fun fun) const -> Codomain<Fun>
     {
         if (has_value) {
             return fun(data.value);
         } else {
-            return Codomain<Fun>(unexpected<E>(data.error));
+            return Codomain<Fun>(failure<E>(data.error));
         }
     }
 };
 
 template <Movable T, Movable E>
-struct value_type_t<expected<T, E>>
+struct value_type_t<result<T, E>>
 {
     using type = T;
 };
 
 template <Movable T, Movable E>
-struct error_type_t<expected<T, E>>
+struct error_type_t<result<T, E>>
 {
     using type = E;
 };
 
 template <Movable T, Movable E>
 constexpr auto
-has_value(expected<T, E> const& x) noexcept -> bool
+has_value(result<T, E> const& x) noexcept -> bool
 {
     return x.has_value;
 }
 
 template <Movable T, Movable E>
 constexpr auto
-has_error(expected<T, E> const& x) noexcept -> bool
+has_error(result<T, E> const& x) noexcept -> bool
 {
     return !has_value(x);
 }
@@ -212,7 +212,7 @@ requires
     Regular<Remove_cv<T>> and
     Regular<Remove_cv<E>>
 constexpr auto
-operator==(expected<T, E> const& x, expected<T, E> const& y) -> bool
+operator==(result<T, E> const& x, result<T, E> const& y) -> bool
 {
     if (x and y) return x.data.value == y.data.value;
     if (!x and !y) return x.data.error == y.data.error;
@@ -222,7 +222,7 @@ operator==(expected<T, E> const& x, expected<T, E> const& y) -> bool
 template <typename T, Movable E>
 requires Regular<Remove_cv<T>>
 constexpr auto
-operator==(expected<T, E> const& x, T const& y) -> bool
+operator==(result<T, E> const& x, T const& y) -> bool
 {
     if (x) return x.data.value == y.data.value;
     return false;
@@ -231,7 +231,7 @@ operator==(expected<T, E> const& x, T const& y) -> bool
 template <typename T, Movable E>
 requires Regular<Remove_cv<T>>
 constexpr auto
-operator==(T const& x, expected<T, E> const& y) -> bool
+operator==(T const& x, result<T, E> const& y) -> bool
 {
     return y == x;
 }
@@ -239,7 +239,7 @@ operator==(T const& x, expected<T, E> const& y) -> bool
 template <typename T, Movable E>
 requires Regular<Remove_cv<T>>
 constexpr auto
-operator!=(expected<T, E> const& x, T const& y) -> bool
+operator!=(result<T, E> const& x, T const& y) -> bool
 {
     return !(x == y);
 }
@@ -247,7 +247,7 @@ operator!=(expected<T, E> const& x, T const& y) -> bool
 template <typename T, Movable E>
 requires Regular<Remove_cv<T>>
 constexpr auto
-operator!=(T const& x, expected<T, E> const& y) -> bool
+operator!=(T const& x, result<T, E> const& y) -> bool
 {
     return !(y == x);
 }
@@ -255,7 +255,7 @@ operator!=(T const& x, expected<T, E> const& y) -> bool
 template <Movable T, typename E>
 requires Regular<Remove_cv<E>>
 constexpr auto
-operator==(expected<T, E> const& x, unexpected<E> const& y) -> bool
+operator==(result<T, E> const& x, failure<E> const& y) -> bool
 {
     if (!x) return x.data.error == y.value.data.error;
     return false;
@@ -264,7 +264,7 @@ operator==(expected<T, E> const& x, unexpected<E> const& y) -> bool
 template <Movable T, typename E>
 requires Regular<Remove_cv<E>>
 constexpr auto
-operator==(unexpected<E> const& x, expected<T, E> const& y) -> bool
+operator==(failure<E> const& x, result<T, E> const& y) -> bool
 {
     return y == x;
 }
@@ -272,7 +272,7 @@ operator==(unexpected<E> const& x, expected<T, E> const& y) -> bool
 template <Movable T, typename E>
 requires Regular<Remove_cv<E>>
 constexpr auto
-operator!=(expected<T, E> const& x, unexpected<E> const& y) -> bool
+operator!=(result<T, E> const& x, failure<E> const& y) -> bool
 {
     return !(x == y);
 }
@@ -280,7 +280,7 @@ operator!=(expected<T, E> const& x, unexpected<E> const& y) -> bool
 template <Movable T, typename E>
 requires Regular<Remove_cv<E>>
 constexpr auto
-operator!=(unexpected<E> const& x, expected<T, E> const& y) -> bool
+operator!=(failure<E> const& x, result<T, E> const& y) -> bool
 {
     return !(y == x);
 }
@@ -290,7 +290,7 @@ requires
     Totally_ordered<Remove_cv<T>> and
     Totally_ordered<Remove_cv<E>>
 constexpr auto
-operator<(expected<T, E> const& x, expected<T, E> const& y) -> bool
+operator<(result<T, E> const& x, result<T, E> const& y) -> bool
 {
     if (x and y) return x.data.value < y.data.value;
     if (x and !y) return false;
@@ -300,7 +300,7 @@ operator<(expected<T, E> const& x, expected<T, E> const& y) -> bool
 
 template <Movable T, Movable E>
 constexpr void
-swap_value_error(expected<T, E>& x, expected<T, E>& y)
+swap_value_error(result<T, E>& x, result<T, E>& y)
     //[[expects: has_value(x)]]
     //[[expects: !has_value(y)]]
 {
@@ -314,7 +314,7 @@ swap_value_error(expected<T, E>& x, expected<T, E>& y)
 
 template <Movable T, Movable E>
 constexpr void
-swap(expected<T, E>& x, expected<T, E>& y)
+swap(result<T, E>& x, result<T, E>& y)
 {
     if (x and y) return swap(x.data.value, y.data.value);
     if (x and !y) return swap_value_error(x, y);
@@ -325,7 +325,7 @@ swap(expected<T, E>& x, expected<T, E>& y)
 template <Movable T, Movable E>
 requires Loadable<T>
 constexpr auto
-load(expected<T, E> const& x) -> T const&
+load(result<T, E> const& x) -> T const&
     //[[expects: has_value(x)]]
 {
     return x.data.value;
@@ -334,7 +334,7 @@ load(expected<T, E> const& x) -> T const&
 template <Movable T, Movable E>
 requires Storable<T>
 constexpr void
-store(expected<T, E>& x, T const& value)
+store(result<T, E>& x, T const& value)
 {
     x.data.value = value;
     x.has_value = true;
@@ -343,7 +343,7 @@ store(expected<T, E>& x, T const& value)
 template <Movable T, Movable E>
 requires Storable<T>
 constexpr void
-store(expected<T, E>& x, T&& value)
+store(result<T, E>& x, T&& value)
 {
     x.data.value = fw<T>(value);
     x.has_value = true;
@@ -352,7 +352,7 @@ store(expected<T, E>& x, T&& value)
 template <Movable T, Movable E>
 requires Mutable<T>
 constexpr auto
-at(expected<T, E>& x) -> T&
+at(result<T, E>& x) -> T&
     //[[expects: has_value(x)]]
 {
     return x.data.value;
@@ -360,7 +360,7 @@ at(expected<T, E>& x) -> T&
 
 template <Movable T, Movable E>
 constexpr auto
-error(expected<T, E> const& x) -> E const&
+error(result<T, E> const& x) -> E const&
     //[[expects: !has_value(x)]]
 {
     return x.data.error;
@@ -368,7 +368,7 @@ error(expected<T, E> const& x) -> E const&
 
 template <Movable T, Movable E>
 constexpr auto
-error(expected<T, E>&& x) -> E&&
+error(result<T, E>&& x) -> E&&
     //[[expects: !has_value(x)]]
 {
     return fw<E>(x.data.error);
@@ -377,7 +377,7 @@ error(expected<T, E>&& x) -> E&&
 template <Movable T, Movable E, Movable U>
 requires Loadable<T>
 constexpr auto
-load_or(expected<T, E> const& x, U&& y) noexcept -> T const&
+load_or(result<T, E> const& x, U&& y) noexcept -> T const&
 {
     if (has_value(x)) {
         return load(x);
@@ -389,7 +389,7 @@ load_or(expected<T, E> const& x, U&& y) noexcept -> T const&
 template <Movable T, Movable E, Movable U>
 requires Loadable<T>
 constexpr auto
-load_or(expected<T, E>&& x, U&& y) noexcept -> T const&
+load_or(result<T, E>&& x, U&& y) noexcept -> T const&
 {
     if (has_value(x)) {
         return fw<T>(load(x));

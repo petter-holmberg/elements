@@ -171,7 +171,7 @@ struct array
     template <Unary_function Fun>
     requires Same<Decay<T>, Domain<Fun>>
     constexpr auto
-    bind(Fun fun) -> Codomain<Fun>
+    flat_map(Fun fun) -> Codomain<Fun>
     {
         Codomain<Fun> x;
         auto src = first(*this);
