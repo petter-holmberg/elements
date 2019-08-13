@@ -256,7 +256,7 @@ When defined, positions have successors and predecessors that can be accessed wi
 
 `Forward_position` describes a `Regular` `Position` type where points may be visited multiple times.
 
-`Bidirectional_position` describes a `Forward_position` type with a function `decrement` that moves it to the previous point.
+`Bidirectional_position` describes a `Forward_position` type with a function `decrement` that moves it to the previous point. It is an `Affine_space` over its `Difference_type`.
 
 ### Access
 

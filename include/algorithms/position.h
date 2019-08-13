@@ -185,8 +185,8 @@ precedes(Pointer_type<T> const& pos0, Pointer_type<T> const& pos1) -> bool
 
 template <Position P, Limit<P> L>
 constexpr auto
-operator-(P pos, L lim) -> Difference_type<P>
-//[[expects axiom: is_bounded_range(range)]]
+operator-(L lim, P pos) -> Difference_type<P>
+//[[expects axiom: is_bounded_range(pos, lim)]]
 {
     auto n(Zero<Difference_type<P>>);
     while (precedes(pos, lim)) {
@@ -194,6 +194,42 @@ operator-(P pos, L lim) -> Difference_type<P>
         increment(pos);
     }
     return n;
+}
+
+template <Position P>
+constexpr auto
+operator+(P pos, Difference_type<P> dist) -> P
+//[[expects axiom: dist >= Zero<Difference_type<P>>]]
+//[[expects axiom: is_weak_range(pos, dist)]]
+{
+    while (!is_zero(dist)) {
+        increment(pos);
+        decrement(dist);
+    }
+    return pos;
+}
+
+template <Position P>
+constexpr auto
+operator+(Difference_type<P> dist, P pos) -> P
+//[[expects axiom: dist >= Zero<Difference_type<P>>]]
+//[[expects axiom: is_weak_range(pos, dist)]]
+{
+    return pos + dist;
+}
+
+template <Bidirectional_position P>
+constexpr auto
+operator-(P pos, Difference_type<P> dist) -> P
+//[[expects axiom: dist >= Zero<Difference_type<P>>]]
+//[[expects axiom first: is_weak_range(first, dist)]]
+//[[expects axiom first: pos = first + dist]]
+{
+    while (!is_zero(dist)) {
+        decrement(pos);
+        decrement(dist);
+    }
+    return pos;
 }
 
 template <Sequence S>

@@ -49,7 +49,6 @@ struct search_binary_upper_predicate
 template <Forward_position P, Limit<P> L, Relation Rel = less<Value_type<P>>>
 requires
     Loadable<P> and
-    Relation<Rel> and
     Same<Value_type<P>, Domain<Rel>>
 constexpr auto
 search_binary_lower(P pos, L lim, Value_type<P> const& value, Rel rel = less<Value_type<P>>{}) -> P
@@ -62,7 +61,6 @@ search_binary_lower(P pos, L lim, Value_type<P> const& value, Rel rel = less<Val
 template <Forward_position P, Limit<P> L, Relation Rel = less<Value_type<P>>>
 requires
     Loadable<P> and
-    Relation<Rel> and
     Same<Value_type<P>, Domain<Rel>>
 constexpr auto
 search_binary_upper(P pos, L lim, Value_type<P> const& value, Rel rel = less<Value_type<P>>{}) -> P
@@ -95,9 +93,8 @@ search_binary(P pos, L lim, Value_type<P> const& value, Rel rel = less<Value_typ
             pos = successor(mid);
         } else {
             auto first = search_binary_lower(pos, mid, value, rel);
-            pos = pos + dist;
             increment(mid);
-            auto limit = search_binary_upper(mid, pos, value, rel);
+            auto limit = search_binary_upper(mid, pos + dist, value, rel);
             return {first, limit};
         }
     }
