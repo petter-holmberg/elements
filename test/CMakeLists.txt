@@ -17,6 +17,7 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/partition.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/polynomial.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/position.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/quantify.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/rational.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/reduce.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/result.cpp

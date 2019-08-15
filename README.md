@@ -94,6 +94,13 @@ For `search_not`, a match is defined as the first element `y` for which the give
 
 `search_match` and `search_mismatch` take two loadable ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `equal`.
 
+## Quantifiers
+
+`all_of` takes a loadable range and a unary predicate. It checks if all values in the range satisfy the predicate.
+`any_not_of` takes a loadable range and a unary predicate. It checks if any value in the range does not satisfy the predicate.
+`none_of` takes a loadable range and a unary predicate. It checks if none of the values in the range satisfies the predicate.
+`any_of` takes a loadable range and a unary predicate. It checks if any value in the range satisfies the predicate.
+
 # Data structures
 
 ## Algebra
@@ -224,7 +231,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 `Functional_procedure` describes a `Procedure` where all input parameters are `Regular`.
 `Unary_function` describes a `Functional_procedure` of `Arity` 1.
 `Binary_function` describes a `Functional_procedure` of `Arity` 2.
-`Homogeneous_function` describes a `Functional_procedure` of arity > 0, where all input parameters are of the same type.
+`Homogeneous_function` describes a `Functional_procedure` of `Arity` > 0, where all input parameters are of the same type.
 
 `Operation` describes a `Homogeneous_function` with the same `Domain` and `Codomain`.
 `Unary_operation` describes an `Operation` of `Arity` 1.
@@ -389,6 +396,11 @@ Index
 `search_if_not_unguarded`
 `search_match`
 `search_mismatch`
+
+`all_of`
+`any_not_of`
+`none_of`
+`any_of`
 
 # Data structures
 

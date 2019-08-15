@@ -21,6 +21,7 @@
 #include "algorithms/ordering.h"
 #include "algorithms/partition.h"
 #include "algorithms/position.h"
+#include "algorithms/quantify.h"
 #include "algorithms/regular.h"
 #include "algorithms/search.h"
 #include "algorithms/search_binary.h"
