@@ -12,7 +12,9 @@
 
 #include "algorithms/algebra.h"
 #include "algorithms/copy.h"
+#include "algorithms/count.h"
 #include "algorithms/fill.h"
+#include "algorithms/for_each.h"
 #include "algorithms/integer.h"
 #include "algorithms/lexicographical.h"
 #include "algorithms/integer.h"

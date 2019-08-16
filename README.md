@@ -38,6 +38,13 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 `fill` takes a writable range and a value, filling the range with that value.
 
+## Counting
+
+`count_if` takes a loadable range, a unary predicate, and optionally an initial count. It counts the number of values in the range that satisfy the predicate.
+`count_if_not` takes a loadable range, a unary predicate, and optionally an initial count. It counts the number of values in the range that do not satisfy the predicate.
+`count` takes a loadable range, a value, and optionally an initial count. It counts the number of values in the range that equal the value.
+`count_not` takes a loadable range, a value, and optionally an initial count. It counts the number of values in the range that do not equal the value.
+
 ## Copying
 
 `copy` takes a loadable range as source and a storable position as destination. It performs copying from the first to the last element of the source, which implies that the range starting at the destination position can overlap with the source position, as long as no source position is read after an aliased destination position.
@@ -93,6 +100,10 @@ For `search_not`, a match is defined as the first element `y` for which the give
 `search_unguarded`, `search_not_unguarded`, `search_if_unguarded`, and `search_if_not_unguarded` are variations of the functions above that assume an element satisfying the applied predicate is known to exist in the given range. They take a position to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration.
 
 `search_match` and `search_mismatch` take two loadable ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `equal`.
+
+## Side effects
+
+`for_each` takes a loadable range and a procedure of `Arity` 1. It applies the procedure on each value in the range, returning the procedure as it could have accumulated information during the traversal.
 
 ## Quantifiers
 
@@ -370,6 +381,11 @@ Index
 
 `fill`
 
+`count_if`
+`count_if_not`
+`count`
+`count_not`
+
 `copy`
 
 `map`
@@ -396,6 +412,8 @@ Index
 `search_if_not_unguarded`
 `search_match`
 `search_mismatch`
+
+`for_each`
 
 `all_of`
 `any_not_of`
