@@ -47,12 +47,6 @@ struct pair
     }
 };
 
-template <Movable T0, Movable T1>
-struct underlying_type_t<pair<T0, T1>>
-{
-    using type = pair<Underlying_type<T0>, Underlying_type<T1>>;
-};
-
 template <Movable T>
 struct value_type_t<pair<T, T>>
 {

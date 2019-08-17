@@ -4,65 +4,66 @@
 
 #include "regular.h"
 #include "invocable.h"
+#include "concepts/regular.h"
 #include "type_functions/position.h"
 
 namespace elements {
 
 // Access
 
-template <typename L>
-requires Movable<Decay<L>>
+template <typename T>
+requires Constructible<Decay<T>>
 constexpr auto
-load(L const& x) -> Value_type<L> const&;
+load(T const& x) -> Value_type<T> const&;
 
 template <typename T>
-requires Movable<Decay<T>>
+requires Constructible<Decay<T>>
 constexpr auto
 load(Pointer_type<T> x) -> T const&;
 
 template <typename L>
 concept Loadable =
-    Movable<L> and
+    //Constructible<L> and
     requires (L const& x) {
         { load(x) } -> Value_type<L> const&;
     };
 
-template <Movable T>
+template <typename T>
 constexpr void
 store(T& x, Value_type<T> const& v);
 
-template <Movable T>
+template <typename T>
 constexpr void
 store(T& x, Value_type<T>&& v);
 
-template <Movable T>
+template <typename T>
 constexpr void
 store(Pointer_type<T> x, Value_type<T> const& v);
 
-template <Movable T>
+template <typename T>
 constexpr void
 store(Pointer_type<T> x, Value_type<T>&& v);
 
 template <typename S>
 concept Storable =
-    Movable<S> and
+    //Constructible<S> and
     requires (S& x, Value_type<S>&& v) {
         store(x, v);
     };
 
-template <Movable T>
+template <Constructible T>
 constexpr auto
 at(T& x) -> T&;
 
-template <Movable T>
+template <Constructible T>
 constexpr auto
 at(T const& x) -> T const&;
 
-template <Movable T>
+template <Constructible T>
 constexpr auto
 at(Pointer_type<T> x) -> T&;
 
-template <Movable T>
+template <Constructible T>
 constexpr auto
 at(Pointer_type<T const> x) -> T const&;
 
@@ -151,6 +152,12 @@ concept Range =
         // }
     };
 
+template <Range>
+struct front;
+
+template <Range>
+struct back;
+
 template <typename R>
 concept Mutable_range =
     Range<R>;
@@ -161,12 +168,6 @@ template <typename S>
 concept Sequence =
     Range<S> and
     Default_totally_ordered<S>;
-
-template <Sequence S>
-struct front;
-
-template <Sequence S>
-struct back;
 
 template <typename T>
 concept Dynamic_sequence =

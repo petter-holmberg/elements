@@ -39,13 +39,6 @@ struct difference_type_t<loadable_position<P>>
 };
 
 template <Position P>
-requires Loadable<P>
-struct underlying_type_t<loadable_position<P>>
-{
-    using type = Underlying_type<P>;
-};
-
-template <Position P>
 constexpr void
 increment(loadable_position<P>& pos)
 {

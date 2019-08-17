@@ -84,13 +84,6 @@ struct array_k
 };
 
 template <Semiregular T, pointer_diff k>
-requires 0 < k and k <= std::numeric_limits<pointer_diff>::max() / sizeof(T)
-struct underlying_type_t<array_k<T, k>>
-{
-    using type = array_k<Underlying_type<T>, k>;
-};
-
-template <Semiregular T, pointer_diff k>
 struct value_type_t<array_k<T, k>>
 {
     using type = T;

@@ -30,13 +30,6 @@ struct rational
 
 template <typename I>
 requires Integral_domain<I>
-struct underlying_type_t<rational<I>>
-{
-    using type = rational<Underlying_type<I>>;
-};
-
-template <typename I>
-requires Integral_domain<I>
 struct value_type_t<rational<I>>
 {
     using type = I;

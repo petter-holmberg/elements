@@ -26,10 +26,11 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/result.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/reverse_position.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/search.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/search_binary.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/search_binary.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/task_system.cpp)
 
 add_executable (tests ${TEST_SOURCES})
-target_link_libraries (tests Catch)
+target_link_libraries (tests -lpthread Catch)
 #set_property (TARGET tests PROPERTY CXX_STANDARD 20)
 target_compile_options (
     tests

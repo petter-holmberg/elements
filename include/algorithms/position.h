@@ -17,72 +17,72 @@ pointer_to(T& x) -> Pointer_type<T>
     return &x;
 }
 
-template <typename L>
-requires Movable<Decay<L>>
+template <typename T>
+requires Constructible<Decay<T>>
 constexpr auto
-load(L const& x) -> Value_type<L> const&
+load(T const& x) -> Value_type<T> const&
 {
     return x;
 }
 
 template <typename T>
-requires Movable<Decay<T>>
+requires Constructible<Decay<T>>
 constexpr auto
 load(Pointer_type<T> x) -> T const&
 {
     return *x;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 store(T& x, Value_type<T> const& v)
 {
     x = v;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 store(T& x, Value_type<T>&& v)
 {
     x = std::forward<Value_type<T>>(v);
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 store(Pointer_type<T> x, Value_type<T> const& v)
 {
     *x = v;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 store(Pointer_type<T> x, Value_type<T>&& v)
 {
     *x = std::forward<Value_type<T>>(v);
 }
 
-template <Movable T>
+template <Constructible T>
 constexpr auto
 at(T& x) -> T&
 {
     return x;
 }
 
-template <Movable T>
+template <Constructible T>
 constexpr auto
 at(T const& x) -> T const&
 {
     return x;
 }
 
-template <Movable T>
+template <Constructible T>
 constexpr auto
 at(Pointer_type<T> x) -> T&
 {
     return *x;
 }
 
-template <Movable T>
+template <Constructible T>
 constexpr auto
 at(Pointer_type<T const> x) -> T const&
 {
@@ -232,23 +232,23 @@ operator-(P pos, Difference_type<P> dist) -> P
     return pos;
 }
 
-template <Sequence S>
+template <Range R>
 struct front
 {
-    Pointer_type<S> sequence;
+    Pointer_type<R> range;
 
-    constexpr front(S& sequence_)
-        : sequence{&sequence_}
+    constexpr front(R& range_)
+        : range{&range_}
     {}
 };
 
-template <Sequence S>
+template <Range R>
 struct back
 {
-    Pointer_type<S> sequence;
+    Pointer_type<R> range;
 
-    back(S& sequence_)
-        : sequence{&sequence_}
+    back(R& range_)
+        : range{&range_}
     {}
 };
 

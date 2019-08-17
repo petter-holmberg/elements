@@ -52,17 +52,6 @@ requires
     Sequence<C> and
     Vector_space<V> and
     Sequence<V>
-struct underlying_type_t<coordinate_point<S, k, C, V>>
-{
-    using type = coordinate_point<Underlying_type<S>, k, Underlying_type<C>, Underlying_type<V>>;
-};
-
-template <typename S, int32_t k, typename C, typename V>
-requires
-    Field<S> and
-    Sequence<C> and
-    Vector_space<V> and
-    Sequence<V>
 struct value_type_t<coordinate_point<S, k, C, V>>
 {
     using type = S;

@@ -35,12 +35,6 @@ struct difference_type_t<counted_position<P>>
 };
 
 template <Position P>
-struct underlying_type_t<counted_position<P>>
-{
-    using type = counted_position<Underlying_type<P>>;
-};
-
-template <Position P>
 constexpr auto
 operator==(counted_position<P> const& x, counted_position<P> const& y) -> bool
 {

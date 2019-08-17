@@ -193,13 +193,6 @@ struct array_double_ended
 
 template <typename T>
 requires Semiregular<Remove_const<T>>
-struct underlying_type_t<array_double_ended<T>>
-{
-    using type = struct { Pointer_type<array_double_ended_prefix<T>> header; };
-};
-
-template <typename T>
-requires Semiregular<Remove_const<T>>
 struct value_type_t<array_double_ended<T>>
 {
     using type = T;
@@ -251,8 +244,8 @@ reserve(
     Size_type<array_double_ended<T>> offset)
 {
     if (n < size(x) or n == capacity(x)) return;
-    array_double_ended<Underlying_type<T>> temp(n);
-    at(temp.header).limit = copy(first(x), limit(x), first(temp) + offset);
+    array_double_ended<T> temp(n);
+    at(temp.header).limit = swap(first(x), limit(x), first(temp) + offset);
     at(temp.header).first = first(temp) + offset;
     swap(x, temp);
 }
@@ -266,8 +259,8 @@ constexpr auto
 insert(back<array_double_ended<T>> arr, U const& x) -> back<array_double_ended<T>>
 {
     using S = Size_type<array_double_ended<T>>;
-    using P = Position_type<array_double_ended<Underlying_type<T>>>;
-    auto& seq = at(arr.sequence);
+    using P = Position_type<array_double_ended<T>>;
+    auto& seq = at(arr.range);
     if (is_full(seq))
     {
         if (first(seq) == first_of_storage(seq)) {
@@ -293,8 +286,8 @@ constexpr auto
 insert(front<array_double_ended<T>> arr, U const& x) -> back<array_double_ended<T>>
 {
     using S = Size_type<array_double_ended<T>>;
-    using P = Position_type<array_double_ended<Underlying_type<T>>>;
-    auto& seq = at(arr.sequence);
+    using P = Position_type<array_double_ended<T>>;
+    auto& seq = at(arr.range);
     if (first(seq) == first_of_storage(seq))
     {
         if (limit(seq) == limit_of_storage(seq)) {
@@ -335,10 +328,10 @@ requires Semiregular<Remove_const<T>>
 constexpr auto
 erase(back<array_double_ended<T>> arr) -> back<array_double_ended<T>>
 {
-    auto& header = at(arr.sequence).header;
+    auto& header = at(arr.range).header;
     decrement(at(header).limit);
     destroy(at(load(header).limit));
-    if (is_empty(at(arr.sequence))) {
+    if (is_empty(at(arr.range))) {
         deallocate_array_double_ended(header);
         header = nullptr;
     }
@@ -350,10 +343,10 @@ requires Semiregular<Remove_const<T>>
 constexpr auto
 erase(front<array_double_ended<T>> arr) -> front<array_double_ended<T>>
 {
-    auto& header = at(arr.sequence).header;
+    auto& header = at(arr.range).header;
     destroy(at(load(header).first));
     increment(at(header).first);
-    if (is_empty(at(arr.sequence))) {
+    if (is_empty(at(arr.range))) {
         deallocate_array_double_ended(header);
         header = nullptr;
     }

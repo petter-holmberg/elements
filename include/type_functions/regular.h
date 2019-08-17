@@ -27,15 +27,4 @@ template <typename T>
 requires Movable<Decay<T>>
 using Value_type = typename value_type_t<T>::type;
 
-template <typename T>
-requires Movable<Decay<T>>
-struct underlying_type_t
-{
-    using type = T;
-};
-
-template <typename T>
-requires Movable<Decay<T>>
-using Underlying_type = typename underlying_type_t<T>::type;
-
 }

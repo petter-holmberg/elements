@@ -50,15 +50,6 @@ template <typename R, typename C>
 requires
     Ring<R> and
     Dynamic_sequence<C>
-struct underlying_type_t<polynomial<R, C>>
-{
-    using type = array<R>;
-};
-
-template <typename R, typename C>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
 struct value_type_t<polynomial<R, C>>
 {
     using type = R;
@@ -70,7 +61,7 @@ requires
     Dynamic_sequence<C>
 struct size_type_t<polynomial<R, C>>
 {
-    using type = Size_type<Underlying_type<polynomial<R, C>>>;
+    using type = Size_type<array<R>>;
 };
 
 template <typename R, typename C>

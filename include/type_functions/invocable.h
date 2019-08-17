@@ -9,6 +9,17 @@ namespace elements {
 template <typename>
 struct invocable_t;
 
+// Free function with no arguments
+template <typename Ret>
+struct invocable_t<Ret()>
+{
+    using codomain_type = Ret;
+
+    static constexpr std::size_t arity = 0;
+
+    using domain_type = void;
+};
+
 // Free function
 template <typename Ret, typename... Args>
 struct invocable_t<Ret(Args...)>

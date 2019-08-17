@@ -30,12 +30,6 @@ struct difference_type_t<reverse_position<P>>
 };
 
 template <Bidirectional_position P>
-struct underlying_type_t<reverse_position<P>>
-{
-    using type = Underlying_type<P>;
-};
-
-template <Bidirectional_position P>
 constexpr auto
 operator==(reverse_position<P> const& x, reverse_position<P> const& y) -> bool
 {

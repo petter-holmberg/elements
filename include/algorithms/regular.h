@@ -71,14 +71,6 @@ operator<=(T const& x, T const& y) -> bool
 }
 
 template <typename T>
-requires Semiregular<Remove_const<T>>
-constexpr auto
-underlying_ref(T& x) noexcept -> Underlying_type<T>&
-{
-    return reinterpret_cast<Underlying_type<T>&>(x);
-}
-
-template <typename T>
 constexpr auto
 fw(Remove_ref<T>& x) noexcept -> T&&
 {
@@ -100,7 +92,7 @@ mv(T&& x) noexcept -> Remove_ref<T>&&
 }
 
 template <typename T>
-requires Semiregular<Remove_const<T>>
+requires Default_constructible<Remove_const<T>>
 constexpr void
 construct(T& raw)
     //[[expects axiom: raw_memory(raw)]]
@@ -109,18 +101,8 @@ construct(T& raw)
     new (&raw) T();
 }
 
-template <typename T, typename U>
-requires Semiregular<Remove_const<T>>
-constexpr void
-construct(T& raw, U const& initializer)
-    //[[expects axiom: raw_memory(raw)]]
-    //[[ensures axiom: raw == initializer]]
-{
-    new (&raw) T(initializer);
-}
-
-template <typename T, typename U>
-requires Semiregular<Remove_const<T>>
+template <typename T, Constructible<T> U>
+requires Default_constructible<Remove_const<T>>
 constexpr void
 construct(T& raw, U&& initializer)
     //[[expects axiom: raw_memory(raw)]]
@@ -130,7 +112,7 @@ construct(T& raw, U&& initializer)
 }
 
 template <typename T>
-requires Semiregular<Remove_const<T>>
+requires Destructible<Remove_const<T>>
 constexpr void
 destroy(T& x)
     //[[expects axiom: partially_formed(x)]]

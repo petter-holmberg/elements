@@ -45,13 +45,6 @@ struct coordinate_vector
 
 template <typename S, int32_t k, typename E, typename S_add_op, typename S_mul_op>
 requires Semiring<S, S_add_op, S_mul_op>
-struct underlying_type_t<coordinate_vector<S, k, E, S_add_op, S_mul_op>>
-{
-    using type = coordinate_vector<Underlying_type<S>, k, Underlying_type<E>, S_add_op, S_mul_op>;
-};
-
-template <typename S, int32_t k, typename E, typename S_add_op, typename S_mul_op>
-requires Semiring<S, S_add_op, S_mul_op>
 struct value_type_t<coordinate_vector<S, k, E, S_add_op, S_mul_op>>
 {
     using type = S;
