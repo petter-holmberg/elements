@@ -1,12 +1,9 @@
 #pragma once
 
-#include <cstddef>
 #include <initializer_list>
-#include <limits>
 
 #include "algorithms/algebra.h"
 #include "algorithms/copy.h"
-#include "algorithms/lexicographical.h"
 #include "algorithms/map.h"
 #include "algorithms/ordering.h"
 #include "algorithms/position.h"
@@ -17,22 +14,8 @@
 
 namespace elements {
 
-template <Range T>
-constexpr auto
-linearizable_equal(T const& x, T const& y) -> bool
-{
-    return lexicographical_equal(first(x), limit(x), first(y), limit(y));
-}
-
-template <Range T>
-constexpr auto
-linearizable_less(T const& x, T const& y) -> bool
-{
-    return lexicographical_less(first(x), limit(x), first(y), limit(y));
-}
-
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 struct array_prefix
 {
     Pointer_type<T> limit;
@@ -41,33 +24,28 @@ struct array_prefix
 };
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr auto
 allocate_array(Difference_type<Pointer_type<T>> n) -> Pointer_type<array_prefix<T>>
 {
-    using P = Pointer_type<array_prefix<T>>;
-    if (is_zero(n)) return P{nullptr};
-    P remote{reinterpret_cast<Pointer_type<array_prefix<T>>>(
-        std::malloc(
-            sizeof(array_prefix<T>) +
-            static_cast<std::size_t>(
-                (predecessor(n) * static_cast<pointer_diff>(sizeof(T))))))};
-    Pointer_type<T> first{pointer_to(at(remote).x)};
+    if (is_zero(n)) return nullptr;
+    auto remote = allocate<array_prefix<T>>(predecessor(n) * static_cast<pointer_diff>(sizeof(T)));
+    auto first = pointer_to(at(remote).x);
     at(remote).limit = first;
     at(remote).limit_of_storage = first + n;
     return remote;
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr void
 deallocate_array(Pointer_type<array_prefix<T>> prefix)
 {
-    std::free(prefix);
+    deallocate(prefix);
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 struct array
 {
     Pointer_type<array_prefix<T>> header{nullptr};
@@ -86,7 +64,7 @@ struct array
     array(array&& x)
     {
         header = x.header;
-        x.header = Pointer_type<array_prefix<T>>{nullptr};
+        x.header = nullptr;
     }
 
     constexpr
@@ -102,7 +80,14 @@ struct array
     {}
 
     constexpr
-    array(Size_type<array<T>> size, Size_type<array<T>> capacity, T const& x)
+    array(Size_type<array<T>> size, T const& x)
+        : header{allocate_array<T>(size)}
+    {
+        while (!is_zero(size)) { push(at(this), x); decrement(size); }
+    }
+
+    constexpr
+    array(Size_type<array<T>> capacity, Size_type<array<T>> size, T const& x)
         : header{allocate_array<T>(capacity)}
     {
         while (!is_zero(size)) { push(at(this), x); decrement(size); }
@@ -189,58 +174,58 @@ struct array
 };
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 struct underlying_type_t<array<T>>
 {
     using type = struct { Pointer_type<array_prefix<T>> header; };
 };
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 struct value_type_t<array<T>>
 {
     using type = T;
 };
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 struct position_type_t<array<T>>
 {
     using type = Pointer_type<T>;
 };
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 struct position_type_t<array<T> const>
 {
     using type = Pointer_type<T const>;
 };
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 struct size_type_t<array<T>>
 {
     using type = pointer_diff;
 };
 
 template <typename T>
-requires Regular<Remove_cv<T>>
+requires Regular<Remove_const<T>>
 constexpr auto
 operator==(array<T> const& x, array<T> const& y) -> bool
 {
-    return linearizable_equal(x, y);
+    return equal_range(x, y);
 }
 
 template <typename T>
-requires Regular<Remove_cv<T>>
+requires Default_totally_ordered<Remove_const<T>>
 constexpr auto
 operator<(array<T> const& x, array<T> const& y) -> bool
 {
-    return linearizable_less(x, y);
+    return less_range(x, y);
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr void
 reserve(array<T>& x, Size_type<array<T>> n)
 {
@@ -252,8 +237,8 @@ reserve(array<T>& x, Size_type<array<T>> n)
 
 template <typename T, typename U>
 requires
-    Semiregular<Remove_cv<T>> and
-    Semiregular<Remove_cv<U>> and
+    Semiregular<Remove_const<T>> and
+    Semiregular<Remove_const<U>> and
     Constructible<T, U>
 constexpr auto
 insert(back<array<T>> arr, U const& x) -> back<array<T>>
@@ -261,8 +246,8 @@ insert(back<array<T>> arr, U const& x) -> back<array<T>>
     auto& seq = at(arr.sequence);
     if (is_full(seq))
     {
-        auto n = size(at(arr.sequence));
-        reserve(seq, max(Size_type<array<T>>{1}, n + n));
+        auto n = size(seq);
+        reserve(seq, max(One<Size_type<array<T>>>, twice(n)));
     }
     construct(at(load(seq.header).limit), x);
     increment(at(seq.header).limit);
@@ -270,7 +255,7 @@ insert(back<array<T>> arr, U const& x) -> back<array<T>>
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr void
 push(array<T>& arr, T const& x)
 {
@@ -278,7 +263,7 @@ push(array<T>& arr, T const& x)
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr auto
 erase(back<array<T>> arr) -> back<array<T>>
 {
@@ -287,13 +272,13 @@ erase(back<array<T>> arr) -> back<array<T>>
     destroy(at(load(header).limit));
     if (is_empty(at(arr.sequence))) {
         deallocate_array(header);
-        header = Remove_ref<decltype(header)>{nullptr};
+        header = nullptr;
     }
     return arr;
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr void
 erase_all(array<T>& x)
 {
@@ -301,7 +286,7 @@ erase_all(array<T>& x)
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr void
 pop(array<T>& arr)
 {
@@ -309,42 +294,42 @@ pop(array<T>& arr)
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr auto
 first(array<T> const& x) -> Position_type<array<T>>
 {
-    if (x.header == Pointer_type<array_prefix<T>>{nullptr}) return Pointer_type<T>{nullptr};
+    if (x.header == nullptr) return nullptr;
     return pointer_to(at(x.header).x);
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr auto
 limit(array<T> const& x) -> Position_type<array<T>>
 {
-    if (x.header == Pointer_type<array_prefix<T>>{nullptr}) return Pointer_type<T>{nullptr};
+    if (x.header == nullptr) return nullptr;
     return at(x.header).limit;
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr auto
 limit_of_storage(array<T> const& x) -> Position_type<array<T>>
 {
-    if (x.header == Pointer_type<array_prefix<T>>{nullptr}) return Pointer_type<T>{nullptr};
+    if (x.header == nullptr) return nullptr;
     return at(x.header).limit_of_storage;
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr auto
-is_empty(T const& x) -> bool
+is_empty(array<T> const& x) -> bool
 {
     return first(x) == limit(x);
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr auto
 is_full(array<T> const& x) -> bool
 {
@@ -352,7 +337,7 @@ is_full(array<T> const& x) -> bool
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr auto
 size(array<T> const& x) -> Size_type<array<T>>
 {
@@ -360,7 +345,7 @@ size(array<T> const& x) -> Size_type<array<T>>
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr auto
 capacity(array<T> const& x) -> Size_type<array<T>>
 {

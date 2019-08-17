@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdlib>
 #include <utility>
 #include "concepts/regular.h"
 #include "type_functions/regular.h"
@@ -70,7 +71,7 @@ operator<=(T const& x, T const& y) -> bool
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr auto
 underlying_ref(T& x) noexcept -> Underlying_type<T>&
 {
@@ -99,7 +100,7 @@ mv(T&& x) noexcept -> Remove_ref<T>&&
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr void
 construct(T& raw)
     //[[expects axiom: raw_memory(raw)]]
@@ -109,7 +110,7 @@ construct(T& raw)
 }
 
 template <typename T, typename U>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr void
 construct(T& raw, U const& initializer)
     //[[expects axiom: raw_memory(raw)]]
@@ -119,7 +120,7 @@ construct(T& raw, U const& initializer)
 }
 
 template <typename T, typename U>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr void
 construct(T& raw, U&& initializer)
     //[[expects axiom: raw_memory(raw)]]
@@ -129,13 +130,28 @@ construct(T& raw, U&& initializer)
 }
 
 template <typename T>
-requires Semiregular<Remove_cv<T>>
+requires Semiregular<Remove_const<T>>
 constexpr void
 destroy(T& x)
     //[[expects axiom: partially_formed(x)]]
     //[[ensures axiom: raw_memory(x)]]
 {
     x.~T();
+}
+
+template <typename T, typename E>
+constexpr auto
+allocate(E extra_bytes = Zero<E>) -> Pointer_type<T>
+{
+    return reinterpret_cast<Pointer_type<T>>(
+        std::malloc(sizeof(T) + static_cast<std::size_t>(extra_bytes)));
+}
+
+template <typename T>
+constexpr void
+deallocate(Pointer_type<T> raw)
+{
+    std::free(reinterpret_cast<void*>(raw));
 }
 
 }

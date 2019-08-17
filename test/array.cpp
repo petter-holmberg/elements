@@ -158,6 +158,33 @@ SCENARIO ("Using array", "[array]")
         CHECK (x0[4] == 4);
         CHECK (x0[5] == 5);
         REQUIRE (e::capacity(x0) == 10);
+
+        e::reserve(x0, 15);
+        REQUIRE (e::size(x0) == 6);
+        REQUIRE (e::capacity(x0) == 15);
+        CHECK (x0[0] == 0);
+        CHECK (x0[1] == 1);
+        CHECK (x0[2] == 2);
+        CHECK (x0[3] == 3);
+        CHECK (x0[4] == 4);
+        CHECK (x0[5] == 5);
+
+        e::pop(x0);
+        REQUIRE (e::size(x0) == 5);
+        REQUIRE (e::capacity(x0) == 15);
+        REQUIRE (e::limit(x0) - e::first(x0) == 5);
+        REQUIRE (e::limit_of_storage(x0) - e::first(x0) == 15);
+        CHECK (x0[0] == 0);
+        CHECK (x0[1] == 1);
+        CHECK (x0[2] == 2);
+        CHECK (x0[3] == 3);
+        CHECK (x0[4] == 4);
+
+        e::erase_all(x0);
+        REQUIRE (e::size(x0) == 0);
+        REQUIRE (e::capacity(x0) == 0);
+        REQUIRE (e::limit(x0) - e::first(x0) == 0);
+        REQUIRE (e::limit_of_storage(x0) - e::first(x0) == 0);
     }
 
     SECTION ("Monadic interface")

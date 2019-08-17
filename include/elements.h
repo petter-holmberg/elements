@@ -32,6 +32,7 @@
 #include "concepts/functional.h"
 
 #include "data_structures/array.h"
+#include "data_structures/array_double_ended.h"
 #include "data_structures/array_k.h"
 #include "data_structures/binary_counter.h"
 #include "data_structures/coordinate_point.h"

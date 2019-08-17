@@ -119,14 +119,14 @@ template <Regular T, pointer_diff k>
 constexpr auto
 operator==(array_k<T, k> const& x, array_k<T, k> const& y) -> bool
 {
-    return lexicographical_equal(first(x), limit(x), first(y), limit(y));
+    return equal_range(x, y);
 }
 
 template <Default_totally_ordered T, pointer_diff k>
 constexpr auto
 operator<(array_k<T, k> const& x, array_k<T, k> const& y) -> bool
 {
-    return lexicographical_less(first(x), limit(x), first(y), limit(y));
+    return less_range(x, y);
 }
 
 template <typename T, pointer_diff k>

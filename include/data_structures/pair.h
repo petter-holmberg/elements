@@ -79,8 +79,8 @@ struct element_type_t<pair<T0, T1>, 1>
 
 template <typename T0, typename T1>
 requires
-    Regular<Remove_cv<T0>> and
-    Regular<Remove_cv<T1>>
+    Regular<Remove_const<T0>> and
+    Regular<Remove_const<T1>>
 constexpr auto
 operator==(pair<T0, T1> const& x, pair<T0, T1> const& y) -> bool
 {
@@ -89,8 +89,8 @@ operator==(pair<T0, T1> const& x, pair<T0, T1> const& y) -> bool
 
 template <typename T0, typename T1>
 requires
-    Totally_ordered<Remove_cv<T0>> and
-    Totally_ordered<Remove_cv<T1>>
+    Totally_ordered<Remove_const<T0>> and
+    Totally_ordered<Remove_const<T1>>
 constexpr auto
 operator<(pair<T0, T1> const& x, pair<T0, T1> const& y) -> bool
 {

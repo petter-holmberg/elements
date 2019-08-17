@@ -50,14 +50,14 @@ twice(I const& a) -> I
 
 template <Binary_integer I>
 constexpr auto
-binary_scale_up_nonnegative(I const& a, I const& k) -> I
+binary_scale_up(I const& a, I const& k) -> I
 {
     return a << k;
 }
 
 template <Binary_integer I>
 constexpr auto
-binary_scale_down_nonnegative(I const& a, I const& k) -> I
+binary_scale_down(I const& a, I const& k) -> I
 {
     return a >> k;
 }

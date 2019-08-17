@@ -13,7 +13,7 @@ requires
     Same<Decay<Value_type<P0>>, Decay<Value_type<P1>>> and
     Same<Decay<Value_type<P0>>, Domain<Rel>>
 constexpr auto
-lexicographical_equivalent(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel) -> bool
+equivalent_lexicographical(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel) -> bool
 //[[expects axiom: loadable_range(pos0, lim0)]]
 //[[expects axiom: loadable_range(pos0, lim1)]]
 //[[expects axiom: equivalence(rel)]]
@@ -28,9 +28,9 @@ requires
     Loadable<P1> and
     Same<Decay<Value_type<P0>>, Decay<Value_type<P1>>>
 constexpr auto
-lexicographical_equal(P0 pos0, L0 lim0, P1 pos1, L1 lim1) -> bool
+equal_lexicographical(P0 pos0, L0 lim0, P1 pos1, L1 lim1) -> bool
 {
-    return lexicographical_equivalent(mv(pos0), lim0, mv(pos1), lim1, equal<Value_type<P0>>{});
+    return equivalent_lexicographical(mv(pos0), lim0, mv(pos1), lim1, equal<Value_type<P0>>{});
 }
 
 template <Position P0, Limit<P0> L0, Position P1, Limit<P1> L1, Relation Rel>
@@ -40,7 +40,7 @@ requires
     Same<Decay<Value_type<P0>>, Decay<Value_type<P1>>> and
     Same<Decay<Value_type<P0>>, Domain<Rel>>
 constexpr auto
-lexicographical_compare(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel) -> bool
+compare_lexicographical(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel) -> bool
 //[[expects axiom: loadable_range(pos0, lim0)]]
 //[[expects axiom: loadable_range(pos0, lim1)]]
 //[[expects axiom: weak_ordering(rel)]]
@@ -61,9 +61,23 @@ requires
     Loadable<P1> and
     Same<Decay<Value_type<P0>>, Decay<Value_type<P1>>>
 constexpr auto
-lexicographical_less(P0 pos0, L0 lim0, P1 pos1, L1 lim1) -> bool
+less_lexicographical(P0 pos0, L0 lim0, P1 pos1, L1 lim1) -> bool
 {
-    return lexicographical_compare(mv(pos0), lim0, mv(pos1), lim1, less<Value_type<P0>>{});
+    return compare_lexicographical(mv(pos0), lim0, mv(pos1), lim1, less<Value_type<P0>>{});
+}
+
+template <Range R>
+constexpr auto
+equal_range(R const& x, R const& y) -> bool
+{
+    return equal_lexicographical(first(x), limit(x), first(y), limit(y));
+}
+
+template <Range R>
+constexpr auto
+less_range(R const& x, R const& y) -> bool
+{
+    return less_lexicographical(first(x), limit(x), first(y), limit(y));
 }
 
 }

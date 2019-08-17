@@ -112,7 +112,7 @@ operator==(polynomial<R, C> const& x, polynomial<R, C> const& y) -> bool
 {
     auto dx = degree(x);
     auto dy = degree(y);
-    return dx == dy and lexicographical_equal(
+    return dx == dy and equal_lexicographical(
         first(x.coefficients), first(x.coefficients) + successor(dx),
         first(y.coefficients), first(y.coefficients) + successor(dy));
 }
@@ -127,7 +127,7 @@ operator<(polynomial<R, C> const& x, polynomial<R, C> const& y) -> bool
     auto dx = degree(x);
     auto dy = degree(y);
     return
-        dx < dy or (!(dy < dx) and lexicographical_less(
+        dx < dy or (!(dy < dx) and less_lexicographical(
             first(x.coefficients), first(x.coefficients) + successor(dx),
             first(y.coefficients), first(y.coefficients) + successor(dy)));
 }

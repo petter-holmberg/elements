@@ -6,14 +6,14 @@ namespace elements {
 
 template <typename T>
 requires Movable<std::remove_cv_t<T>>
-using Remove_cv = std::remove_cv_t<T>;
+using Remove_const = std::remove_cv_t<T>;
 
 template <typename T>
 requires Movable<std::remove_reference_t<T>>
 using Remove_ref = std::remove_reference_t<T>;
 
 template <typename T>
-requires Movable<Remove_cv<Remove_ref<T>>>
+requires Movable<Remove_const<Remove_ref<T>>>
 using Decay = typename std::decay<T>::type;
 
 template <typename T>

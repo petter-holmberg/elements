@@ -2,6 +2,7 @@ set (CMAKE_BUILD_TYPE Debug)
 set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/algebra.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/array_double_ended.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array_k.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/copy.cpp

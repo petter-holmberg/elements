@@ -30,9 +30,12 @@ Adapters are type constructors that provide a different behavior and/or differen
 `select_1_3_ab` takes a weak ordering and three values, where the first two are in increasing order, returning the median. `select_1_3` takes a weak ordering and three values, returning the median. `median` uses `less` as the weak ordering.
 `select_2_3` takes a weak ordering and three values, returning the maximum. `max` uses `less` as the weak ordering.
 
-`lexicographical_equivalent` take two loadable ranges and an equivalence relation, comparing them for equivalence. `lexicographical_equal` uses `equal` as the equivalence relation.
+`equivalent_lexicographical` takes two loadable ranges and an equivalence relation, comparing them for equivalence. `equal_lexicographical` uses `equal` as the equivalence relation.
 
-`lexicographical_compare` take two loadable ranges and a weak ordering, comparing them for lexicographical ordering. `lexicographical_less` uses `less` as the ordering.
+`compare_lexicographical` takes two loadable ranges and a weak ordering, comparing them for lexicographical ordering. `less_lexicographical` uses `less` as the ordering.
+
+`equal_range` takes two `Range`s, comparing them for equality.
+`less_range` takes two `Range`s, comparing them for `less` lexicographical ordering.
 
 ## Assigning
 
@@ -131,9 +134,17 @@ For `search_not`, a match is defined as the first element `y` for which the give
 `pair` implements a structure of two elements (that may differ in type) allocated on the stack. They can be accessed through the function `get`, either by position or by type. If the two elements
 are of the same type, `pair` also provides a functor interface through the member function `.map`.
 
-`array` implements an array of elements contiguously allocated on the free store, like `std::vector`. It stores a single pointer on the stack, keeping the array size and capacity in a header
-to the array elements. `array` has regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
+`array` implements an array of elements contiguously allocated on the free store. It stores a single pointer on the stack, keeping the array size and capacity in a header
+to the array elements.
+`array` supports insertion at the back in amortized constant time using `push`. If the capacity is exceeded it reallocates and moves its elements.
+`array` has regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
 `array` also provides a monadic interface through the member functions `.map` and `.flat_map`.
+
+`array_double_ended` implements an array of elements contiguously allocated on the free store. It stores a single pointer on the stack, keeping the array size and capacity in a header
+to the array elements.
+`array_double_ended` supports insertion at the back and the front in amortized constant time using `push` and `push_first`. If the capacity is exceeded it reallocates and moves its elements.
+`array_double_ended` has regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
+`array_double_ended` also provides a monadic interface through the member functions `.map` and `.flat_map`.
 
 `array_k` implements an array of *k* elements contiguously allocated on the stack, like built-in C++ arrays, but with regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
 `array_k` also provides a monadic interface through the member functions `.map` and `.flat_map`.
@@ -297,7 +308,7 @@ returns either a reference or a constant reference to its held object.
 
 # Type functions
 
-`Remove_cv` is a type stripped of const and volatile qualifiers.
+`Remove_const` is a type stripped of const and volatile qualifiers.
 
 `Remove_ref` is a type stripped of reference qualifiers.
 
@@ -374,10 +385,12 @@ Index
 `select_1_3_ab`
 `select_1_3`
 `median`
-`lexicographical_equivalent`
-`lexicographical_equal`
-`lexicographical_compare`
-`lexicographical_less`
+`equivalent_lexicographical`
+`equal_lexicographical`
+`compare_lexicographical`
+`less_lexicographical`
+`equal_range`
+`less_range`
 
 `fill`
 
@@ -429,6 +442,7 @@ Index
 
 `pair`
 `array`
+`array_double_ended`
 `array_k`
 
 `bounded_range`
@@ -517,7 +531,7 @@ Index
 
 # Type functions
 
-`Remove_cv`
+`Remove_const`
 `Remove_ref`
 `Decay`
 `Underlying_type`

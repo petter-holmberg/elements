@@ -137,6 +137,18 @@ concept Range =
     requires (R&& x) {
         { first(x) } -> Position_type<R>;
         limit(x);
+    } and
+    requires (R x, Size_type<R> i) {
+        { is_empty(x) } -> bool;
+        { size(x) } -> Size_type<R>;
+        { x[i] } -> Value_type<R> const&;
+        { x[i] } -> Value_type<R>&;
+        // axiom {
+        //     is_empty(x) == limit(x) - first(x);
+        // }
+        // axiom {
+        //     size(x) == limit(x) - first(x);
+        // }
     };
 
 template <typename R>
@@ -148,19 +160,7 @@ concept Mutable_range =
 template <typename S>
 concept Sequence =
     Range<S> and
-    Default_totally_ordered<S> and
-    requires (S x, Size_type<S> i) {
-        { is_empty(x) } -> bool;
-        { size(x) } -> Size_type<S>;
-        { x[i] } -> Value_type<S> const&;
-        { x[i] } -> Value_type<S>&;
-        // axiom {
-        //     is_empty(x) == limit(x) - first(x);
-        // }
-        // axiom {
-        //     size(x) == limit(x) - first(x);
-        // }
-    };
+    Default_totally_ordered<S>;
 
 template <Sequence S>
 struct front;

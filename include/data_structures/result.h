@@ -209,8 +209,8 @@ has_error(result<T, E> const& x) noexcept -> bool
 
 template <typename T, typename E>
 requires
-    Regular<Remove_cv<T>> and
-    Regular<Remove_cv<E>>
+    Regular<Remove_const<T>> and
+    Regular<Remove_const<E>>
 constexpr auto
 operator==(result<T, E> const& x, result<T, E> const& y) -> bool
 {
@@ -220,7 +220,7 @@ operator==(result<T, E> const& x, result<T, E> const& y) -> bool
 }
 
 template <typename T, Movable E>
-requires Regular<Remove_cv<T>>
+requires Regular<Remove_const<T>>
 constexpr auto
 operator==(result<T, E> const& x, T const& y) -> bool
 {
@@ -229,7 +229,7 @@ operator==(result<T, E> const& x, T const& y) -> bool
 }
 
 template <typename T, Movable E>
-requires Regular<Remove_cv<T>>
+requires Regular<Remove_const<T>>
 constexpr auto
 operator==(T const& x, result<T, E> const& y) -> bool
 {
@@ -237,7 +237,7 @@ operator==(T const& x, result<T, E> const& y) -> bool
 }
 
 template <typename T, Movable E>
-requires Regular<Remove_cv<T>>
+requires Regular<Remove_const<T>>
 constexpr auto
 operator!=(result<T, E> const& x, T const& y) -> bool
 {
@@ -245,7 +245,7 @@ operator!=(result<T, E> const& x, T const& y) -> bool
 }
 
 template <typename T, Movable E>
-requires Regular<Remove_cv<T>>
+requires Regular<Remove_const<T>>
 constexpr auto
 operator!=(T const& x, result<T, E> const& y) -> bool
 {
@@ -253,7 +253,7 @@ operator!=(T const& x, result<T, E> const& y) -> bool
 }
 
 template <Movable T, typename E>
-requires Regular<Remove_cv<E>>
+requires Regular<Remove_const<E>>
 constexpr auto
 operator==(result<T, E> const& x, failure<E> const& y) -> bool
 {
@@ -262,7 +262,7 @@ operator==(result<T, E> const& x, failure<E> const& y) -> bool
 }
 
 template <Movable T, typename E>
-requires Regular<Remove_cv<E>>
+requires Regular<Remove_const<E>>
 constexpr auto
 operator==(failure<E> const& x, result<T, E> const& y) -> bool
 {
@@ -270,7 +270,7 @@ operator==(failure<E> const& x, result<T, E> const& y) -> bool
 }
 
 template <Movable T, typename E>
-requires Regular<Remove_cv<E>>
+requires Regular<Remove_const<E>>
 constexpr auto
 operator!=(result<T, E> const& x, failure<E> const& y) -> bool
 {
@@ -278,7 +278,7 @@ operator!=(result<T, E> const& x, failure<E> const& y) -> bool
 }
 
 template <Movable T, typename E>
-requires Regular<Remove_cv<E>>
+requires Regular<Remove_const<E>>
 constexpr auto
 operator!=(failure<E> const& x, result<T, E> const& y) -> bool
 {
@@ -287,8 +287,8 @@ operator!=(failure<E> const& x, result<T, E> const& y) -> bool
 
 template <typename T, typename E>
 requires
-    Totally_ordered<Remove_cv<T>> and
-    Totally_ordered<Remove_cv<E>>
+    Totally_ordered<Remove_const<T>> and
+    Totally_ordered<Remove_const<E>>
 constexpr auto
 operator<(result<T, E> const& x, result<T, E> const& y) -> bool
 {
