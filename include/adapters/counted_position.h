@@ -22,7 +22,6 @@ struct counted_position
     {}
 };
 
-
 template <Position P>
 struct value_type_t<counted_position<P>>
 {

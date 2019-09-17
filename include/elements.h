@@ -9,6 +9,7 @@
 #include "adapters/loadable_position.h"
 #include "adapters/loadable_forward_position.h"
 #include "adapters/reverse_position.h"
+#include "adapters/map_position.h"
 
 #include "algorithms/algebra.h"
 #include "algorithms/copy.h"
