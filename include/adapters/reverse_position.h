@@ -85,7 +85,15 @@ requires Storable<P>
 constexpr void
 store(reverse_position<P>& pos, Value_type<P>&& value)
 {
-    store(pos.pos, std::forward<Value_type<P>>(value));
+    store(pos.pos, fw<Value_type<P>>(value));
+}
+
+template <Bidirectional_position P>
+requires Mutable<P>
+constexpr auto
+at(reverse_position<P> const& pos) -> Value_type<P> const&
+{
+    return at(predecessor(pos.pos));
 }
 
 template <Bidirectional_position P>

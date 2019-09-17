@@ -1,6 +1,7 @@
 #pragma once
 
 #include "algorithms/position.h"
+#include "algorithms/regular.h"
 #include "concepts/position.h"
 
 namespace elements {
@@ -92,7 +93,7 @@ requires Storable<P>
 constexpr void
 store(counted_position<P>& pos, Value_type<P>&& value)
 {
-    store(pos.pos, std::forward<Value_type<P>>(value));
+    store(pos.pos, fw<Value_type<P>>(value));
 }
 
 template <Position P>

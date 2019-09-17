@@ -13,8 +13,8 @@ SCENARIO ("Quantifiers", "[quantify]")
     {
         int x[]{0, 2, 4, 6, 8};
 
-        REQUIRE (e::all_of(x, x + 5, is_even));
-        REQUIRE (!e::all_of(x, x+ 5, is_odd));
+        REQUIRE (e::each_of(x, x + 5, is_even));
+        REQUIRE (!e::each_of(x, x+ 5, is_odd));
 
         REQUIRE (!e::any_not_of(x, x + 5, is_even));
         REQUIRE (e::any_not_of(x, x + 5, is_odd));
@@ -30,8 +30,8 @@ SCENARIO ("Quantifiers", "[quantify]")
     {
         int x[]{0, 1, 2, 3, 4};
 
-        REQUIRE (!e::all_of(x, x + 5, is_even));
-        REQUIRE (!e::all_of(x, x + 5, is_odd));
+        REQUIRE (!e::each_of(x, x + 5, is_even));
+        REQUIRE (!e::each_of(x, x + 5, is_odd));
 
         REQUIRE (e::any_not_of(x, x + 5, is_even));
         REQUIRE (e::any_not_of(x, x + 5, is_odd));

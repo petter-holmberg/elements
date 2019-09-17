@@ -12,11 +12,11 @@
 #include "concepts/invocable.h"
 #include "concepts/position.h"
 #include "concepts/regular.h"
+#include "dynamic_sequence.h"
 
 namespace elements {
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 struct array_double_ended_prefix
 {
     Pointer_type<T> first;
@@ -25,31 +25,30 @@ struct array_double_ended_prefix
     T x;
 };
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 constexpr auto
 allocate_array_double_ended(
     Difference_type<Pointer_type<T>> n,
-    Difference_type<Pointer_type<T>> offset) -> Pointer_type<array_double_ended_prefix<T>>
+    Difference_type<Pointer_type<T>> offset = Zero<Difference_type<Pointer_type<T>>>)
+    -> Pointer_type<array_double_ended_prefix<T>>
 {
     if (is_zero(n)) return nullptr;
     auto remote = allocate<array_double_ended_prefix<T>>(predecessor(n) * static_cast<pointer_diff>(sizeof(T)));
-    at(remote).first = pointer_to(at(remote).x) + offset;
+    auto const& first = pointer_to(at(remote).x);
+    at(remote).first = first + offset;
     at(remote).limit = load(remote).first;
-    at(remote).limit_of_storage = pointer_to(at(remote).x) + n;
+    at(remote).limit_of_storage = first + n;
     return remote;
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 constexpr void
 deallocate_array_double_ended(Pointer_type<array_double_ended_prefix<T>> prefix)
 {
     deallocate(prefix);
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 struct array_double_ended
 {
     Pointer_type<array_double_ended_prefix<T>> header{nullptr};
@@ -59,9 +58,9 @@ struct array_double_ended
 
     constexpr
     array_double_ended(array_double_ended const& x)
-        : header{allocate_array_double_ended<T>(size(x), Zero<Size_type<array_double_ended<T>>>)}
+        : header{allocate_array_double_ended<T>(size(x))}
     {
-        at(header).limit = copy(first(x), limit(x), first(at(this)));
+        insert_range(x, back{at(this)});
     }
 
     constexpr
@@ -73,14 +72,12 @@ struct array_double_ended
 
     constexpr
     array_double_ended(std::initializer_list<T> x)
-        : header{allocate_array_double_ended<T>(
-            Size_type<array_double_ended<T>>{static_cast<pointer_diff>(std::size(x))},
-            Zero<Size_type<array_double_ended<T>>>)}
+        : header{allocate_array_double_ended<T>(static_cast<pointer_diff>(std::size(x)))}
     {
-        at(header).limit = copy(std::begin(x), std::end(x), first(at(this)));
+        insert_range(x, back{at(this)});
     }
 
-    constexpr
+    explicit constexpr
     array_double_ended(Size_type<array_double_ended<T>> capacity)
         : array_double_ended(capacity, Zero<Size_type<array_double_ended<T>>>)
     {}
@@ -108,7 +105,10 @@ struct array_double_ended
         T const& x)
         : header{allocate_array_double_ended<T>(capacity, offset)}
     {
-        while (!is_zero(size)) { push(at(this), x); decrement(size); }
+        while (!is_zero(size)) {
+            push(at(this), x);
+            decrement(size);
+        }
     }
 
     constexpr auto
@@ -143,7 +143,7 @@ struct array_double_ended
     constexpr auto
     operator[](pointer_diff i) const -> T const&
     {
-        return at(first(at(this)) + i);
+        return load(first(at(this)) + i);
     }
 
     template <Unary_function Fun>
@@ -154,8 +154,8 @@ struct array_double_ended
     map(Fun fun) -> array_double_ended<T>&
     {
         using elements::map;
-        map(first(*this), limit(*this), first(*this), fun);
-        return *this;
+        map(first(at(this)), limit(at(this)), first(at(this)), fun);
+        return at(this);
     }
 
     template <Unary_function Fun>
@@ -165,220 +165,225 @@ struct array_double_ended
     {
         using elements::map;
         array_double_ended<Codomain<Fun>> x;
-        reserve(x, size(*this), Zero<Size_type<array_double_ended<T>>>);
-        map(first(*this), limit(*this), first(x), fun);
+        reserve(x, size(at(this)));
+        map(first(at(this)), limit(at(this)), insert_sink{back{x}}, fun);
         at(x.header).limit = at(x.header).limit_of_storage;
         return x;
     }
 
     template <Unary_function Fun>
-    requires Same<Decay<T>, Domain<Fun>>
+    requires
+        Same<Decay<T>, Domain<Fun>> and
+        Same<array_double_ended<Decay<T>>, Codomain<Fun>>
+    constexpr auto
+    flat_map(Fun fun) -> array_double_ended<T>&
+    {
+        using elements::flat_map;
+        auto x = flat_map(first(at(this)), limit(at(this)), fun);
+        swap(at(this), x);
+        return at(this);
+    }
+
+    template <Unary_function Fun>
+    requires
+        Same<Decay<T>, Domain<Fun>> and
+        Regular<T>
     constexpr auto
     flat_map(Fun fun) -> Codomain<Fun>
     {
-        Codomain<Fun> x;
-        auto src = first(*this);
-        auto lim = limit(*this);
-        while (precedes(src, lim)) {
-            auto y = fun(load(src));
-            reserve(x, size(x) + size(y), Zero<Size_type<array_double_ended<T>>>);
-            auto dst = first(x) + size(x);
-            copy(first(y), limit(y), dst);
-            at(x.header).limit = at(x.header).limit_of_storage;
-            increment(src);
-        }
-        return x;
+        using elements::flat_map;
+        return flat_map(first(at(this)), limit(at(this)), fun);
     }
 };
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 struct value_type_t<array_double_ended<T>>
 {
     using type = T;
 };
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 struct position_type_t<array_double_ended<T>>
 {
     using type = Pointer_type<T>;
 };
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 struct position_type_t<array_double_ended<T> const>
 {
     using type = Pointer_type<T const>;
 };
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 struct size_type_t<array_double_ended<T>>
 {
     using type = pointer_diff;
 };
 
-template <typename T>
-requires Regular<Remove_const<T>>
+template <Regular T>
 constexpr auto
 operator==(array_double_ended<T> const& x, array_double_ended<T> const& y) -> bool
 {
     return equal_range(x, y);
 }
 
-template <typename T>
-requires Default_totally_ordered<Remove_const<T>>
+template <Default_totally_ordered T>
 constexpr auto
 operator<(array_double_ended<T> const& x, array_double_ended<T> const& y) -> bool
 {
     return less_range(x, y);
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
+constexpr void
+swap(array_double_ended<T>& x, array_double_ended<T>& y)
+{
+    swap(x.header, y.header);
+}
+
+template <Movable T>
 constexpr void
 reserve(
     array_double_ended<T>& x,
     Size_type<array_double_ended<T>> n,
-    Size_type<array_double_ended<T>> offset)
+    Size_type<array_double_ended<T>> offset = Zero<Size_type<array_double_ended<T>>>)
 {
     if (n < size(x) or n == capacity(x)) return;
     array_double_ended<T> temp(n);
-    at(temp.header).limit = swap(first(x), limit(x), first(temp) + offset);
-    at(temp.header).first = first(temp) + offset;
+    auto pos = first(x);
+    auto dst = first(temp) + offset;
+    at(temp.header).first = dst;
+    while (precedes(pos, limit(x))) {
+        construct(at(dst), mv(at(pos)));
+        increment(pos);
+        increment(dst);
+    }
+    at(temp.header).limit = dst;
     swap(x, temp);
 }
 
-template <typename T, typename U>
-requires
-    Semiregular<Remove_const<T>> and
-    Semiregular<Remove_const<U>> and
-    Constructible<T, U>
+template <Movable T, typename U>
 constexpr auto
-insert(back<array_double_ended<T>> arr, U const& x) -> back<array_double_ended<T>>
+insert(back<array_double_ended<T>> arr, U&& x) -> back<array_double_ended<T>>
 {
-    using S = Size_type<array_double_ended<T>>;
-    using P = Position_type<array_double_ended<T>>;
     auto& seq = at(arr.range);
-    if (is_full(seq))
-    {
+    if (limit(seq) == limit_of_storage(seq)) {
         if (first(seq) == first_of_storage(seq)) {
-            auto n = size(seq);
-            reserve(seq, max(One<S>, twice(n)), Zero<S>);
+            reserve(seq, max(One<Size_type<array_double_ended<T>>>, twice(size(seq))));
         } else {
-            P pos = first_of_storage(seq) + half(first(seq) - first_of_storage(seq));
-            at(seq.header).limit = copy(first(seq), limit(seq), pos);
+            auto pos = first_of_storage(seq) + half(first(seq) - first_of_storage(seq));
+            at(seq.header).limit = swap(first(seq), limit(seq), pos);
             at(seq.header).first = pos;
         }
     }
-    construct(at(load(seq.header).limit), x);
-    increment(at(seq.header).limit);
+    auto& header = at(seq.header);
+    construct(at(header.limit), fw<U>(x));
+    increment(header.limit);
     return seq;
 }
 
-template <typename T, typename U>
-requires
-    Semiregular<Remove_const<T>> and
-    Semiregular<Remove_const<U>> and
-    Constructible<T, U>
+template <Movable T, typename U>
 constexpr auto
-insert(front<array_double_ended<T>> arr, U const& x) -> back<array_double_ended<T>>
+insert(front<array_double_ended<T>> arr, U&& x) -> back<array_double_ended<T>>
 {
-    using S = Size_type<array_double_ended<T>>;
-    using P = Position_type<array_double_ended<T>>;
     auto& seq = at(arr.range);
-    if (first(seq) == first_of_storage(seq))
-    {
+    if (first(seq) == first_of_storage(seq)) {
         if (limit(seq) == limit_of_storage(seq)) {
             auto n = size(seq);
-            reserve(seq, max(One<S>, twice(n)), n);
+            reserve(seq, max(One<Size_type<array_double_ended<T>>>, twice(n)), n);
         } else {
-            P pos = limit(seq) + successor(half(limit_of_storage(seq) - limit(seq)));
-            at(seq.header).first = copy(
+            auto pos = limit(seq) + successor(half(limit_of_storage(seq) - limit(seq)));
+            at(seq.header).first = swap(
                 reverse_position(limit(seq)),
                 reverse_position(first(seq)),
                 reverse_position(pos)).pos;
             at(seq.header).limit = pos;
         }
     }
-    decrement(at(seq.header).first);
-    construct(at(load(seq.header).first), x);
+    auto& header = at(seq.header);
+    decrement(header.first);
+    construct(at(header.first), fw<U>(x));
     return seq;
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T, typename U>
 constexpr void
-push(array_double_ended<T>& arr, T const& x)
+emplace(array_double_ended<T>& arr, U&& x)
 {
-    insert(back<array_double_ended<T>>(arr), x);
+    insert(back<array_double_ended<T>>(arr), fw<U>(x));
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T, typename U>
 constexpr void
-push_first(array_double_ended<T>& arr, T const& x)
+push(array_double_ended<T>& arr, U x)
 {
-    insert(front<array_double_ended<T>>(arr), x);
+    insert(back<array_double_ended<T>>(arr), T{mv(x)});
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T, typename U>
+constexpr void
+emplace_first(array_double_ended<T>& arr, U&& x)
+{
+    insert(front<array_double_ended<T>>(arr), fw<U>(x));
+}
+
+template <Movable T, typename U>
+constexpr void
+push_first(array_double_ended<T>& arr, U x)
+{
+    insert(front<array_double_ended<T>>(arr), T{mv(x)});
+}
+
+template <Movable T>
 constexpr auto
 erase(back<array_double_ended<T>> arr) -> back<array_double_ended<T>>
 {
     auto& header = at(arr.range).header;
     decrement(at(header).limit);
     destroy(at(load(header).limit));
-    if (is_empty(at(arr.range))) {
+    if (is_empty(load(arr.range))) {
         deallocate_array_double_ended(header);
         header = nullptr;
     }
     return arr;
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 constexpr auto
 erase(front<array_double_ended<T>> arr) -> front<array_double_ended<T>>
 {
     auto& header = at(arr.range).header;
     destroy(at(load(header).first));
     increment(at(header).first);
-    if (is_empty(at(arr.range))) {
+    if (is_empty(load(arr.range))) {
         deallocate_array_double_ended(header);
         header = nullptr;
     }
     return arr;
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 constexpr void
 erase_all(array_double_ended<T>& x)
 {
     while (!is_empty(x)) erase(back<array_double_ended<T>>(x));
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 constexpr void
 pop(array_double_ended<T>& arr)
 {
     erase(back<array_double_ended<T>>(arr));
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 constexpr void
 pop_first(array_double_ended<T>& arr)
 {
     erase(front<array_double_ended<T>>(arr));
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 constexpr auto
 first(array_double_ended<T> const& x) -> Position_type<array_double_ended<T>>
 {
@@ -386,8 +391,7 @@ first(array_double_ended<T> const& x) -> Position_type<array_double_ended<T>>
     return at(x.header).first;
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 constexpr auto
 limit(array_double_ended<T> const& x) -> Position_type<array_double_ended<T>>
 {
@@ -395,8 +399,7 @@ limit(array_double_ended<T> const& x) -> Position_type<array_double_ended<T>>
     return at(x.header).limit;
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 constexpr auto
 first_of_storage(array_double_ended<T> const& x) -> Position_type<array_double_ended<T>>
 {
@@ -404,8 +407,7 @@ first_of_storage(array_double_ended<T> const& x) -> Position_type<array_double_e
     return pointer_to(at(x.header).x);
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 constexpr auto
 limit_of_storage(array_double_ended<T> const& x) -> Position_type<array_double_ended<T>>
 {
@@ -413,52 +415,25 @@ limit_of_storage(array_double_ended<T> const& x) -> Position_type<array_double_e
     return at(x.header).limit_of_storage;
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 constexpr auto
 is_empty(array_double_ended<T> const& x) -> bool
 {
     return first(x) == limit(x);
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
-constexpr auto
-is_full(array_double_ended<T> const& x) -> bool
-{
-    return limit(x) == limit_of_storage(x);
-}
-
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 constexpr auto
 size(array_double_ended<T> const& x) -> Size_type<array_double_ended<T>>
 {
     return limit(x) - first(x);
 }
 
-template <typename T>
-requires Semiregular<Remove_const<T>>
+template <Movable T>
 constexpr auto
 capacity(array_double_ended<T> const& x) -> Size_type<array_double_ended<T>>
 {
     return limit_of_storage(x) - first_of_storage(x);
-}
-
-template <typename T>
-requires Semiregular<Remove_const<T>>
-constexpr auto
-capacity_back(array_double_ended<T> const& x) -> Size_type<array_double_ended<T>>
-{
-    return limit_of_storage(x) - first(x);
-}
-
-template <typename T>
-requires Semiregular<Remove_const<T>>
-constexpr auto
-capacity_front(array_double_ended<T> const& x) -> Size_type<array_double_ended<T>>
-{
-    return limit(x) - first_of_storage(x);
 }
 
 }

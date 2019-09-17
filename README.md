@@ -110,7 +110,7 @@ For `search_not`, a match is defined as the first element `y` for which the give
 
 ## Quantifiers
 
-`all_of` takes a loadable range and a unary predicate. It checks if all values in the range satisfy the predicate.
+`each_of` takes a loadable range and a unary predicate. It checks if each value in the range satisfy the predicate.
 `any_not_of` takes a loadable range and a unary predicate. It checks if any value in the range does not satisfy the predicate.
 `none_of` takes a loadable range and a unary predicate. It checks if none of the values in the range satisfies the predicate.
 `any_of` takes a loadable range and a unary predicate. It checks if any value in the range satisfies the predicate.
@@ -145,6 +145,13 @@ to the array elements.
 `array_double_ended` supports insertion at the back and the front in amortized constant time using `push` and `push_first`. If the capacity is exceeded it reallocates and moves its elements.
 `array_double_ended` has regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
 `array_double_ended` also provides a monadic interface through the member functions `.map` and `.flat_map`.
+
+`array_circular` implements an array of elements that are not necessarily contiguously allocated, as the elements are treated as if they may wrap around at the end of the reserved area.
+It stores a single pointer on the stack, keeping the array size and capacity in a header to the array elements.
+Positions of `array_circular` elements are larger and element access is slower than for `array` and `array_double_ended`.
+`array_circular` supports insertion at the back and the front in amortized constant time using `push` and `push_first`. If the capacity is exceeded it reallocates and moves its elements.
+`array_circular` has regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
+`array_circular` also provides a monadic interface through the member functions `.map` and `.flat_map`.
 
 `array_k` implements an array of *k* elements contiguously allocated on the stack, like built-in C++ arrays, but with regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
 `array_k` also provides a monadic interface through the member functions `.map` and `.flat_map`.
@@ -428,7 +435,7 @@ Index
 
 `for_each`
 
-`all_of`
+`each_of`
 `any_not_of`
 `none_of`
 `any_of`
@@ -443,6 +450,7 @@ Index
 `pair`
 `array`
 `array_double_ended`
+`array_circular`
 `array_k`
 
 `bounded_range`

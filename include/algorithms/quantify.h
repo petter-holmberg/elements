@@ -12,7 +12,7 @@ requires
     Loadable<P> and
     Same<Value_type<P>, Domain<U>>
 constexpr auto
-all_of(P pos, L lim, U pred) -> bool
+each_of(P pos, L lim, U pred) -> bool
 //[[expects axiom: loadable_range(pos, lim)]]
 {
     return !precedes(search_if_not(mv(pos), lim, pred), lim);

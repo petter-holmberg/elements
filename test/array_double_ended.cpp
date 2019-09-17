@@ -130,11 +130,8 @@ SCENARIO ("Using double-ended array", "[array_double_ended]")
         e::array_double_ended<int> x0(5);
 
         REQUIRE (e::is_empty(x0));
-        REQUIRE (!e::is_full(x0));
         REQUIRE (e::size(x0) == 0);
         REQUIRE (e::capacity(x0) == 5);
-        REQUIRE (e::capacity_front(x0) == 0);
-        REQUIRE (e::capacity_back(x0) == 5);
 
         e::push(x0, 0);
         e::push(x0, 1);
@@ -146,8 +143,6 @@ SCENARIO ("Using double-ended array", "[array_double_ended]")
         CHECK (x0[1] == 1);
         CHECK (x0[2] == 2);
         REQUIRE (e::capacity(x0) == 5);
-        REQUIRE (e::capacity_front(x0) == 3);
-        REQUIRE (e::capacity_back(x0) == 5);
 
         e::push(x0, 3);
         e::push(x0, 4);
@@ -162,13 +157,9 @@ SCENARIO ("Using double-ended array", "[array_double_ended]")
         CHECK (x0[4] == 4);
         CHECK (x0[5] == 5);
         REQUIRE (e::capacity(x0) == 10);
-        REQUIRE (e::capacity_front(x0) == 6);
-        REQUIRE (e::capacity_back(x0) == 10);
 
         e::insert(e::front<decltype(x0)>{x0}, -1);
         REQUIRE (e::capacity(x0) == 10);
-        REQUIRE (e::capacity_front(x0) == 9);
-        REQUIRE (e::capacity_back(x0) == 8);
         CHECK (x0[0] == -1);
         CHECK (x0[1] == 0);
         CHECK (x0[2] == 1);
@@ -179,8 +170,6 @@ SCENARIO ("Using double-ended array", "[array_double_ended]")
 
         e::insert(e::front<decltype(x0)>{x0}, -2);
         REQUIRE (e::capacity(x0) == 10);
-        REQUIRE (e::capacity_front(x0) == 9);
-        REQUIRE (e::capacity_back(x0) == 9);
         CHECK (x0[0] == -2);
         CHECK (x0[1] == -1);
         CHECK (x0[2] == 0);
@@ -192,8 +181,6 @@ SCENARIO ("Using double-ended array", "[array_double_ended]")
 
         e::insert(e::back<decltype(x0)>{x0}, 6);
         REQUIRE (e::capacity(x0) == 10);
-        REQUIRE (e::capacity_front(x0) == 10);
-        REQUIRE (e::capacity_back(x0) == 9);
         CHECK (x0[0] == -2);
         CHECK (x0[1] == -1);
         CHECK (x0[2] == 0);
@@ -206,8 +193,6 @@ SCENARIO ("Using double-ended array", "[array_double_ended]")
 
         e::insert(e::front<decltype(x0)>{x0}, -3);
         REQUIRE (e::capacity(x0) == 10);
-        REQUIRE (e::capacity_front(x0) == 10);
-        REQUIRE (e::capacity_back(x0) == 10);
         CHECK (x0[0] == -3);
         CHECK (x0[1] == -2);
         CHECK (x0[2] == -1);
@@ -221,8 +206,6 @@ SCENARIO ("Using double-ended array", "[array_double_ended]")
 
         e::insert(e::front<decltype(x0)>{x0}, -4);
         REQUIRE (e::capacity(x0) == 20);
-        REQUIRE (e::capacity_front(x0) == 20);
-        REQUIRE (e::capacity_back(x0) == 11);
         CHECK (x0[0] == -4);
         CHECK (x0[1] == -3);
         CHECK (x0[2] == -2);

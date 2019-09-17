@@ -1,10 +1,19 @@
 #pragma once
 
+#include <functional>
+#include <utility>
+
 #include "regular.h"
 #include "type_functions/invocable.h"
 #include "type_functions/regular.h"
 
 namespace elements {
+
+template <typename F, typename... Args>
+concept Invocable =
+    requires(F&& f, Args&&... args) {
+        std::invoke(std::forward<F>(f), std::forward(args)...);
+    };
 
 template <typename P>
 concept Procedure =

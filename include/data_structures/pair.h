@@ -7,7 +7,7 @@
 
 namespace elements {
 
-template <Movable T0, Movable T1 = T0>
+template <typename T0, typename T1 = T0>
 struct pair
 {
     T0 m0;
@@ -47,7 +47,7 @@ struct pair
     }
 };
 
-template <Movable T>
+template <typename T>
 struct value_type_t<pair<T, T>>
 {
     using type = T;
@@ -59,13 +59,13 @@ struct element_type_t;
 template <typename T, int i>
 using Element_type = typename element_type_t<T, i>::type;
 
-template <Movable T0, Movable T1>
+template <typename T0, typename T1>
 struct element_type_t<pair<T0, T1>, 0>
 {
     using type = T0;
 };
 
-template <Movable T0, Movable T1>
+template <typename T0, typename T1>
 struct element_type_t<pair<T0, T1>, 1>
 {
     using type = T1;
@@ -97,28 +97,28 @@ struct pair_get;
 template <>
 struct pair_get<0>
 {
-    template <Movable T0, Movable T1>
+    template <typename T0, typename T1>
     static constexpr auto
     get(pair<T0, T1>& x) noexcept -> T0&
     {
         return x.m0;
     }
 
-    template <Movable T0, Movable T1>
+    template <typename T0, typename T1>
     static constexpr auto
     get_const(pair<T0, T1> const& x) noexcept -> T0 const&
     {
         return x.m0;
     }
 
-    template <Movable T0, Movable T1>
+    template <typename T0, typename T1>
     static constexpr auto
     get_move(pair<T0, T1>&& x) noexcept -> T0&&
     {
         return std::forward<T0>(x.m0);
     }
 
-    template <Movable T0, Movable T1>
+    template <typename T0, typename T1>
     static constexpr auto
     get_move_const(pair<T0, T1> const&& x) noexcept -> T0 const&&
     {
@@ -129,28 +129,28 @@ struct pair_get<0>
 template <>
 struct pair_get<1>
 {
-    template <Movable T0, Movable T1>
+    template <typename T0, typename T1>
     static constexpr auto
     get(pair<T0, T1>& x) noexcept -> T1&
     {
         return x.m1;
     }
 
-    template <Movable T0, Movable T1>
+    template <typename T0, typename T1>
     static constexpr auto
     get_const(pair<T0, T1> const& x) noexcept -> T1 const&
     {
         return x.m1;
     }
 
-    template <Movable T0, Movable T1>
+    template <typename T0, typename T1>
     static constexpr auto
     get_move(pair<T0, T1>&& x) noexcept -> T1&&
     {
         return std::forward<T1>(x.m1);
     }
 
-    template <Movable T0, Movable T1>
+    template <typename T0, typename T1>
     static constexpr auto
     get_move_const(pair<T0, T1> const&& x) noexcept -> T1 const&&
     {
@@ -159,84 +159,84 @@ struct pair_get<1>
 };
 
 
-template <int i, Movable T0, Movable T1>
+template <int i, typename T0, typename T1>
 constexpr auto
 get(pair<T0, T1>& x) noexcept -> Element_type<pair<T0, T1>, i>&
 {
     return pair_get<i>::get(x);
 }
 
-template <int i, Movable T0, Movable T1>
+template <int i, typename T0, typename T1>
 constexpr auto
 get(pair<T0, T1> const& x) noexcept -> Element_type<pair<T0, T1>, i> const&
 {
     return pair_get<i>::get_const(x);
 }
 
-template <int i, Movable T0, Movable T1>
+template <int i, typename T0, typename T1>
 constexpr auto
 get(pair<T0, T1>&& x) noexcept -> Element_type<pair<T0, T1>, i>&&
 {
     return pair_get<i>::get_move(std::move(x));
 }
 
-template <int i, Movable T0, Movable T1>
+template <int i, typename T0, typename T1>
 constexpr auto
 get(pair<T0, T1> const&& x) noexcept -> Element_type<pair<T0, T1>, i> const&&
 {
     return pair_get<i>::get_move_const(std::move(x));
 }
 
-template <Movable T0, Movable T1>
+template <typename T0, typename T1>
 constexpr auto
 get(pair<T0, T1>& x) noexcept -> T0&
 {
     return x.m0;
 }
 
-template <Movable T0, Movable T1>
+template <typename T0, typename T1>
 constexpr auto
 get(pair<T0, T1> const& x) noexcept -> T0 const&
 {
     return x.m0;
 }
 
-template <Movable T0, Movable T1>
+template <typename T0, typename T1>
 constexpr auto
 get(pair<T0, T1>&& x) noexcept -> T0&&
 {
     return std::move(x.m0);
 }
 
-template <Movable T0, Movable T1>
+template <typename T0, typename T1>
 constexpr auto
 get(pair<T0, T1> const&& x) noexcept -> T0 const&&
 {
     return std::move(x.m0);
 }
 
-template <Movable T0, Movable T1>
+template <typename T0, typename T1>
 constexpr auto
 get(pair<T1, T0>& x) noexcept -> T0&
 {
     return x.m1;
 }
 
-template <Movable T0, Movable T1>
+template <typename T0, typename T1>
 constexpr auto
 get(pair<T1, T0> const& x) noexcept -> T0 const&
 {
     return x.m1;
 }
 
-template <Movable T0, Movable T1>
+template <typename T0, typename T1>
 constexpr auto
 get(pair<T1, T0>&& x) noexcept -> T0&&
 {
     return std::move(x.m1);
 }
 
-template <Movable T0, Movable T1>
+template <typename T0, typename T1>
 constexpr auto
 get(pair<T1, T0> const&& x) noexcept -> T0 const&&
 {

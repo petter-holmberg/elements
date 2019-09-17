@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
-#include <deque>
 #include <functional>
 #include <mutex>
 #include <thread>
@@ -11,38 +10,41 @@
 
 #include "algorithms/for_each.h"
 #include "algorithms/position.h"
-
-#define Function typename
+#include "algorithms/regular.h"
+#include "algorithms/swap.h"
+#include "data_structures/array.h"
+#include "data_structures/array_double_ended.h"
+#include "data_structures/pair.h"
 
 namespace elements {
 
 struct notification_queue
 {
-    bool is_done{false};
+    bool is_done = false;
     std::mutex mutex{};
     std::condition_variable ready{};
-    std::deque<std::function<void()>> queue{};
+    array_double_ended<std::function<void()>> queue{};
 
     using lock_type = std::unique_lock<std::mutex>;
 
-    template <typename F>
-    bool try_push(F&& task)
+    template <Invocable T>
+    bool try_push(T&& task)
     {
         {
             lock_type lock{mutex, std::try_to_lock};
             if (!lock) return false;
-            queue.emplace_back(std::forward<F>(task));
+            emplace(queue, fw<T>(task));
         }
         ready.notify_one();
         return true;
     }
 
-    template <typename F>
-    void push(F&& task)
+    template <Invocable T>
+    void push(T&& task)
     {
         {
             lock_type lock{mutex};
-            queue.emplace_back(std::forward<F>(task));
+            emplace(queue, fw<T>(task));
         }
         ready.notify_one();
     }
@@ -50,19 +52,19 @@ struct notification_queue
     bool try_pop(std::function<void()>& task)
     {
         lock_type lock{mutex, std::try_to_lock};
-        if (!lock or queue.empty()) return false;
-        task = std::move(queue.front());
-        queue.pop_front();
+        if (!lock or is_empty(queue)) return false;
+        task = mv(at(first(queue)));
+        pop_first(queue);
         return true;
     }
 
     bool pop(std::function<void()>& task)
     {
         lock_type lock{mutex};
-        while (queue.empty() and !is_done) ready.wait(lock);
-        if (queue.empty()) return false;
-        task = std::move(queue.front());
-        queue.pop_front();
+        while (is_empty(queue) and !is_done) ready.wait(lock);
+        if (is_empty(queue)) return false;
+        task = mv(at(first(queue)));
+        pop_first(queue);
         return true;
     }
 
@@ -82,7 +84,28 @@ struct task_system
     uint32_t n_task_stealing_attempts;
     array<std::thread> threads{};
     std::vector<notification_queue> queues{n_cores};
-    std::atomic<uint32_t> atomic_index{0};
+    std::atomic<uint32_t> atomic_index = 0;
+
+    explicit task_system(
+        uint32_t n_queues = std::thread::hardware_concurrency(),
+        uint32_t n_task_stealing_attempts_ = 64
+    )
+        : n_cores{n_queues}
+        , n_task_stealing_attempts{n_task_stealing_attempts_}
+    {
+        reserve(threads, n_cores);
+        for (uint32_t n = 0; n != n_cores; ++n) {
+            emplace(threads, [&, n]{ run(n); });
+        }
+    }
+
+    ~task_system()
+    {
+        auto done = [](notification_queue& queue){ queue.done(); };
+        for_each(std::begin(queues), std::end(queues), done);
+        auto join = [](std::thread& thread){ thread.join(); };
+        for_each(first(threads), limit(threads), join);
+    }
 
     void run(uint32_t i)
     {
@@ -96,38 +119,14 @@ struct task_system
         }
     }
 
-    explicit task_system(
-        uint32_t n_queues = std::thread::hardware_concurrency(),
-        uint32_t n_task_stealing_attempts_ = 64
-    )
-        : n_cores{n_queues}
-        , n_task_stealing_attempts{n_task_stealing_attempts_}
-    {
-        reserve(threads, n_cores);
-        uint32_t n = 0;
-        while (n != n_cores) {
-            push(threads, [&, n]{ run(n); });
-            increment(n);
-        }
-    }
-
-    ~task_system()
-    {
-        auto done = [](notification_queue& queue){ queue.done(); };
-        for_each(std::begin(queues), std::end(queues), done);
-        auto join = [](std::thread& thread){ thread.join(); };
-        for_each(first(threads), limit(threads), join);
-    }
-
-    template <typename F>
-    void async(F&& task)
+    template <Invocable T>
+    void async(T&& task)
     {
         auto i = atomic_index++;
         for (uint32_t n = 0; n != n_cores * n_task_stealing_attempts; ++n) {
-            if (queues[(i + n) % n_cores].try_push(std::forward<F>(task))) return;
+            if (queues[(i + n) % n_cores].try_push(fw<T>(task))) return;
         }
-
-        queues[i % n_cores].push(std::forward<F>(task));
+        queues[i % n_cores].push(fw<T>(task));
     }
 };
 
@@ -135,128 +134,146 @@ struct task_system
 
 //TODO
 
-static task_system _system;
+static task_system global_task_system;
 
 template <typename R>
-struct shared_base {
+struct shared_base
+{
     std::vector<R> _r{}; // optional
-    std::mutex _mutex{};
+    std::mutex mutex{};
     std::condition_variable _ready{};
-    std::vector<std::function<void()>> _then{};
+    array<std::function<void()>> _then{};
 
-    using lock_t = std::unique_lock<std::mutex>;
+    using lock_type = std::unique_lock<std::mutex>;
 
-    virtual ~shared_base() { }
+    virtual ~shared_base()
+    {}
 
-    void set(R&& r) {
-        std::vector<std::function<void()>> then;
+    void set(R&& r)
+    {
+        array<std::function<void()>> then;
         {
-            lock_t lock{_mutex};
-            _r.push_back(std::move(r));
-            std::swap(_then, then);
+            lock_type lock{mutex};
+            _r.push_back(mv(r));
+            swap(_then, then);
         }
         _ready.notify_all();
-        for (const auto& f : then) _system.async(std::move(f));
+        auto pos = first(_then);
+        while (precedes(pos, limit(_then))) {
+            global_task_system.async(mv(at(pos)));
+            increment(pos);
+        }
     }
 
-    template <typename F>
-    void then(F&& f) {
+    template <Invocable Fun>
+    void map(Fun&& fun)
+    {
         bool resolved{false};
         {
-            lock_t lock{_mutex};
-            if (_r.empty()) _then.push_back(std::forward<F>(f));
+            lock_type lock{mutex};
+            if (_r.empty()) push(_then, fw<Fun>(fun));
             else resolved = true;
         }
-        if (resolved) _system.async(std::move(f));
+        if (resolved) global_task_system.async(mv(fun));
     }
 
-    const R& get() {
-        lock_t lock{_mutex};
+    auto get() -> R const&
+    {
+        lock_type lock{mutex};
         while (_r.empty()) _ready.wait(lock);
         return _r.back();
     }
 };
 
-template <typename> struct shared; // not defined
+template <typename>
+struct shared;
 
-template <typename R, typename... Args>
-struct shared<R(Args...)> : shared_base<R> {
-    std::function<R(Args...)> _f;
-
-    template<typename F>
-    shared(F&& f) : _f(std::forward<F>(f)) { }
-
-    template <typename... A>
-    void operator()(A&&... args) {
-        this->set(_f(std::forward<A>(args)...));
-        _f = nullptr;
-    }
-};
-
-template <typename> class packaged_task; //not defined
-template <typename> class future;
-
-template <typename S, typename F>
-auto package(F&& f) -> std::pair<packaged_task<S>, future<Codomain<S>>>;
-
-template <typename R>
-class future {
-    std::shared_ptr<shared_base<R>> _p;
-
-    template <typename S, typename F>
-    friend auto package(F&& f) -> std::pair<packaged_task<S>, future<Codomain<S>>>;
-
-    explicit future(std::shared_ptr<shared_base<R>> p) : _p(std::move(p)) { }
- public:
-    future() = default;
+template <typename Res, typename... Args>
+struct shared<Res(Args...)> : shared_base<Res>
+{
+    std::function<Res(Args...)> fun;
 
     template <typename F>
-    auto then(F&& f) {
-        auto pack = package<std::result_of_t<F(R)>()>([p = _p, f = std::forward<F>(f)](){
-            return f(p->_r.back());
-        });
-        _p->then(std::move(pack.first));
-        return pack.second;
-    }
+    shared(F&& fun_)
+        : fun(fw<F>(fun_))
+    {}
 
-    const R& get() const { return _p->get(); }
+    template <typename... Args_>
+    void operator()(Args_&&... args)
+    {
+        this->set(fun(fw<Args_>(args)...));
+        fun = nullptr;
+    }
 };
 
-template<typename R, typename ...Args >
-class packaged_task<R (Args...)> {
-    std::weak_ptr<shared<R(Args...)>> _p;
+template <typename>
+struct packaged_task;
 
-    template <typename S, typename F>
-    friend auto package(F&& f) -> std::pair<packaged_task<S>, future<Codomain<S>>>;
+template <typename>
+struct future;
 
-    explicit packaged_task(std::weak_ptr<shared<R(Args...)>> p) : _p(move(p)) { }
+template <Invocable Task, Invocable Fun>
+auto package(Fun&& fun) -> pair<packaged_task<Task>, future<Codomain<Task>>>;
 
- public:
+template <typename Res>
+struct future
+{
+    std::shared_ptr<shared_base<Res>> header;
+
+    explicit future(std::shared_ptr<shared_base<Res>> pos)
+        : header(mv(pos))
+    {}
+
+    future() = default;
+
+    template <Invocable Fun>
+    auto map(Fun&& fun)
+    {
+        auto pack = package<Result_type<Fun(Res)>()>([header_ = header, fun_ = fw<Fun>(fun)](){
+            return fun_(header_->_r.back());
+        });
+        header->map(mv(pack.first));
+        return get<1>(pack);
+    }
+
+    auto get() const -> Res const&
+    {
+        return header->get();
+    }
+};
+
+template <typename Fun, typename... Args>
+struct packaged_task<Fun(Args...)>
+{
+    std::weak_ptr<shared<Fun(Args...)>> wp;
+
+    explicit packaged_task(std::weak_ptr<shared<Fun(Args...)>> wp_)
+        : wp(mv(wp_))
+    {}
+
     packaged_task() = default;
 
-    template <typename... A>
-    void operator()(A&&... args) const {
-        auto p = _p.lock();
-        if (p) (*p)(std::forward<A>(args)...);
+    template <typename... Args_>
+    void operator()(Args_&&... args) const
+    {
+        auto sp = wp.lock();
+        if (sp) (*sp)(fw<Args_>(args)...);
     }
 };
 
-template <typename S, typename F>
-auto package(F&& f) -> std::pair<packaged_task<S>, future<Codomain<S>>> {
-    auto p = std::make_shared<shared<S>>(std::forward<F>(f));
-    return std::make_pair(packaged_task<S>(p), future<Codomain<S>>(p));
+template <Invocable Task, Invocable Fun>
+auto package(Fun&& fun) -> pair<packaged_task<Task>, future<Codomain<Task>>>
+{
+    auto pack = std::make_shared<shared<Task>>(fw<Fun>(fun));
+    return {packaged_task<Task>(pack), future<Codomain<Task>>(pack)};
 }
 
-template <typename F, typename ...Args>
-auto async(F&& f, Args&&... args)
+template <typename Fun, typename... Args>
+auto async(Fun&& fun, Args&&... args)
 {
-    using result_type = std::result_of_t<F (Args...)>;
-//    using packaged_type = packaged_task<result_type()>;
-
-    auto pack = package<result_type()>(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
-
-    _system.async(std::move(std::get<0>(pack)));
-    return std::get<1>(pack);
+    auto pack = package<Result_type<Fun, Args...>()>(std::bind(fw<Fun>(fun), fw<Args>(args)...));
+    global_task_system.async(mv(get<0>(pack)));
+    return get<1>(pack);
 }
 
 }

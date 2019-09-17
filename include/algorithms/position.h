@@ -133,7 +133,7 @@ successor(T x) -> T
 }
 
 template <typename T>
-requires Semiregular<Decay<T>>
+requires Default_constructible<Decay<T>>
 constexpr auto
 successor(Pointer_type<T> x) -> Pointer_type<T>
 {
@@ -142,7 +142,7 @@ successor(Pointer_type<T> x) -> Pointer_type<T>
 }
 
 template <typename T>
-requires Semiregular<Decay<T>>
+requires Default_constructible<Decay<T>>
 constexpr auto
 predecessor(T x) -> T
 {
@@ -243,6 +243,33 @@ struct front
 };
 
 template <Range R>
+struct value_type_t<front<R>>
+{
+    using type = Value_type<R>;
+};
+
+template <Range R>
+constexpr auto
+base(front<R>& seq) -> R&
+{
+    return at(seq.range);
+}
+
+template <Range R>
+constexpr auto
+first(front<R>& seq) -> Position_type<R>
+{
+    return first(base(seq));
+}
+
+template <Range R>
+constexpr auto
+limit(front<R>& seq) -> Position_type<R>
+{
+    return limit(base(seq));
+}
+
+template <Range R>
 struct back
 {
     Pointer_type<R> range;
@@ -251,5 +278,32 @@ struct back
         : range{&range_}
     {}
 };
+
+template <Range R>
+struct value_type_t<back<R>>
+{
+    using type = Value_type<R>;
+};
+
+template <Range R>
+constexpr auto
+base(back<R>& seq) -> R&
+{
+    return at(seq.range);
+}
+
+template <Range R>
+constexpr auto
+first(back<R>& seq) -> Position_type<R>
+{
+    return first(base(seq));
+}
+
+template <Range R>
+constexpr auto
+limit(back<R>& seq) -> Position_type<R>
+{
+    return limit(base(seq));
+}
 
 }

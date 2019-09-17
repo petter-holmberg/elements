@@ -98,4 +98,7 @@ constexpr auto Arity = invocable_t<T>::arity;
 template <typename T>
 using Domain = typename invocable_t<T>::domain_type;
 
+template <typename Fun, typename... Args>
+using Result_type = std::invoke_result_t<Fun, Args...>;
+
 }

@@ -11,11 +11,11 @@
 #include "concepts/invocable.h"
 #include "concepts/position.h"
 #include "concepts/regular.h"
+#include "dynamic_sequence.h"
 
 namespace elements {
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 struct array_prefix
 {
     Pointer_type<T> limit;
@@ -23,29 +23,26 @@ struct array_prefix
     T x;
 };
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 constexpr auto
 allocate_array(Difference_type<Pointer_type<T>> n) -> Pointer_type<array_prefix<T>>
 {
     if (is_zero(n)) return nullptr;
     auto remote = allocate<array_prefix<T>>(predecessor(n) * static_cast<pointer_diff>(sizeof(T)));
-    auto first = pointer_to(at(remote).x);
+    auto const& first = pointer_to(at(remote).x);
     at(remote).limit = first;
     at(remote).limit_of_storage = first + n;
     return remote;
 }
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 constexpr void
 deallocate_array(Pointer_type<array_prefix<T>> prefix)
 {
     deallocate(prefix);
 }
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 struct array
 {
     Pointer_type<array_prefix<T>> header{nullptr};
@@ -57,7 +54,7 @@ struct array
     array(array const& x)
         : header{allocate_array<T>(size(x))}
     {
-        at(header).limit = copy(first(x), limit(x), first(at(this)));
+        insert_range(x, back{at(this)});
     }
 
     constexpr
@@ -71,26 +68,27 @@ struct array
     array(std::initializer_list<T> x)
         : header{allocate_array<T>(Size_type<array<T>>{static_cast<pointer_diff>(std::size(x))})}
     {
-        at(header).limit = copy(std::begin(x), std::end(x), first(at(this)));
+        insert_range(x, back{at(this)});
     }
 
-    constexpr
+    explicit constexpr
     array(Size_type<array<T>> capacity)
         : header{allocate_array<T>(capacity)}
     {}
 
     constexpr
     array(Size_type<array<T>> size, T const& x)
-        : header{allocate_array<T>(size)}
-    {
-        while (!is_zero(size)) { push(at(this), x); decrement(size); }
-    }
+        : array(size, size, x)
+    {}
 
     constexpr
     array(Size_type<array<T>> capacity, Size_type<array<T>> size, T const& x)
         : header{allocate_array<T>(capacity)}
     {
-        while (!is_zero(size)) { push(at(this), x); decrement(size); }
+        while (!is_zero(size)) {
+            push(at(this), x);
+            decrement(size);
+        }
     }
 
     constexpr auto
@@ -125,7 +123,7 @@ struct array
     constexpr auto
     operator[](pointer_diff i) const -> T const&
     {
-        return at(first(at(this)) + i);
+        return load(first(at(this)) + i);
     }
 
     template <Unary_function Fun>
@@ -136,8 +134,8 @@ struct array
     map(Fun fun) -> array<T>&
     {
         using elements::map;
-        map(first(*this), limit(*this), first(*this), fun);
-        return *this;
+        map(first(at(this)), limit(at(this)), first(at(this)), fun);
+        return at(this);
     }
 
     template <Unary_function Fun>
@@ -147,147 +145,155 @@ struct array
     {
         using elements::map;
         array<Codomain<Fun>> x;
-        reserve(x, size(*this));
-        map(first(*this), limit(*this), first(x), fun);
-        at(x.header).limit = at(x.header).limit_of_storage;
+        reserve(x, size(at(this)));
+        map(first(at(this)), limit(at(this)), insert_sink{back{x}}, fun);
         return x;
     }
 
     template <Unary_function Fun>
-    requires Same<Decay<T>, Domain<Fun>>
+    requires
+        Same<Decay<T>, Domain<Fun>> and
+        Same<array<Decay<T>>, Codomain<Fun>>
     constexpr auto
-    flat_map(Fun fun) -> Codomain<Fun>
+    flat_map(Fun fun) -> array<T>&
     {
-        Codomain<Fun> x;
-        auto src = first(*this);
-        auto lim = limit(*this);
-        while (precedes(src, lim)) {
-            auto y = fun(load(src));
-            reserve(x, size(x) + size(y));
-            auto dst = first(x) + size(x);
-            copy(first(y), limit(y), dst);
-            at(x.header).limit = at(x.header).limit_of_storage;
-            increment(src);
-        }
-        return x;
+        using elements::flat_map;
+        auto x = flat_map(first(at(this)), limit(at(this)), fun);
+        swap(at(this), x);
+        return at(this);
+    }
+
+    template <Unary_function Fun>
+    requires
+        Same<Decay<T>, Domain<Fun>> and
+        Regular<T>
+    constexpr auto
+    flat_map(Fun fun) const -> Codomain<Fun>
+    {
+        using elements::flat_map;
+        return flat_map(first(at(this)), limit(at(this)), fun);
     }
 };
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 struct value_type_t<array<T>>
 {
     using type = T;
 };
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 struct position_type_t<array<T>>
 {
     using type = Pointer_type<T>;
 };
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 struct position_type_t<array<T> const>
 {
     using type = Pointer_type<T const>;
 };
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 struct size_type_t<array<T>>
 {
     using type = pointer_diff;
 };
 
-template <typename T>
-requires Regular<Remove_const<T>>
+template <Regular T>
 constexpr auto
 operator==(array<T> const& x, array<T> const& y) -> bool
 {
     return equal_range(x, y);
 }
 
-template <typename T>
-requires Default_totally_ordered<Remove_const<T>>
+template <Default_totally_ordered T>
 constexpr auto
 operator<(array<T> const& x, array<T> const& y) -> bool
 {
     return less_range(x, y);
 }
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
+constexpr void
+swap(array<T>& x, array<T>& y)
+{
+    swap(x.header, y.header);
+}
+
+template <Movable T>
 constexpr void
 reserve(array<T>& x, Size_type<array<T>> n)
 {
     if (n < size(x) or n == capacity(x)) return;
     array<T> temp(n);
-    at(temp.header).limit = swap(first(x), limit(x), first(temp));
+    auto pos = first(x);
+    auto dst = first(temp);
+    while (precedes(pos, limit(x))) {
+        construct(at(dst), mv(at(pos)));
+        increment(pos);
+        increment(dst);
+    }
+    at(temp.header).limit = dst;
     swap(x, temp);
 }
 
-template <typename T, typename U>
-requires
-    Default_constructible<T> and
-    Default_constructible<Decay<U>> and
-    Constructible<T, U>
+template <Movable T, typename U>
 constexpr auto
 insert(back<array<T>> arr, U&& x) -> back<array<T>>
 {
     auto& seq = at(arr.range);
-    if (is_full(seq))
-    {
-        auto n = size(seq);
-        reserve(seq, max(One<Size_type<array<T>>>, twice(n)));
+    if (limit(seq) == limit_of_storage(seq)) {
+        reserve(seq, max(One<Size_type<array<T>>>, twice(size(seq))));
     }
-    construct(at(load(seq.header).limit), fw<T>(x));
-    increment(at(seq.header).limit);
+    auto& header = at(seq.header);
+    construct(at(header.limit), fw<U>(x));
+    increment(header.limit);
     return seq;
 }
 
-template <typename T, typename U>
-requires Movable<Remove_const<T>>
+template <Movable T, typename U>
+constexpr void
+emplace(array<T>& arr, U&& x)
+{
+    insert(back<array<T>>(arr), fw<U>(x));
+}
+
+template <Movable T, typename U>
 constexpr void
 push(array<T>& arr, U x)
 {
-    insert(back<array<T>>(arr), T{mv(x)});
+    insert(back<array<T>>(arr), mv(x));
 }
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 constexpr auto
 erase(back<array<T>> arr) -> back<array<T>>
 {
     auto& header = at(arr.range).header;
     decrement(at(header).limit);
     destroy(at(load(header).limit));
-    if (is_empty(at(arr.range))) {
+    if (is_empty(load(arr.range))) {
         deallocate_array(header);
         header = nullptr;
     }
     return arr;
 }
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 constexpr void
 erase_all(array<T>& x)
 {
     while (!is_empty(x)) erase(back<array<T>>(x));
 }
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 constexpr void
 pop(array<T>& arr)
 {
     erase(back<array<T>>(arr));
 }
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 constexpr auto
 first(array<T> const& x) -> Position_type<array<T>>
 {
@@ -295,8 +301,7 @@ first(array<T> const& x) -> Position_type<array<T>>
     return pointer_to(at(x.header).x);
 }
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 constexpr auto
 limit(array<T> const& x) -> Position_type<array<T>>
 {
@@ -304,8 +309,7 @@ limit(array<T> const& x) -> Position_type<array<T>>
     return at(x.header).limit;
 }
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 constexpr auto
 limit_of_storage(array<T> const& x) -> Position_type<array<T>>
 {
@@ -313,32 +317,21 @@ limit_of_storage(array<T> const& x) -> Position_type<array<T>>
     return at(x.header).limit_of_storage;
 }
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 constexpr auto
 is_empty(array<T> const& x) -> bool
 {
     return first(x) == limit(x);
 }
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
-constexpr auto
-is_full(array<T> const& x) -> bool
-{
-    return limit(x) == limit_of_storage(x);
-}
-
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 constexpr auto
 size(array<T> const& x) -> Size_type<array<T>>
 {
     return limit(x) - first(x);
 }
 
-template <typename T>
-requires Default_constructible<Remove_const<T>>
+template <Movable T>
 constexpr auto
 capacity(array<T> const& x) -> Size_type<array<T>>
 {

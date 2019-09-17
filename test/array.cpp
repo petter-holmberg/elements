@@ -1,7 +1,6 @@
 #include "catch.hpp"
 
 #include "elements.h"
-
 namespace e = elements;
 
 SCENARIO ("Using array", "[array]")
@@ -130,7 +129,6 @@ SCENARIO ("Using array", "[array]")
         e::array<int> x0(5);
 
         REQUIRE (e::is_empty(x0));
-        REQUIRE (!e::is_full(x0));
         REQUIRE (e::size(x0) == 0);
         REQUIRE (e::capacity(x0) == 5);
 

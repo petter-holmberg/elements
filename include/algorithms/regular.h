@@ -101,7 +101,7 @@ construct(T& raw)
     new (&raw) T();
 }
 
-template <typename T, Constructible<T> U>
+template <typename T, typename U>
 requires Default_constructible<Remove_const<T>>
 constexpr void
 construct(T& raw, U&& initializer)
