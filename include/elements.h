@@ -6,6 +6,7 @@
 #define concept concept bool // Use C++20 syntax
 
 #include "adapters/counted_position.h"
+#include "adapters/filter_position.h"
 #include "adapters/loadable_position.h"
 #include "adapters/loadable_forward_position.h"
 #include "adapters/reverse_position.h"

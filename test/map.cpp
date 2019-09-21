@@ -32,15 +32,4 @@ SCENARIO ("Mapping", "[map]")
         CHECK (y[3] == 11);
         CHECK (y[4] == 13);
     }
-
-    SECTION ("Mapping with sink")
-    {
-        auto pos = e::copy(x, x + 5, e::map_sink{e::negative<int>{}}(y + 0));
-        REQUIRE(!precedes(pos, y + 5));
-        CHECK (y[0] == 0);
-        CHECK (y[1] == -1);
-        CHECK (y[2] == -2);
-        CHECK (y[3] == -3);
-        CHECK (y[4] == -4);
-    }
 }

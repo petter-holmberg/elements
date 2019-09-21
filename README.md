@@ -15,7 +15,9 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 `reverse_position` takes a `Bidirectional_position` and implements a `Bidirectional_position` where `increment` decrements and `decrement` increments. Loading and storing is done from the predecessor of the original position. It is used for traversing ranges in reverse.
 
-`map_position` takes a `Storable` `Position` and a `Unary_function`, constructing a position type that applies the function when `store` is called. `map_sink` takes a `Unary_function`, constructing an `Invocable` type that returns a `map_position` when invoked with a `Storable` `Position`. It is useful to construct destinations type for algorithms.
+`filter_position` takes a `Storable` `Position` and a `Unary_predicate`, constructing a position type that stores and increments when `store` is called, if the predicate is true for the current element. `filter_sink` takes a `Unary_predicate`, constructing an `Invocable` type that returns a `filter_position` when invoked with a `Storable` `Position`.
+
+`map_position` takes a `Storable` `Position` and a `Unary_function`, constructing a position type that applies the function on the current element when `store` is called. `map_sink` takes a `Unary_function`, constructing an `Invocable` type that returns a `map_position` when invoked with a `Storable` `Position`.
 
 # Algorithms
 
@@ -380,6 +382,8 @@ Index
 `loadable_forward_position`
 `reverse_position`
 
+`filter_position`
+`filter_sink`
 `map_position`
 `map_sink`
 

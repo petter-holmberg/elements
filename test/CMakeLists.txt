@@ -11,10 +11,12 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/coordinate_vector.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/count.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/counted_position.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/filter_position.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/for_each.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/invocable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lexicographical.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/map.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/map_position.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ordered_algebra.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ordering.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pair.cpp
@@ -52,7 +54,7 @@ target_compile_options (
     -Wuseless-cast
     -Wdouble-promotion
     -Wformat=2
-    -Weffc++
+    #-Weffc++
     -Wno-unused-variable
     -pedantic
     -std=c++2a
