@@ -17,6 +17,8 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 `filter_position` takes a `Storable` `Position` and a `Unary_predicate`, constructing a position type that stores and increments when `store` is called, if the predicate is true for the current element. `filter_sink` takes a `Unary_predicate`, constructing an `Invocable` type that returns a `filter_position` when invoked with a `Storable` `Position`.
 
+`insert_position` takes a `Storable` `Position`, constructing a position type that applies the function `insert` on the current element when `store` is called. `insert_sink` in an `Invocable` type that returns an `insert_position` when invoked with a `Storable` `Position`.
+
 `map_position` takes a `Storable` `Position` and a `Unary_function`, constructing a position type that applies the function on the current element when `store` is called. `map_sink` takes a `Unary_function`, constructing an `Invocable` type that returns a `map_position` when invoked with a `Storable` `Position`.
 
 # Algorithms
@@ -384,6 +386,8 @@ Index
 
 `filter_position`
 `filter_sink`
+`insert_position`
+`insert_sink`
 `map_position`
 `map_sink`
 

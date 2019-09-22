@@ -49,9 +49,8 @@ struct array_k
     constexpr auto
     map(Fun fun) -> array_k<T, k>&
     {
-        using elements::map;
-        map(first(*this), limit(*this), first(*this), fun);
-        return *this;
+        copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
+        return at(this);
     }
 
     template <Unary_function Fun>
@@ -61,7 +60,7 @@ struct array_k
     {
         using elements::map;
         array_k<Codomain<Fun>, k> x;
-        map(first(*this), limit(*this), first(x), fun);
+        map(first(at(this)), limit(at(this)), first(x), fun);
         return x;
     }
 
@@ -71,8 +70,8 @@ struct array_k
     flat_map(Fun fun) -> array_k<Value_type<Codomain<Fun>>, k * Size<Codomain<Fun>>>
     {
         array_k<Value_type<Codomain<Fun>>, k * Size<Codomain<Fun>>> x;
-        auto src = first(*this);
-        auto lim = limit(*this);
+        auto src = first(at(this));
+        auto lim = limit(at(this));
         auto dst = first(x);
         while (precedes(src, lim)) {
             auto y = fun(load(src));

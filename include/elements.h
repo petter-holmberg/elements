@@ -7,6 +7,7 @@
 
 #include "adapters/counted_position.h"
 #include "adapters/filter_position.h"
+#include "adapters/insert_position.h"
 #include "adapters/loadable_position.h"
 #include "adapters/loadable_forward_position.h"
 #include "adapters/reverse_position.h"
@@ -15,6 +16,7 @@
 #include "algorithms/algebra.h"
 #include "algorithms/copy.h"
 #include "algorithms/count.h"
+#include "algorithms/dynamic_sequence.h"
 #include "algorithms/fill.h"
 #include "algorithms/for_each.h"
 #include "algorithms/integer.h"
@@ -48,7 +50,6 @@
 #include "data_structures/bounded_range.h"
 #include "data_structures/coordinate_point.h"
 #include "data_structures/coordinate_vector.h"
-#include "data_structures/dynamic_sequence.h"
 #include "data_structures/pair.h"
 #include "data_structures/polynomial.h"
 #include "data_structures/rational.h"

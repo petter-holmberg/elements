@@ -2,9 +2,11 @@
 
 #include <initializer_list>
 
+#include "adapters/map_position.h"
 #include "adapters/reverse_position.h"
 #include "algorithms/algebra.h"
 #include "algorithms/copy.h"
+#include "algorithms/dynamic_sequence.h"
 #include "algorithms/map.h"
 #include "algorithms/ordering.h"
 #include "algorithms/position.h"
@@ -12,7 +14,6 @@
 #include "concepts/invocable.h"
 #include "concepts/position.h"
 #include "concepts/regular.h"
-#include "dynamic_sequence.h"
 
 namespace elements {
 
@@ -153,8 +154,7 @@ struct array_double_ended
     constexpr auto
     map(Fun fun) -> array_double_ended<T>&
     {
-        using elements::map;
-        map(first(at(this)), limit(at(this)), first(at(this)), fun);
+        copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
         return at(this);
     }
 
@@ -166,7 +166,7 @@ struct array_double_ended
         using elements::map;
         array_double_ended<Codomain<Fun>> x;
         reserve(x, size(at(this)));
-        map(first(at(this)), limit(at(this)), insert_sink{back{x}}, fun);
+        map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
         at(x.header).limit = at(x.header).limit_of_storage;
         return x;
     }

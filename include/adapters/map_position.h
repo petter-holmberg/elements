@@ -7,7 +7,6 @@ namespace elements {
 template <Position P, Unary_function F>
 requires
     Storable<P> and
-    Same<Decay<Value_type<P>>, Domain<F>> and
     Same<Decay<Value_type<P>>, Codomain<F>>
 struct map_position
 {
@@ -24,7 +23,6 @@ struct map_position
 template <Position P, Unary_function F>
 requires
     Storable<P> and
-    Same<Decay<Value_type<P>>, Domain<F>> and
     Same<Decay<Value_type<P>>, Codomain<F>>
 struct value_type_t<map_position<P, F>>
 {
@@ -34,7 +32,6 @@ struct value_type_t<map_position<P, F>>
 template <Position P, Unary_function F>
 requires
     Storable<P> and
-    Same<Decay<Value_type<P>>, Domain<F>> and
     Same<Decay<Value_type<P>>, Codomain<F>>
 constexpr auto
 precedes(map_position<P, F> const& pos0, P const& pos1) -> bool
@@ -45,7 +42,6 @@ precedes(map_position<P, F> const& pos0, P const& pos1) -> bool
 template <Position P, Unary_function F>
 requires
     Storable<P> and
-    Same<Decay<Value_type<P>>, Domain<F>> and
     Same<Decay<Value_type<P>>, Codomain<F>>
 constexpr auto
 precedes(P const& pos0, map_position<P, F> const& pos1) -> bool
@@ -56,7 +52,6 @@ precedes(P const& pos0, map_position<P, F> const& pos1) -> bool
 template <Position P, Unary_function F>
 requires
     Storable<P> and
-    Same<Decay<Value_type<P>>, Domain<F>> and
     Same<Decay<Value_type<P>>, Codomain<F>>
 constexpr void
 increment(map_position<P, F>& pos)
@@ -64,21 +59,9 @@ increment(map_position<P, F>& pos)
     increment(pos.pos);
 }
 
-template <Forward_position P, Unary_function F>
-requires
-    Storable<P> and
-    Same<Decay<Value_type<P>>, Domain<F>> and
-    Same<Decay<Value_type<P>>, Codomain<F>>
-constexpr void
-decrement(map_position<P, F>& pos)
-{
-    decrement(pos.pos);
-}
-
 template <Position P, Unary_function F>
 requires
     Storable<P> and
-    Same<Decay<Value_type<P>>, Domain<F>> and
     Same<Decay<Value_type<P>>, Codomain<F>>
 constexpr auto
 successor(map_position<P, F> const& pos) -> map_position<P, F>
@@ -86,24 +69,12 @@ successor(map_position<P, F> const& pos) -> map_position<P, F>
     return map_position{successor(pos.pos)};
 }
 
-template <Forward_position P, Unary_function F>
-requires
-    Storable<P> and
-    Same<Decay<Value_type<P>>, Domain<F>> and
-    Same<Decay<Value_type<P>>, Codomain<F>>
-constexpr auto
-predecessor(map_position<P, F> const& pos) -> map_position<P, F>
-{
-    return map_position{predecessor(pos.pos)};
-}
-
 template <Position P, Unary_function F>
 requires
     Storable<P> and
-    Same<Decay<Value_type<P>>, Domain<F>> and
     Same<Decay<Value_type<P>>, Codomain<F>>
 constexpr void
-store(map_position<P, F>& pos, Value_type<P> const& x)
+store(map_position<P, F>& pos, Domain<F> const& x)
 {
     store(at(pos.pos), pos.fun(x));
 }
@@ -111,12 +82,11 @@ store(map_position<P, F>& pos, Value_type<P> const& x)
 template <Position P, Unary_function F>
 requires
     Storable<P> and
-    Same<Decay<Value_type<P>>, Domain<F>> and
     Same<Decay<Value_type<P>>, Codomain<F>>
 constexpr void
-store(map_position<P, F>& pos, Value_type<P>&& x)
+store(map_position<P, F>& pos, Domain<F>&& x)
 {
-    store(at(pos.pos), pos.fun(fw<Value_type<P>>(x)));
+    store(at(pos.pos), pos.fun(fw<Domain<F>>(x)));
 }
 
 template <Unary_function F>
@@ -132,7 +102,6 @@ struct map_sink
     template <Position P>
     requires
         Storable<P> and
-        Same<Decay<Value_type<P>>, Domain<F>> and
         Same<Decay<Value_type<P>>, Codomain<F>>
     constexpr auto
     operator()(P const& pos)
