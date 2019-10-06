@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "elements.h"
+#include "ordering.h"
 
 namespace e = elements;
 

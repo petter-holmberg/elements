@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "elements.h"
+#include "partition.h"
 
 namespace e = elements;
 
@@ -10,10 +10,10 @@ SCENARIO ("Partition points", "[partition]")
 
     SECTION ("Checking if an empty array is partitioned")
     {
-        e::array<int> x;
+        int x[]{0};
 
-        REQUIRE (e::is_partitioned(e::first(x), e::limit(x), is_even));
-        REQUIRE (!e::precedes(e::partition_point(e::first(x), e::limit(x), is_even), e::limit(x)));
+        REQUIRE (e::is_partitioned(x, x, is_even));
+        REQUIRE (!e::precedes(e::partition_point(x, x, is_even), +x));
     }
 
     SECTION ("Checking if a single-element array with an even number is partitioned")

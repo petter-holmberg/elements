@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "elements.h"
+#include "search_binary.h"
 
 namespace e = elements;
 

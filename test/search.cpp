@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "elements.h"
+#include "search.h"
 
 namespace e = elements;
 
@@ -41,7 +41,7 @@ SCENARIO ("Linear search", "[search]")
         SECTION ("Searcing for an even element")
         {
             auto pos = e::search_if(e::loadable_position(x), x + 5, is_even);
-            REQUIRE (!e::precedes(pos, x + 0));
+            REQUIRE (!e::precedes(pos, +x));
         }
 
         SECTION ("Searcing for an odd element")
@@ -77,7 +77,7 @@ SCENARIO ("Linear search", "[search]")
         SECTION ("Searcing for an even element")
         {
             auto pos = e::search_if_unguarded(e::loadable_position(x), is_even);
-            REQUIRE (!e::precedes(pos, x + 0));
+            REQUIRE (!e::precedes(pos, +x));
         }
 
         SECTION ("Searcing for an odd element")
@@ -92,8 +92,8 @@ SCENARIO ("Linear search", "[search]")
         SECTION ("Searcing for a match between two empty ranges")
         {
             auto pos = e::search_match(e::loadable_position(x), x, x, x);
-            REQUIRE (!e::precedes(e::get<0>(pos), x + 0));
-            REQUIRE (!e::precedes(e::get<1>(pos), x + 0));
+            REQUIRE (!e::precedes(e::get<0>(pos), +x));
+            REQUIRE (!e::precedes(e::get<1>(pos), +x));
         }
 
         SECTION ("Searcing for a match between two arrays of equal length where there is a match")
@@ -146,8 +146,8 @@ SCENARIO ("Linear search", "[search]")
         SECTION ("Searcing for a mismatch between two empty ranges")
         {
             auto pos = e::search_mismatch(e::loadable_position(x), x, x, x);
-            REQUIRE (!e::precedes(e::get<0>(pos), x + 0));
-            REQUIRE (!e::precedes(e::get<1>(pos), x + 0));
+            REQUIRE (!e::precedes(e::get<0>(pos), +x));
+            REQUIRE (!e::precedes(e::get<1>(pos), +x));
         }
 
         SECTION ("Searcing for a mismatch between two arrays of equal length where there is a mismatch")

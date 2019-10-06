@@ -1,22 +1,21 @@
 set (CMAKE_BUILD_TYPE Debug)
 set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/affine_space.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/algebra.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array_double_ended.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array_circular.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array_k.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/copy.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/coordinate_point.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/coordinate_vector.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/combinatorics.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/count.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/counted_position.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/filter_position.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/fill.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/for_each.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/functional.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/invocable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lexicographical.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/map.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/map_position.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ordered_algebra.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ordering.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pair.cpp
@@ -27,10 +26,11 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/rational.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/reduce.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/result.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/reverse_position.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/reverse.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/rotate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/search.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/search_binary.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/task_system.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/swap.cpp)
 
 add_executable (tests ${TEST_SOURCES})
 target_link_libraries (tests -lpthread Catch)

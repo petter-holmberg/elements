@@ -1,6 +1,7 @@
 #include "catch.hpp"
 
-#include "elements.h"
+#include "functional.h"
+#include "pair.h"
 
 namespace e = elements;
 

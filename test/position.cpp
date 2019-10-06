@@ -1,6 +1,7 @@
 #include "catch.hpp"
 
-#include "elements.h"
+#include "affine_space.h"
+#include "position.h"
 
 namespace e = elements;
 
@@ -23,15 +24,6 @@ struct storable_position
     ~storable_position() = default;
 };
 
-struct forward_position
-{
-    int value = 0;
-
-    forward_position() = default;
-
-    explicit forward_position(int value_) : value{value_} {}
-};
-
 namespace elements {
 
 template <>
@@ -40,49 +32,20 @@ struct value_type_t<storable_position>
     using type = int;
 };
 
-template <>
-struct value_type_t<forward_position>
-{
-    using type = int;
-};
-
-constexpr auto
-operator==(forward_position const& x, forward_position const& y) -> bool
-{
-    return x.value == y.value;
-}
-
-template <>
 constexpr void
 store(storable_position& x, Value_type<storable_position> const& value)
 {
     x.value = value;
 }
 
-template <>
 constexpr void
 store(storable_position& x, Value_type<storable_position>&& value)
 {
     x.value = std::forward<Value_type<storable_position>>(value);
 }
 
-template <>
-constexpr auto
-load(forward_position const& x) -> int const&
-{
-    return x.value;
-}
-
-template <>
 constexpr void
 increment(storable_position& x)
-{
-    ++x.value;
-}
-
-template <>
-constexpr void
-increment(forward_position& x)
 {
     ++x.value;
 }
@@ -93,14 +56,6 @@ precedes(storable_position const& pos, int const& lim) -> bool
     return pos.value < lim;
 }
 
-template <>
-constexpr auto
-precedes(forward_position const& pos, int const& lim) -> bool
-{
-    return pos.value < lim;
-}
-
-template <>
 constexpr auto
 precedes(int const& pos, int const& lim) -> bool
 {
@@ -117,7 +72,7 @@ SCENARIO ("Using access functions", "[position]")
     SECTION ("Loadable")
     {
         static_assert(e::Loadable<e::loadable_position<int>>);
-        static_assert(e::Loadable<forward_position>);
+        static_assert(e::Loadable<e::forward_position<int>>);
         static_assert(e::Loadable<int>);
         static_assert(e::Loadable<int*>);
 
@@ -126,7 +81,7 @@ SCENARIO ("Using access functions", "[position]")
         REQUIRE(e::predecessor(lp).pos == -1);
         REQUIRE(e::load(lp) == 0);
 
-        forward_position fp{0};
+        e::forward_position fp{0};
         REQUIRE(e::load(fp) == 0);
 
         REQUIRE (e::load(x) == x);
@@ -186,6 +141,80 @@ SCENARIO ("Using linear traversal functions", "[position]")
     {
         static_assert(e::Forward_position<int>);
         static_assert(e::Forward_position<int*>);
-        static_assert(e::Forward_position<e::loadable_forward_position<int>>);
+        static_assert(e::Position<e::loadable_position<int>>);
+        static_assert(e::Forward_position<e::forward_position<int>>);
+        static_assert(!e::Bidirectional_position<e::forward_position<int>>);
+    }
+
+    SECTION ("Bidirectional_position")
+    {
+        static_assert(e::Bidirectional_position<int>);
+        static_assert(e::Bidirectional_position<int*>);
+        static_assert(e::Bidirectional_position<e::bidirectional_position<int>>);
+    }
+}
+
+SCENARIO ("Reversing positions", "[reverse_position]")
+{
+    int xs[] = {0, 1};
+
+    SECTION ("Bidirectional traversal")
+    {
+        auto px = e::reverse_position(xs + 2);
+        static_assert(e::Bidirectional_position<decltype(px)>);
+        static_assert(e::Affine_space<decltype(px)>);
+
+        REQUIRE (load(px) == 1);
+        REQUIRE (successor(px).pos == xs + 1);
+
+        increment(px);
+        REQUIRE (load(px) == 0);
+        REQUIRE (predecessor(px).pos == xs + 2);
+
+        decrement(px);
+        REQUIRE (px.pos == xs + 2);
+    }
+}
+
+SCENARIO ("Counted positions", "[counted_position]")
+{
+    int xs[] = {0, 1};
+
+    SECTION ("Counted traversal")
+    {
+        auto px = e::counted_position(xs + 0);
+        static_assert(e::Bidirectional_position<decltype(px)>);
+
+        REQUIRE(load(px) == 0);
+        REQUIRE(px.pos == xs);
+        REQUIRE(px.count == 0);
+        REQUIRE(successor(px).pos == xs + 1);
+        REQUIRE(successor(px).count == 1);
+        REQUIRE(precedes(px, 2));
+
+        increment(px);
+        REQUIRE(load(px) == 1);
+        REQUIRE(px.pos == xs + 1);
+        REQUIRE(px.count == 1);
+        REQUIRE(successor(px).pos == xs + 2);
+        REQUIRE(successor(px).count == 2);
+        REQUIRE(precedes(px, 2));
+
+        increment(px);
+        REQUIRE(px.pos == xs + 2);
+        REQUIRE(px.count == 2);
+        REQUIRE(predecessor(px).pos == xs + 1);
+        REQUIRE(predecessor(px).count == 1);
+        REQUIRE(!precedes(px, 2));
+
+        decrement(px);
+        REQUIRE(load(px) == 1);
+        REQUIRE(px.pos == xs + 1);
+        REQUIRE(px.count == 1);
+        REQUIRE(successor(px).pos == xs + 2);
+        REQUIRE(successor(px).count == 2);
+        REQUIRE(predecessor(px).pos == xs);
+        REQUIRE(predecessor(px).count == 0);
+        REQUIRE(precedes(px, 2));
     }
 }

@@ -4,7 +4,7 @@
 #include <complex>
 #include <cstddef>
 
-#include "elements.h"
+#include "ordered_algebra.h"
 
 namespace e = elements;
 

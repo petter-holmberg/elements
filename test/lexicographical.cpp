@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "elements.h"
+#include "lexicographical.h"
 
 namespace e = elements;
 

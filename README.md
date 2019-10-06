@@ -23,7 +23,7 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 # Algorithms
 
-## Algebra
+## Combinatorics
 
 `choose` selects the n choose k binomial coefficent.
 
@@ -110,6 +110,16 @@ For `search_not`, a match is defined as the first element `y` for which the give
 
 `search_match` and `search_mismatch` take two loadable ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `equal`.
 
+## Permutations
+
+### Reverse
+
+`reverse` takes a mutable range and reverses the elements in the range.
+
+### Rotate
+
+`rotate` takes a mutable range and a position in the range, swapping elements such that the element at the given position becomes the first element in the range, and the element preceding it becomes the last element.
+
 ## Side effects
 
 `for_each` takes a loadable range and a procedure of `Arity` 1. It applies the procedure on each value in the range, returning the procedure as it could have accumulated information during the traversal.
@@ -125,9 +135,9 @@ For `search_not`, a match is defined as the first element `y` for which the give
 
 ## Algebra
 
-`coordinate_point` implements a coordinate point type for use in linear algebra. It is an `Affine_space` over a `Vector_space` and a `Sequence`. By default it uses `array_k` for storage of the coordinates.
+`affine_point` implements an affine point type for use in linear algebra. It is an `Affine_space` over a `Vector_space` and a `Sequence`. By default it uses `array_k` for storage of the coordinates.
 
-`coordinate_vector` implements a coordinate vector type for use in linear algebra. It is both a `Semimodule` over a `Semiring` and a `Sequence`. If the `Semiring` is a `Field` it supports all operations on a `Vector_space`. By default it uses `array_k` for storage of the elements. It takes two optional operators for addition and multiplication of the semiring elements.
+`affine_vector` implements an affine vector type for use in linear algebra. It is both a `Semimodule` over a `Semiring` and a `Sequence`. If the `Semiring` is a `Field` it supports all operations on a `Vector_space`. By default it uses `array_k` for storage of the elements. It takes two optional operators for addition and multiplication of the semiring elements.
 
 `rational` implements a rational number type, forming a `Field` over any `Integral_domain`.
 
@@ -176,7 +186,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 ### Regular types
 
-`Same` describes a pair of types that are the same.
+`Same_as` describes a pair of types that are the same.
 
 `Weakly_equality_comparable` describes a type with equality comparison operators that may not necessarily be callable twice.
 `Equality_comparable` describes a type with equality comparison operators that can be called multiple times.
@@ -258,7 +268,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 ## Integers
 
-`Binary_integer` describes a `Totally_ordered` integral type represented like a built-in machine type, with all its standard operators.
+`Integral` describes a `Totally_ordered` integral type represented like a built-in machine type, with all its standard operators.
 
 ## Invocable concepts
 
@@ -446,6 +456,9 @@ Index
 `search_match`
 `search_mismatch`
 
+`reverse`
+`rotate`
+
 `for_each`
 
 `each_of`
@@ -455,8 +468,8 @@ Index
 
 # Data structures
 
-`coordinate_point`
-`coordinate_vector`
+`affine_point`
+`affine_vector`
 `rational`
 `polynomial`
 
@@ -499,7 +512,7 @@ Index
 `Functor`
 `Monad`
 
-`Binary_integer`
+`Integral`
 
 `Procedure`
 `Functional_procedure`
@@ -533,7 +546,7 @@ Index
 `Sequence`
 `Dynamic_sequence`
 
-`Same`
+`Same_as`
 `Weakly_equality_comparable`
 `Equality_comparable`
 `Equality_comparable_with`

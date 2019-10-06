@@ -1,6 +1,7 @@
 #include "catch.hpp"
 
-#include "elements.h"
+#include "array_k.h"
+#include "functional.h"
 
 namespace e = elements;
 

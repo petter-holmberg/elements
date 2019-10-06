@@ -1,13 +1,16 @@
 #include "catch.hpp"
 
-#include "elements.h"
+#include "affine_space.h"
+#include "array.h"
+
 namespace e = elements;
 
 SCENARIO ("Using array", "[array]")
 {
-    static_assert(e::Dynamic_sequence<e::array<int>>);
-
     e::array<int> x{0, 1, 2, 3, 4};
+    static_assert(e::Dynamic_sequence<decltype(x)>);
+    static_assert(e::Affine_space<e::Position_type<decltype(x)>>);
+
     REQUIRE (e::axiom_Regular(x));
 
     SECTION ("Checking elements")

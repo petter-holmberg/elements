@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "elements.h"
+#include "map.h"
 
 namespace e = elements;
 
@@ -14,6 +14,7 @@ SCENARIO ("Mapping", "[map]")
         auto pos = e::map(x, x + 5, y, e::negative<int>{});
 
         REQUIRE(pos == y + 5);
+
         CHECK (y[0] == 0);
         CHECK (y[1] == -1);
         CHECK (y[2] == -2);
@@ -26,6 +27,7 @@ SCENARIO ("Mapping", "[map]")
         auto pos = e::map(x, x + 5, y, y + 0, e::sum<int>{});
 
         REQUIRE(pos == y + 5);
+
         CHECK (y[0] == 5);
         CHECK (y[1] == 7);
         CHECK (y[2] == 9);

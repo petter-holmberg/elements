@@ -1,14 +1,16 @@
 #include "catch.hpp"
 
-#include "elements.h"
+#include "affine_space.h"
+#include "array_double_ended.h"
 
 namespace e = elements;
 
 SCENARIO ("Using double-ended array", "[array_double_ended]")
 {
-    static_assert(e::Dynamic_sequence<e::array_double_ended<int>>);
-
     e::array_double_ended<int> x{0, 1, 2, 3, 4};
+    static_assert(e::Dynamic_sequence<decltype(x)>);
+    static_assert(e::Affine_space<e::Position_type<decltype(x)>>);
+
     REQUIRE (e::axiom_Regular(x));
 
     SECTION ("Checking elements")

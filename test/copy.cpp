@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "elements.h"
+#include "copy.h"
 
 namespace e = elements;
 
@@ -14,6 +14,7 @@ SCENARIO ("Copying", "[copy]")
         auto pos = e::copy(x, x + 5, y);
 
         REQUIRE(pos == y + 5);
+
         CHECK (y[0] == 0);
         CHECK (y[1] == 1);
         CHECK (y[2] == 2);
@@ -26,6 +27,7 @@ SCENARIO ("Copying", "[copy]")
         auto pos = e::copy(x, x + 5, x);
 
         REQUIRE(pos == x + 5);
+
         CHECK (x[0] == 0);
         CHECK (x[1] == 1);
         CHECK (x[2] == 2);
@@ -38,6 +40,7 @@ SCENARIO ("Copying", "[copy]")
         auto pos = e::copy(x + 1, x + 5, x);
 
         REQUIRE(pos == x + 4);
+
         CHECK (x[0] == 1);
         CHECK (x[1] == 2);
         CHECK (x[2] == 3);

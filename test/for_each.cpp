@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "elements.h"
+#include "for_each.h"
 
 namespace e = elements;
 
@@ -12,6 +12,7 @@ SCENARIO ("For each", "[for_each]")
 
         int sum = 0;
         e::for_each(x, x + 5, [&sum](int a){ sum += a; });
+
         REQUIRE (sum == 10);
     }
 }

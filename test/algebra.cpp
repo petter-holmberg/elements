@@ -1,10 +1,10 @@
 #include "catch.hpp"
 
-#include <chrono>
 #include <complex>
 #include <cstddef>
 
-#include "elements.h"
+#include "algebra.h"
+#include "position.h"
 
 namespace e = elements;
 
@@ -86,46 +86,5 @@ SCENARIO ("Using built-in and library algebraic types", "[algebra]")
     SECTION ("Vector spaces")
     {
         static_assert(e::Vector_space<std::ptrdiff_t>);
-    }
-
-    SECTION ("Affine spaces")
-    {
-        static_assert(e::Affine_space<int*>);
-
-        static_assert(
-            e::Affine_space<
-                std::chrono::system_clock::time_point,
-                typename std::chrono::system_clock::time_point::duration,
-                typename std::chrono::system_clock::time_point::duration::rep>);
-    }
-
-    SECTION ("Binomial coefficients")
-    {
-        REQUIRE (e::choose(0, 0) == 1);
-
-        REQUIRE (e::choose(1, 0) == 1);
-        REQUIRE (e::choose(1, 1) == 1);
-
-        REQUIRE (e::choose(2, 0) == 1);
-        REQUIRE (e::choose(2, 1) == 2);
-        REQUIRE (e::choose(2, 2) == 1);
-
-        REQUIRE (e::choose(3, 0) == 1);
-        REQUIRE (e::choose(3, 1) == 3);
-        REQUIRE (e::choose(3, 2) == 3);
-        REQUIRE (e::choose(3, 3) == 1);
-
-        REQUIRE (e::choose(4, 0) == 1);
-        REQUIRE (e::choose(4, 1) == 4);
-        REQUIRE (e::choose(4, 2) == 6);
-        REQUIRE (e::choose(4, 3) == 4);
-        REQUIRE (e::choose(4, 4) == 1);
-
-        REQUIRE (e::choose(5, 0) == 1);
-        REQUIRE (e::choose(5, 1) == 5);
-        REQUIRE (e::choose(5, 2) == 10);
-        REQUIRE (e::choose(5, 3) == 10);
-        REQUIRE (e::choose(5, 4) == 5);
-        REQUIRE (e::choose(5, 5) == 1);
     }
 }
