@@ -194,4 +194,77 @@ SCENARIO ("Linear search", "[search]")
             REQUIRE (e::get<1>(pos) == x + 4);
         }
     }
+
+    SECTION ("search_adjacent_match")
+    {
+        SECTION ("Positions")
+        {
+            SECTION ("Searcing for an adjacent equality match in an array that contains it")
+            {
+                int y[]{0, 1, 2, 3, 3, 4, 5};
+
+                auto pos = e::search_adjacent_match(e::position(y), y + 7);
+                REQUIRE (!e::precedes(pos, y + 4));
+            }
+
+            SECTION ("Searcing for an adjacent equality match in an array that doesn't contain it")
+            {
+                int y[]{0, 1, 2, 3, 4, 5, 6};
+
+                auto pos = e::search_adjacent_match(e::position(y), y + 7);
+                REQUIRE (!e::precedes(pos, y + 7));
+            }
+
+            SECTION ("Searcing for an adjacent equality mismatch in an array that contains it")
+            {
+                int y[]{0, 0, 0, 0, 1, 1, 1};
+
+                auto pos = e::search_adjacent_mismatch(e::position(y), y + 7);
+                REQUIRE (!e::precedes(pos, y + 4));
+            }
+
+            SECTION ("Searcing for an adjacent equality mismatch in an array that doesn't contain it")
+            {
+                int y[]{0, 0, 0, 0, 0, 0, 0};
+
+                auto pos = e::search_adjacent_mismatch(e::position(y), y + 7);
+                REQUIRE (!e::precedes(pos, y + 7));
+            }
+        }
+
+        SECTION ("Forward positions")
+        {
+            SECTION ("Searcing for an adjacent equality match in an array that contains it")
+            {
+                int y[]{0, 1, 2, 3, 3, 4, 5};
+
+                auto pos = e::search_adjacent_match(e::forward_position(y), y + 7);
+                REQUIRE (!e::precedes(pos, y + 4));
+            }
+
+            SECTION ("Searcing for an adjacent equality match in an array that doesn't contain it")
+            {
+                int y[]{0, 1, 2, 3, 4, 5, 6};
+
+                auto pos = e::search_adjacent_match(e::forward_position(y), y + 7);
+                REQUIRE (!e::precedes(pos, y + 7));
+            }
+
+            SECTION ("Searcing for an adjacent equality mismatch in an array that contains it")
+            {
+                int y[]{0, 0, 0, 0, 1, 1, 1};
+
+                auto pos = e::search_adjacent_mismatch(e::forward_position(y), y + 7);
+                REQUIRE (!e::precedes(pos, y + 4));
+            }
+
+            SECTION ("Searcing for an adjacent equality mismatch in an array that doesn't contain it")
+            {
+                int y[]{0, 0, 0, 0, 0, 0, 0};
+
+                auto pos = e::search_adjacent_mismatch(e::forward_position(y), y + 7);
+                REQUIRE (!e::precedes(pos, y + 7));
+            }
+        }
+    }
 }

@@ -7,11 +7,13 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 ## Position adapters
 
+`position` takes a `Position` and provides the minimal interface required.
+
+`forward_position` takes a `Forward_position` and provides the minimal interface required.
+
 `counted_position` takes a `Position` and optionally a count of the `Difference_type` of the position, constructing a position type that can be compared against a limit that is `Equality_comparable_with` the count. `increment` increments both the position and the count, `decrement` decrements both the position and the count.
 
 `loadable_position` takes a `Loadable` `Position` and provides the minimal interface required.
-
-`loadable_forward_position` takes a `Loadable` `Forward_position` and provides the minimal interface required.
 
 `reverse_position` takes a `Bidirectional_position` and implements a `Bidirectional_position` where `increment` decrements and `decrement` increments. Loading and storing is done from the predecessor of the original position. It is used for traversing ranges in reverse.
 
@@ -109,6 +111,9 @@ For `search_not`, a match is defined as the first element `y` for which the give
 `search_unguarded`, `search_not_unguarded`, `search_if_unguarded`, and `search_if_not_unguarded` are variations of the functions above that assume an element satisfying the applied predicate is known to exist in the given range. They take a position to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration.
 
 `search_match` and `search_mismatch` take two loadable ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `equal`.
+
+`search_adjacent_match` and `search_adjacent_mismatch` takes a loadable range and a relation,
+stopping at the first position where an element and its successor satisfy the relation, or does not satisfy the relation, respectively. The default relation is `equal`.
 
 ## Permutations
 
@@ -395,9 +400,10 @@ Index
 
 # Adapters
 
+`position`
+`forward_position`
 `counted_position`
 `loadable_position`
-`loadable_forward_position`
 `reverse_position`
 
 `filter_position`

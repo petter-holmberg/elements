@@ -561,6 +561,109 @@ precedes(counted_position<P> const& pos, C const& count) -> bool
     return pos.count != count;
 }
 
+template <Position P>
+requires Loadable<P>
+struct position
+{
+    P pos;
+
+    position() = default;
+
+    explicit position(P pos_) : pos{pos_} {}
+
+    position(position const&) = delete;
+
+    position(position&&) = default;
+
+    position& operator=(position const&) = delete;
+
+    position& operator=(position&&) = default;
+
+    ~position() = default;
+};
+
+template <Position P>
+requires Loadable<P>
+struct value_type_t<position<P>>
+{
+    using type = Value_type<P>;
+};
+
+template <Position P>
+requires Loadable<P>
+struct difference_type_t<position<P>>
+{
+    using type = Difference_type<P>;
+};
+
+template <Position P>
+constexpr void
+increment(position<P>& pos)
+{
+    increment(pos.pos);
+}
+
+template <Position P>
+constexpr auto
+successor(position<P> const& pos) -> position<P>
+{
+    return {successor(pos.pos)};
+}
+
+template <Position P>
+requires Loadable<P>
+constexpr auto
+load(position<P> const& pos) -> Value_type<P> const&
+{
+    return load(pos.pos);
+}
+
+template <Position P>
+requires Storable<P>
+constexpr void
+store(position<P>& pos, Value_type<P> const& value)
+{
+    store(pos.pos, value);
+}
+
+template <Position P>
+requires Storable<P>
+constexpr void
+store(position<P>& pos, Value_type<P>&& value)
+{
+    store(pos.pos, std::forward<Value_type<P>>(value));
+}
+
+template <Position P>
+requires Mutable<P>
+constexpr auto
+at(position<P> const& pos) -> Value_type<P> const&
+{
+    return at(pos.pos);
+}
+
+template <Position P>
+requires Mutable<P>
+constexpr auto
+at(position<P>& pos) -> Value_type<P>&
+{
+    return at(pos.pos);
+}
+
+template <Position P>
+constexpr auto
+precedes(position<P> const& pos0, position<P> const& pos1) -> bool
+{
+    return pos0.pos != pos1.pos;
+}
+
+template <Position P, Limit<P> L>
+constexpr auto
+precedes(position<P> const& pos, L const& lim) -> bool
+{
+    return pos.pos != lim;
+}
+
 template <Forward_position P>
 requires Loadable<P>
 struct forward_position
@@ -591,6 +694,20 @@ constexpr auto
 operator==(forward_position<P> const& x, forward_position<P> const& y) -> bool
 {
     return x.pos == y.pos;
+}
+
+template <Forward_position P>
+constexpr auto
+operator==(forward_position<P> const& x, P const& y) -> bool
+{
+    return x.pos == y;
+}
+
+template <Forward_position P>
+constexpr auto
+operator==(P const& x, forward_position<P> const& y) -> bool
+{
+    return x == y.pos;
 }
 
 template <Forward_position P>
@@ -652,6 +769,13 @@ constexpr auto
 precedes(forward_position<P> const& pos0, forward_position<P> const& pos1) -> bool
 {
     return pos0.pos != pos1.pos;
+}
+
+template <Forward_position P, Limit<P> L>
+constexpr auto
+precedes(forward_position<P> const& pos, L const& lim) -> bool
+{
+    return pos.pos != lim;
 }
 
 template <Position P, Limit<P> L>

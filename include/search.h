@@ -126,4 +126,68 @@ search_mismatch(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel = equal<Value_type<P
     return search_match(mv(pos0), mv(lim0), mv(pos1), mv(lim1), complement<Rel>{rel});
 }
 
+template <Position P, Limit<P> L, Relation Rel = equal<Value_type<P>>>
+requires
+    Loadable<P> and
+    Relation<Rel> and
+    Same_as<Decay<Value_type<P>>, Domain<Rel>>
+constexpr auto
+search_adjacent_match(P pos, L lim, Rel rel = equal<Value_type<P>>{}) -> P
+//[[expects axiom: loadable_range(pos, lim)]]
+{
+    if (!precedes(pos, lim)) return pos;
+    auto x{load(pos)};
+    increment(pos);
+    while (precedes(pos, lim)) {
+        if (rel(x, load(pos))) break;
+        x = load(pos);
+        increment(pos);
+    }
+    return pos;
+}
+
+template <Position P, Limit<P> L, Relation Rel = equal<Value_type<P>>>
+requires
+    Loadable<P> and
+    Relation<Rel> and
+    Same_as<Decay<Value_type<P>>, Domain<Rel>>
+constexpr auto
+search_adjacent_mismatch(P pos, L lim, Rel rel = equal<Value_type<P>>{}) -> P
+//[[expects axiom: loadable_range(pos, lim)]]
+{
+    return search_adjacent_match(mv(pos), mv(lim), complement<Rel>{rel});
+}
+
+template <Forward_position P, Limit<P> L, Relation Rel = equal<Value_type<P>>>
+requires
+    Loadable<P> and
+    Relation<Rel> and
+    Same_as<Decay<Value_type<P>>, Domain<Rel>>
+constexpr auto
+search_adjacent_match(P pos, L lim, Rel rel = equal<Value_type<P>>{}) -> P
+//[[expects axiom: loadable_range(pos, lim)]]
+{
+    if (!precedes(pos, lim)) return pos;
+    P prev_pos{pos};
+    increment(pos);
+    while (precedes(pos, lim)) {
+        if (rel(load(prev_pos), load(pos))) break;
+        prev_pos = pos;
+        increment(pos);
+    }
+    return pos;
+}
+
+template <Forward_position P, Limit<P> L, Relation Rel = equal<Value_type<P>>>
+requires
+    Loadable<P> and
+    Relation<Rel> and
+    Same_as<Decay<Value_type<P>>, Domain<Rel>>
+constexpr auto
+search_adjacent_mismatch(P pos, L lim, Rel rel = equal<Value_type<P>>{}) -> P
+//[[expects axiom: loadable_range(pos, lim)]]
+{
+    return search_adjacent_match(pos, lim, complement<Rel>{rel});
+}
+
 }
