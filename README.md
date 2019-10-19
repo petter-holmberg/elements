@@ -131,6 +131,12 @@ For `search_not`, a match is defined as the first element `y` for which the give
 `none_of` takes a loadable range and a unary predicate. It checks if none of the values in the range satisfies the predicate.
 `any_of` takes a loadable range and a unary predicate. It checks if any value in the range satisfies the predicate.
 
+## Zipping/Unzipping
+
+`zip` takes two loadable ranges as sources and a storable position as destination. It performs copying from the first to the last element of the sources, starting with the first source and alternating between the sources for every element. If one of the source ranges is longer than the other, its remaining elements are appended at the end.
+
+`unzip` takes one loadable range as source and two storable positions as destinations. It performs copying from the first to the last element of the source, alternating between the destinations for each element.
+
 # Data structures
 
 ## Algebra

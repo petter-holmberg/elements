@@ -30,7 +30,8 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/rotate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/search.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/search_binary.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/swap.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/swap.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/zip.cpp)
 
 add_executable (tests ${TEST_SOURCES})
 target_link_libraries (tests -lpthread Catch)
