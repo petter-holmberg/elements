@@ -1,8 +1,8 @@
 #pragma once
 
-#include "array.h"
 #include "invocable.h"
 #include "partition.h"
+#include "range.h"
 
 namespace elements {
 

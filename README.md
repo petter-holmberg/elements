@@ -161,11 +161,11 @@ stopping at the first position where an element and its successor satisfy the re
 `pair` implements a structure of two elements (that may differ in type) allocated on the stack. They can be accessed through the function `get`, either by position or by type. If the two elements
 are of the same type, `pair` also provides a functor interface through the member function `.map`.
 
-`array` implements an array of elements contiguously allocated on the free store. It stores a single pointer on the stack, keeping the array size and capacity in a header
+`array_single_ended` implements an array of elements contiguously allocated on the free store. It stores a single pointer on the stack, keeping the array size and capacity in a header
 to the array elements.
-`array` supports insertion at the back in amortized constant time using `push`. If the capacity is exceeded it reallocates and moves its elements.
-`array` has regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
-`array` also provides a monadic interface through the member functions `.map` and `.flat_map`.
+`array_single_ended` supports insertion at the back in amortized constant time using `push`. If the capacity is exceeded it reallocates and moves its elements.
+`array_single_ended` has regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
+`array_single_ended` also provides a monadic interface through the member functions `.map` and `.flat_map`.
 
 `array_double_ended` implements an array of elements contiguously allocated on the free store. It stores a single pointer on the stack, keeping the array size and capacity in a header
 to the array elements.
@@ -486,7 +486,7 @@ Index
 `polynomial`
 
 `pair`
-`array`
+`array_single_ended`
 `array_double_ended`
 `array_circular`
 `array_k`

@@ -1,13 +1,13 @@
 #include "catch.hpp"
 
 #include "affine_space.h"
-#include "array.h"
+#include "array_single_ended.h"
 
 namespace e = elements;
 
-SCENARIO ("Using array", "[array]")
+SCENARIO ("Using single-ended array", "[array_single_ended]")
 {
-    e::array<int> x{0, 1, 2, 3, 4};
+    e::array_single_ended<int> x{0, 1, 2, 3, 4};
     static_assert(e::Dynamic_sequence<decltype(x)>);
     static_assert(e::Affine_space<e::Position_type<decltype(x)>>);
 
@@ -48,7 +48,7 @@ SCENARIO ("Using array", "[array]")
         }
 
         {
-            e::array<int> y{0, 1, 2, 3};
+            e::array_single_ended<int> y{0, 1, 2, 3};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -59,7 +59,7 @@ SCENARIO ("Using array", "[array]")
         }
 
         {
-            e::array<int> y{0, 1, 2, 3, 4, 5};
+            e::array_single_ended<int> y{0, 1, 2, 3, 4, 5};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -70,7 +70,7 @@ SCENARIO ("Using array", "[array]")
         }
 
         {
-            e::array<int> y{0, -1, -2, -3, -4};
+            e::array_single_ended<int> y{0, -1, -2, -3, -4};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -81,7 +81,7 @@ SCENARIO ("Using array", "[array]")
         }
 
         {
-            e::array<int> y{5, 6, 7, 8, 9};
+            e::array_single_ended<int> y{5, 6, 7, 8, 9};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -111,7 +111,7 @@ SCENARIO ("Using array", "[array]")
         }
 
         {
-            e::array<int> y{5, 6, 7, 8, 9};
+            e::array_single_ended<int> y{5, 6, 7, 8, 9};
             e::swap(x, y);
 
             CHECK (x[0] == 5);
@@ -129,7 +129,7 @@ SCENARIO ("Using array", "[array]")
 
     SECTION ("Checking capacity")
     {
-        e::array<int> x0(5);
+        e::array_single_ended<int> x0(5);
 
         REQUIRE (e::is_empty(x0));
         REQUIRE (e::size(x0) == 0);
@@ -190,7 +190,7 @@ SCENARIO ("Using array", "[array]")
 
     SECTION ("Monadic interface")
     {
-        auto fn0 = [](int const& i){ return e::array<int>{i, -i}; };
+        auto fn0 = [](int const& i){ return e::array_single_ended<int>{i, -i}; };
         auto fn1 = [](int const& i){ return i + 0.5; };
 
         static_assert(e::Monad<decltype(x), decltype(fn0)>);

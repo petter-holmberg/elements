@@ -1,18 +1,18 @@
 #pragma once
 
-#include "array.h"
+#include "array_single_ended.h"
 #include "combinatorics.h"
 #include "ordered_algebra.h"
 
 namespace elements {
 
-template <typename R, typename C = array<R>>
+template <typename R, typename C = array_single_ended<R>>
 requires
     Ring<R> and
     Dynamic_sequence<C>
 struct polynomial
 {
-    array<R> coefficients;
+    C coefficients;
 
     polynomial()
         : coefficients{Zero<R>}
@@ -22,18 +22,18 @@ struct polynomial
         : coefficients(coefficients_)
     {}
 
-    polynomial(Size_type<array<R>> const& size, R const& value)
+    polynomial(Size_type<C> const& size, R const& value)
         : coefficients(size, size, value)
     {}
 
     constexpr auto
-    operator[](Size_type<array<R>> i) const -> R const&
+    operator[](Size_type<C> i) const -> R const&
     {
         return coefficients[i];
     }
 
     constexpr auto
-    operator[](Size_type<array<R>> i) -> R&
+    operator[](Size_type<C> i) -> R&
     {
         return coefficients[i];
     }
@@ -54,7 +54,7 @@ requires
     Dynamic_sequence<C>
 struct size_type_t<polynomial<R, C>>
 {
-    using type = Size_type<array<R>>;
+    using type = Size_type<C>;
 };
 
 template <typename R, typename C>

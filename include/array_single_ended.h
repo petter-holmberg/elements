@@ -9,7 +9,7 @@
 namespace elements {
 
 template <Movable T>
-struct array_prefix
+struct array_single_ended_prefix
 {
     Pointer_type<T> limit;
     Pointer_type<T> limit_of_storage;
@@ -18,10 +18,10 @@ struct array_prefix
 
 template <Movable T>
 constexpr auto
-allocate_array(Difference_type<Pointer_type<T>> n) -> Pointer_type<array_prefix<T>>
+allocate_array_single_ended(Difference_type<Pointer_type<T>> n) -> Pointer_type<array_single_ended_prefix<T>>
 {
     if (is_zero(n)) return nullptr;
-    auto remote = allocate<array_prefix<T>>(predecessor(n) * static_cast<pointer_diff>(sizeof(T)));
+    auto remote = allocate<array_single_ended_prefix<T>>(predecessor(n) * static_cast<pointer_diff>(sizeof(T)));
     auto const& first = pointer_to(at(remote).x);
     at(remote).limit = first;
     at(remote).limit_of_storage = first + n;
@@ -30,47 +30,47 @@ allocate_array(Difference_type<Pointer_type<T>> n) -> Pointer_type<array_prefix<
 
 template <Movable T>
 constexpr void
-deallocate_array(Pointer_type<array_prefix<T>> prefix)
+deallocate_array_single_ended(Pointer_type<array_single_ended_prefix<T>> prefix)
 {
     deallocate(prefix);
 }
 
 template <Movable T>
-struct array
+struct array_single_ended
 {
-    Pointer_type<array_prefix<T>> header{nullptr};
+    Pointer_type<array_single_ended_prefix<T>> header{nullptr};
 
-    array() = default;
+    array_single_ended() = default;
 
-    array(array const& x)
-        : header{allocate_array<T>(size(x))}
+    array_single_ended(array_single_ended const& x)
+        : header{allocate_array_single_ended<T>(size(x))}
     {
         insert_range(x, back{at(this)});
     }
 
-    array(array&& x)
+    array_single_ended(array_single_ended&& x)
     {
         header = x.header;
         x.header = nullptr;
     }
 
-    array(std::initializer_list<T> x)
-        : header{allocate_array<T>(Size_type<array<T>>{static_cast<pointer_diff>(std::size(x))})}
+    array_single_ended(std::initializer_list<T> x)
+        : header{allocate_array_single_ended<T>(Size_type<array_single_ended<T>>{static_cast<pointer_diff>(std::size(x))})}
     {
         insert_range(x, back{at(this)});
     }
 
     explicit
-    array(Size_type<array<T>> capacity)
-        : header{allocate_array<T>(capacity)}
+    array_single_ended(Size_type<array_single_ended<T>> capacity)
+        : header{allocate_array_single_ended<T>(capacity)}
     {}
 
-    array(Size_type<array<T>> size, T const& x)
-        : array(size, size, x)
+    array_single_ended(Size_type<array_single_ended<T>> size, T const& x)
+        : array_single_ended(size, size, x)
     {}
 
-    array(Size_type<array<T>> capacity, Size_type<array<T>> size, T const& x)
-        : header{allocate_array<T>(capacity)}
+    array_single_ended(Size_type<array_single_ended<T>> capacity, Size_type<array_single_ended<T>> size, T const& x)
+        : header{allocate_array_single_ended<T>(capacity)}
     {
         while (!is_zero(size)) {
             push(at(this), x);
@@ -79,15 +79,15 @@ struct array
     }
 
     auto
-    operator=(array const& x) -> array&
+    operator=(array_single_ended const& x) -> array_single_ended&
     {
-        array temp(x);
+        array_single_ended temp(x);
         swap(at(this), temp);
         return at(this);
     }
 
     auto
-    operator=(array&& x) -> array&
+    operator=(array_single_ended&& x) -> array_single_ended&
     {
         if (this != pointer_to(x)) {
             erase_all(at(this));
@@ -96,7 +96,7 @@ struct array
         return at(this);
     }
 
-    ~array()
+    ~array_single_ended()
     {
         erase_all(at(this));
     }
@@ -118,7 +118,7 @@ struct array
         Same_as<Decay<T>, Domain<Fun>> and
         Same_as<Decay<T>, Codomain<Fun>>
     constexpr auto
-    map(Fun fun) -> array<T>&
+    map(Fun fun) -> array_single_ended<T>&
     {
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
         return at(this);
@@ -127,10 +127,10 @@ struct array
     template <Unary_function Fun>
     requires Same_as<Decay<T>, Domain<Fun>>
     constexpr auto
-    map(Fun fun) const -> array<Codomain<Fun>>
+    map(Fun fun) const -> array_single_ended<Codomain<Fun>>
     {
         using elements::map;
-        array<Codomain<Fun>> x;
+        array_single_ended<Codomain<Fun>> x;
         reserve(x, size(at(this)));
         map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
         return x;
@@ -139,9 +139,9 @@ struct array
     template <Unary_function Fun>
     requires
         Same_as<Decay<T>, Domain<Fun>> and
-        Same_as<array<Decay<T>>, Codomain<Fun>>
+        Same_as<array_single_ended<Decay<T>>, Codomain<Fun>>
     constexpr auto
-    flat_map(Fun fun) -> array<T>&
+    flat_map(Fun fun) -> array_single_ended<T>&
     {
         using elements::flat_map;
         auto x = flat_map(first(at(this)), limit(at(this)), fun);
@@ -162,56 +162,56 @@ struct array
 };
 
 template <Movable T>
-struct value_type_t<array<T>>
+struct value_type_t<array_single_ended<T>>
 {
     using type = T;
 };
 
 template <Movable T>
-struct position_type_t<array<T>>
+struct position_type_t<array_single_ended<T>>
 {
     using type = Pointer_type<T>;
 };
 
 template <Movable T>
-struct position_type_t<array<T> const>
+struct position_type_t<array_single_ended<T> const>
 {
     using type = Pointer_type<T const>;
 };
 
 template <Movable T>
-struct size_type_t<array<T>>
+struct size_type_t<array_single_ended<T>>
 {
     using type = pointer_diff;
 };
 
 template <Regular T>
 constexpr auto
-operator==(array<T> const& x, array<T> const& y) -> bool
+operator==(array_single_ended<T> const& x, array_single_ended<T> const& y) -> bool
 {
     return equal_range(x, y);
 }
 
 template <Default_totally_ordered T>
 constexpr auto
-operator<(array<T> const& x, array<T> const& y) -> bool
+operator<(array_single_ended<T> const& x, array_single_ended<T> const& y) -> bool
 {
     return less_range(x, y);
 }
 
 template <Movable T>
 constexpr void
-swap(array<T>& x, array<T>& y)
+swap(array_single_ended<T>& x, array_single_ended<T>& y)
 {
     swap(x.header, y.header);
 }
 
 template <Movable T>
 constexpr void
-reserve(array<T>& x, Size_type<array<T>> n)
+reserve(array_single_ended<T>& x, Size_type<array_single_ended<T>> n)
 {
     if (n < size(x) or n == capacity(x)) return;
-    array<T> temp(n);
+    array_single_ended<T> temp(n);
     auto pos = first(x);
     auto dst = first(temp);
     while (precedes(pos, limit(x))) {
@@ -225,11 +225,11 @@ reserve(array<T>& x, Size_type<array<T>> n)
 
 template <Movable T, typename U>
 constexpr auto
-insert(back<array<T>> arr, U&& x) -> back<array<T>>
+insert(back<array_single_ended<T>> arr, U&& x) -> back<array_single_ended<T>>
 {
     auto& seq = at(arr.seq);
     if (limit(seq) == limit_of_storage(seq)) {
-        reserve(seq, max(One<Size_type<array<T>>>, twice(size(seq))));
+        reserve(seq, max(One<Size_type<array_single_ended<T>>>, twice(size(seq))));
     }
     auto& header = at(seq.header);
     construct(at(header.limit), fw<U>(x));
@@ -239,27 +239,27 @@ insert(back<array<T>> arr, U&& x) -> back<array<T>>
 
 template <Movable T, typename U>
 constexpr void
-emplace(array<T>& arr, U&& x)
+emplace(array_single_ended<T>& arr, U&& x)
 {
-    insert(back<array<T>>(arr), fw<U>(x));
+    insert(back<array_single_ended<T>>(arr), fw<U>(x));
 }
 
 template <Movable T, typename U>
 constexpr void
-push(array<T>& arr, U x)
+push(array_single_ended<T>& arr, U x)
 {
-    insert(back<array<T>>(arr), mv(x));
+    insert(back<array_single_ended<T>>(arr), mv(x));
 }
 
 template <Movable T>
 constexpr auto
-erase(back<array<T>> arr) -> back<array<T>>
+erase(back<array_single_ended<T>> arr) -> back<array_single_ended<T>>
 {
     auto& header = at(arr.seq).header;
     decrement(at(header).limit);
     destroy(at(load(header).limit));
     if (is_empty(load(arr.seq))) {
-        deallocate_array(header);
+        deallocate_array_single_ended(header);
         header = nullptr;
     }
     return arr;
@@ -267,21 +267,21 @@ erase(back<array<T>> arr) -> back<array<T>>
 
 template <Movable T>
 constexpr void
-erase_all(array<T>& x)
+erase_all(array_single_ended<T>& x)
 {
-    while (!is_empty(x)) erase(back<array<T>>(x));
+    while (!is_empty(x)) erase(back<array_single_ended<T>>(x));
 }
 
 template <Movable T>
 constexpr void
-pop(array<T>& arr)
+pop(array_single_ended<T>& arr)
 {
-    erase(back<array<T>>(arr));
+    erase(back<array_single_ended<T>>(arr));
 }
 
 template <Movable T>
 constexpr auto
-first(array<T> const& x) -> Position_type<array<T>>
+first(array_single_ended<T> const& x) -> Position_type<array_single_ended<T>>
 {
     if (x.header == nullptr) return nullptr;
     return pointer_to(at(x.header).x);
@@ -289,7 +289,7 @@ first(array<T> const& x) -> Position_type<array<T>>
 
 template <Movable T>
 constexpr auto
-limit(array<T> const& x) -> Position_type<array<T>>
+limit(array_single_ended<T> const& x) -> Position_type<array_single_ended<T>>
 {
     if (x.header == nullptr) return nullptr;
     return at(x.header).limit;
@@ -297,7 +297,7 @@ limit(array<T> const& x) -> Position_type<array<T>>
 
 template <Movable T>
 constexpr auto
-limit_of_storage(array<T> const& x) -> Position_type<array<T>>
+limit_of_storage(array_single_ended<T> const& x) -> Position_type<array_single_ended<T>>
 {
     if (x.header == nullptr) return nullptr;
     return at(x.header).limit_of_storage;
@@ -305,21 +305,21 @@ limit_of_storage(array<T> const& x) -> Position_type<array<T>>
 
 template <Movable T>
 constexpr auto
-is_empty(array<T> const& x) -> bool
+is_empty(array_single_ended<T> const& x) -> bool
 {
     return first(x) == limit(x);
 }
 
 template <Movable T>
 constexpr auto
-size(array<T> const& x) -> Size_type<array<T>>
+size(array_single_ended<T> const& x) -> Size_type<array_single_ended<T>>
 {
     return limit(x) - first(x);
 }
 
 template <Movable T>
 constexpr auto
-capacity(array<T> const& x) -> Size_type<array<T>>
+capacity(array_single_ended<T> const& x) -> Size_type<array_single_ended<T>>
 {
     return limit_of_storage(x) - first(x);
 }

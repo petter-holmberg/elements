@@ -1,6 +1,7 @@
 #include "catch.hpp"
 
 #include "search_binary.h"
+#include "array_single_ended.h"
 
 namespace e = elements;
 
@@ -8,7 +9,7 @@ SCENARIO ("Binary search", "[search_binary]")
 {
     SECTION ("Emtpy array of integers")
     {
-        e::array<int> x{};
+        e::array_single_ended<int> x{};
 
         auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (pos == e::limit(x));
@@ -23,7 +24,7 @@ SCENARIO ("Binary search", "[search_binary]")
 
     SECTION ("Array with one 3")
     {
-        e::array<int> x{3};
+        e::array_single_ended<int> x{3};
 
         auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (pos == e::first(x));
@@ -38,7 +39,7 @@ SCENARIO ("Binary search", "[search_binary]")
 
     SECTION ("Array with two 3s")
     {
-        e::array<int> x{3, 3};
+        e::array_single_ended<int> x{3, 3};
 
         auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (pos == e::first(x));
@@ -53,7 +54,7 @@ SCENARIO ("Binary search", "[search_binary]")
 
     SECTION ("Array with two 3s at the beginning")
     {
-        e::array<int> x{3, 3, 4, 5};
+        e::array_single_ended<int> x{3, 3, 4, 5};
 
         auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (pos == e::first(x));
@@ -68,7 +69,7 @@ SCENARIO ("Binary search", "[search_binary]")
 
     SECTION ("Array with two 3s at the end")
     {
-        e::array<int> x{0, 1, 2, 3, 3};
+        e::array_single_ended<int> x{0, 1, 2, 3, 3};
 
         auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (pos == e::first(x) + 3);
@@ -83,7 +84,7 @@ SCENARIO ("Binary search", "[search_binary]")
 
     SECTION ("Array with three 3s in the first half")
     {
-        e::array<int> x{0, 3, 3, 3, 4, 5, 6, 7, 8};
+        e::array_single_ended<int> x{0, 3, 3, 3, 4, 5, 6, 7, 8};
 
         auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (pos == e::first(x) + 1);
@@ -98,7 +99,7 @@ SCENARIO ("Binary search", "[search_binary]")
 
     SECTION ("Array with three 3s in the middle")
     {
-        e::array<int> x{0, 3, 3, 3, 4};
+        e::array_single_ended<int> x{0, 3, 3, 3, 4};
 
         auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (pos == e::first(x) + 1);
@@ -113,7 +114,7 @@ SCENARIO ("Binary search", "[search_binary]")
 
     SECTION ("Array with three 3s in the second half")
     {
-        e::array<int> x{0, 1, 1, 2, 2, 3, 3, 3, 4};
+        e::array_single_ended<int> x{0, 1, 1, 2, 2, 3, 3, 3, 4};
 
         auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (pos == e::first(x) + 5);
