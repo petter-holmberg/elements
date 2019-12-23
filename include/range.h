@@ -214,13 +214,79 @@ limit(front<S>& seq) -> Position_type<S>
     return limit(base(seq));
 }
 
-template <typename S>
+template <typename S, typename I = back<S>>
 concept Dynamic_sequence =
     Sequence<S> and
-    requires (back<S> s, Value_type<S> x) {
-        { insert(s, x) } -> back<S>;
-        { erase(s) } -> back<S>;
+    requires (I s, Value_type<S> x) {
+        { insert(s, x) } -> I;
+        { erase(s) } -> I;
     };
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+struct after
+{
+    Pointer_type<S> seq;
+    Position_type<S> pos;
+
+    after(S& seq_, Position_type<S> pos_)
+        : seq(&seq_)
+        , pos(pos_)
+    {}
+};
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+struct value_type_t<after<S>>
+{
+    using type = Value_type<S>;
+};
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+struct position_type_t<after<S>>
+{
+    using type = Position_type<S>;
+};
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+struct size_type_t<after<S>>
+{
+    using type = Difference_type<Position_type<S>>;
+};
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+constexpr auto
+base(after<S>& pos) -> S&
+{
+    return *(pos.seq);
+}
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+constexpr auto
+current(after<S>& pos) -> Position_type<S>
+{
+    return {pos.pos};
+}
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+constexpr auto
+first(after<S>& pos) -> Position_type<S>
+{
+    return first(base(pos));
+}
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+constexpr auto
+limit(after<S>& pos) -> Position_type<S>
+{
+    return limit(base(pos));
+}
 
 template <typename P>
 struct insert_position
@@ -288,7 +354,7 @@ struct insert_sink
     }
 };
 
-template <Dynamic_sequence S, typename P>
+template <Sequence S, typename P>
 constexpr auto
 insert_range(S const& seq, P pos) -> P
 {
@@ -306,7 +372,7 @@ template <Position P, Limit<P> L, Unary_function Fun>
 requires
     Loadable<P> and
     Same_as<Value_type<P>, Domain<Fun>> and
-    Dynamic_sequence<Codomain<Fun>>
+    Sequence<Codomain<Fun>>
 constexpr auto
 flat_map(P src, L lim, Fun fun) -> Codomain<Fun>
 {

@@ -15,6 +15,7 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/functional.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/invocable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lexicographical.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/list_singly_linked.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/map.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ordered_algebra.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ordering.cpp

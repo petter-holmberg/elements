@@ -158,8 +158,29 @@ stopping at the first position where an element and its successor satisfy the re
 
 ## Linear data structures
 
+### Ranges
+
+`bounded_range` implements a `Range` consisting of two `Loadable` positions.
+
+### Static sequences
+
 `pair` implements a structure of two elements (that may differ in type) allocated on the stack. They can be accessed through the function `get`, either by position or by type. If the two elements
 are of the same type, `pair` also provides a functor interface through the member function `.map`.
+
+`array_k` implements an array of *k* elements contiguously allocated on the stack, like built-in C++ arrays, but with regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
+`array_k` also provides a monadic interface through the member functions `.map` and `.flat_map`.
+
+### Dynamic sequences
+
+#### Linked data structures
+
+In linked data structures, the elements are stored in nodes that are permanently placed. During the lifetime of a linked data structure its nodes never move.
+
+##### Singly-linked lists
+
+`list_singly_linked_basic` implements a singly-linked list that supports constant-time `insert` or `erase` at the front or after a given position. The header and position type are the size of a single pointer.
+
+#### Extent-based data structures
 
 `array_single_ended` implements an array of elements contiguously allocated on the free store. It stores a single pointer on the stack, keeping the array size and capacity in a header
 to the array elements.
@@ -179,11 +200,6 @@ Positions of `array_circular` elements are larger and element access is slower t
 `array_circular` supports insertion at the back and the front in amortized constant time using `push` and `push_first`. If the capacity is exceeded it reallocates and moves its elements.
 `array_circular` has regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
 `array_circular` also provides a monadic interface through the member functions `.map` and `.flat_map`.
-
-`array_k` implements an array of *k* elements contiguously allocated on the stack, like built-in C++ arrays, but with regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
-`array_k` also provides a monadic interface through the member functions `.map` and `.flat_map`.
-
-`bounded_range` implements a `Range` consisting of two `Loadable` positions.
 
 ## Sum types
 
@@ -321,6 +337,12 @@ When defined, positions have successors and predecessors that can be accessed wi
 
 `Bidirectional_position` describes a `Forward_position` type with a function `decrement` that moves it to the previous point. It is an `Affine_space` over its `Difference_type`.
 
+#### Linear traversal with mutable successors
+
+`Linked_forward_position` describes a `Forward_position` type with a function `next_link` that returns a reference to the next linked element.
+
+`Forward_linker` describes a function object type that can be called with two `Linked_forward_position` objects and will relink the first one to the second one.
+
 ### Access
 
 `Loadable` describes a type with a function `load` that returns a constant reference to its held object. For an object that represents the position of another object, `load` returns a reference to the other object. For other objects, load returns a reference to the object itself.
@@ -338,7 +360,7 @@ returns either a reference or a constant reference to its held object.
 `Mutable_range` describes a `Range` with a `Mutable` `Position_type`.
 
 `Sequence` describes a `Range` that is `Totally_ordered`, and represents a composite object whose range of elements are its parts. It has functions `is_empty`. `size` and `operator[]` for element access.
-`Dynamic_sequence` describes a `Sequence` that can change size at runtime. It has functions `insert` and `erase` to change elements at the back of the range.
+`Dynamic_sequence` describes a `Sequence` that can change size at runtime. It has functions `insert` and `erase` to change elements at the back or the front of the range.
 
 # Type functions
 
@@ -485,13 +507,15 @@ Index
 `rational`
 `polynomial`
 
+`bounded_range`
+
 `pair`
+`array_k`
+
+`list_singly_linked_basic`
 `array_single_ended`
 `array_double_ended`
 `array_circular`
-`array_k`
-
-`bounded_range`
 
 `result`
 
@@ -549,6 +573,8 @@ Index
 `Position`
 `Forward_position`
 `Bidirectional_position`
+`Linked_forward_position`
+`Forward_linker`
 `Loadable`
 `Storable`
 `Mutable`

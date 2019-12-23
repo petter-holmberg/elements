@@ -105,6 +105,21 @@ template <typename T>
 concept Default_constructible = Constructible_from<T>;
 
 template <typename T>
+constexpr auto
+allocate_raw() -> T*
+{
+    return reinterpret_cast<T*>(std::malloc(sizeof(T)));
+}
+
+template <typename T>
+constexpr void
+free_raw(T& raw)
+    //[[expects axiom: raw_memory(*raw)]]
+{
+    std::free(&raw);
+}
+
+template <typename T>
 requires Default_constructible<Remove_const<T>>
 constexpr void
 construct(T& raw)

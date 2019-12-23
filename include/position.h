@@ -778,7 +778,7 @@ precedes(forward_position<P> const& pos, L const& lim) -> bool
     return pos.pos != lim;
 }
 
-template <Position P, Limit<P> L>
+template <Forward_position P, Limit<P> L>
 constexpr auto
 operator-(L lim, P pos) -> Difference_type<P>
 //[[expects axiom: is_bounded_range(pos, lim)]]
@@ -791,7 +791,7 @@ operator-(L lim, P pos) -> Difference_type<P>
     return n;
 }
 
-template <Position P>
+template <Forward_position P>
 constexpr auto
 operator+(P pos, Difference_type<P> dist) -> P
 //[[expects axiom: dist >= Zero<Difference_type<P>>]]
@@ -804,7 +804,7 @@ operator+(P pos, Difference_type<P> dist) -> P
     return pos;
 }
 
-template <Position P>
+template <Forward_position P>
 constexpr auto
 operator+(Difference_type<P> dist, P pos) -> P
 //[[expects axiom: dist >= Zero<Difference_type<P>>]]
@@ -933,5 +933,41 @@ precedes(bidirectional_position<P> const& pos0, bidirectional_position<P> const&
 {
     return pos0.pos != pos1.pos;
 }
+
+template <typename P>
+concept Linked_forward_position =
+    Forward_position<P> and
+    requires (P x) {
+        next_link(x);
+    };
+
+template <typename L>
+concept Forward_linker =
+    requires (L linker, Position_type<L> pos) {
+        linker(pos, pos);
+    };
+
+template <Linked_forward_position P>
+struct forward_linker
+{
+    void operator()(P x, P y)
+    {
+        next_link(x) = y.pos;
+    }
+};
+
+template <typename P>
+    requires Linked_forward_position<P>
+constexpr void
+set_link_forward(P x, P y)
+{
+    forward_linker<P>{}(x, y);
+}
+
+template <Linked_forward_position P>
+struct position_type_t<forward_linker<P>>
+{
+    using type = P;
+};
 
 }

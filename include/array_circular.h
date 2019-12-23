@@ -363,7 +363,7 @@ insert(back<array_circular<T>> arr, U&& x) -> back<array_circular<T>>
 
 template <Movable T, typename U>
 constexpr auto
-insert(front<array_circular<T>> arr, U&& x) -> back<array_circular<T>>
+insert(front<array_circular<T>> arr, U&& x) -> front<array_circular<T>>
 {
     using S = Size_type<array_circular<T>>;
     auto& seq = at(arr.seq);

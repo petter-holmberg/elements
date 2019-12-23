@@ -268,7 +268,7 @@ insert(back<array_double_ended<T>> arr, U&& x) -> back<array_double_ended<T>>
 
 template <Movable T, typename U>
 constexpr auto
-insert(front<array_double_ended<T>> arr, U&& x) -> back<array_double_ended<T>>
+insert(front<array_double_ended<T>> arr, U&& x) -> front<array_double_ended<T>>
 {
     auto& seq = at(arr.seq);
     if (first(seq) == first_of_storage(seq)) {
