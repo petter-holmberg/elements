@@ -176,11 +176,19 @@ are of the same type, `pair` also provides a functor interface through the membe
 
 In linked data structures, the elements are stored in nodes that are permanently placed. During the lifetime of a linked data structure its nodes never move.
 
-##### Singly-linked lists
+##### Lists
 
-`list_singly_linked_basic` implements a singly-linked list that supports constant-time `insert` or `erase` at the front or after a given position. The header and position type are the size of a single pointer.
+###### Singly-linked lists
+
+`list_singly_linked_front` implements a singly-linked list that supports constant-time `insert` or `erase` at the front or after a given position. The header and position type are the size of a single pointer.
+
+`list_singly_linked_front_back` implements a singly-linked list that supports constant-time `insert` or `erase` at the front or after a given position, and constant-time insert at the back. The header is the size of two pointers and the position type is the size of a single pointer.
 
 #### Extent-based data structures
+
+In extent-based data structures, the elements are stored in one or more *extents* that are allocated and deallocated on demand. During the lifetime of an extent-based data structure its elements may move.
+
+##### Arrays
 
 `array_single_ended` implements an array of elements contiguously allocated on the free store. It stores a single pointer on the stack, keeping the array size and capacity in a header
 to the array elements.
@@ -512,7 +520,9 @@ Index
 `pair`
 `array_k`
 
-`list_singly_linked_basic`
+`list_singly_linked_front`
+`list_singly_linked_front_back`
+
 `array_single_ended`
 `array_double_ended`
 `array_circular`

@@ -261,7 +261,7 @@ template <typename S>
 constexpr auto
 base(after<S>& pos) -> S&
 {
-    return *(pos.seq);
+    return at(pos.seq);
 }
 
 template <typename S>
@@ -278,6 +278,14 @@ constexpr auto
 first(after<S>& pos) -> Position_type<S>
 {
     return first(base(pos));
+}
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+constexpr auto
+last(after<S>& pos) -> Position_type<S>
+{
+    return last(base(pos));
 }
 
 template <typename S>

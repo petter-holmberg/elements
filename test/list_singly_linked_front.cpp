@@ -1,13 +1,13 @@
 #include "catch.hpp"
 
 #include "affine_space.h"
-#include "list_singly_linked.h"
+#include "list_singly_linked_front.h"
 
 namespace e = elements;
 
-SCENARIO ("Using basic singly linked list", "[list_singly_linked_basic]")
+SCENARIO ("Using singly linked list with front access", "[list_singly_linked_front]")
 {
-    e::list_singly_linked_basic<int> x{0, 1, 2, 3, 4};
+    e::list_singly_linked_front<int> x{0, 1, 2, 3, 4};
     static_assert(e::Dynamic_sequence<decltype(x), e::front<decltype(x)>>);
     static_assert(e::Linked_forward_position<e::Position_type<decltype(x)>>);
 
@@ -48,7 +48,7 @@ SCENARIO ("Using basic singly linked list", "[list_singly_linked_basic]")
         }
 
         {
-            e::list_singly_linked_basic<int> y{0, 1, 2, 3};
+            e::list_singly_linked_front<int> y{0, 1, 2, 3};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -59,7 +59,7 @@ SCENARIO ("Using basic singly linked list", "[list_singly_linked_basic]")
         }
 
         {
-            e::list_singly_linked_basic<int> y{0, 1, 2, 3, 4, 5};
+            e::list_singly_linked_front<int> y{0, 1, 2, 3, 4, 5};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -70,7 +70,7 @@ SCENARIO ("Using basic singly linked list", "[list_singly_linked_basic]")
         }
 
         {
-            e::list_singly_linked_basic<int> y{0, -1, -2, -3, -4};
+            e::list_singly_linked_front<int> y{0, -1, -2, -3, -4};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -81,7 +81,7 @@ SCENARIO ("Using basic singly linked list", "[list_singly_linked_basic]")
         }
 
         {
-            e::list_singly_linked_basic<int> y{5, 6, 7, 8, 9};
+            e::list_singly_linked_front<int> y{5, 6, 7, 8, 9};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -111,7 +111,7 @@ SCENARIO ("Using basic singly linked list", "[list_singly_linked_basic]")
         }
 
         {
-            e::list_singly_linked_basic<int> y{5, 6, 7, 8, 9};
+            e::list_singly_linked_front<int> y{5, 6, 7, 8, 9};
             e::swap(x, y);
 
             CHECK (x[0] == 5);
@@ -129,7 +129,7 @@ SCENARIO ("Using basic singly linked list", "[list_singly_linked_basic]")
 
     SECTION ("Appending elements")
     {
-        e::list_singly_linked_basic<int> x0;
+        e::list_singly_linked_front<int> x0;
 
         REQUIRE (e::is_empty(x0));
         REQUIRE (e::size(x0) == 0);

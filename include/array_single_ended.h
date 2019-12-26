@@ -227,7 +227,7 @@ template <Movable T, typename U>
 constexpr auto
 insert(back<array_single_ended<T>> arr, U&& x) -> back<array_single_ended<T>>
 {
-    auto& seq = at(arr.seq);
+    auto& seq = base(arr);
     if (limit(seq) == limit_of_storage(seq)) {
         reserve(seq, max(One<Size_type<array_single_ended<T>>>, twice(size(seq))));
     }
@@ -255,10 +255,11 @@ template <Movable T>
 constexpr auto
 erase(back<array_single_ended<T>> arr) -> back<array_single_ended<T>>
 {
-    auto& header = at(arr.seq).header;
+    auto& seq = base(arr);
+    auto& header = seq.header;
     decrement(at(header).limit);
     destroy(at(load(header).limit));
-    if (is_empty(load(arr.seq))) {
+    if (is_empty(seq)) {
         deallocate_array_single_ended(header);
         header = nullptr;
     }

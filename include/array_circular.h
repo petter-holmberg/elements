@@ -348,7 +348,7 @@ template <Movable T, typename U>
 constexpr auto
 insert(back<array_circular<T>> arr, U&& x) -> back<array_circular<T>>
 {
-    auto& seq = at(arr.seq);
+    auto& seq = base(arr);
     if (size(seq) == capacity(seq)) {
         reserve(seq, max(One<Size_type<array_circular<T>>>, twice(size(seq))));
     } else if (load(seq.header).limit == load(seq.header).limit_of_storage) {
@@ -366,7 +366,7 @@ constexpr auto
 insert(front<array_circular<T>> arr, U&& x) -> front<array_circular<T>>
 {
     using S = Size_type<array_circular<T>>;
-    auto& seq = at(arr.seq);
+    auto& seq = base(arr);
     if (size(seq) == capacity(seq)) {
         reserve(seq, max(One<S>, twice(size(seq))), size(seq));
     } else if (load(seq.header).first == pointer_to(load(seq.header).x)) {
@@ -411,14 +411,15 @@ template <Movable T>
 constexpr auto
 erase(back<array_circular<T>> arr) -> back<array_circular<T>>
 {
-    auto& header = at(arr.seq).header;
+    auto& seq = base(arr);
+    auto& header = seq.header;
     if (load(header).limit == pointer_to(at(header).x)) {
         at(header).limit = load(header).limit_of_storage;
     }
     decrement(at(header).limit);
     destroy(at(load(header).limit));
     decrement(at(header).size);
-    if (is_empty(load(arr.seq))) {
+    if (is_empty(seq)) {
         deallocate_array_circular(header);
         header = nullptr;
     }
@@ -429,14 +430,15 @@ template <Movable T>
 constexpr auto
 erase(front<array_circular<T>> arr) -> front<array_circular<T>>
 {
-    auto& header = at(arr.seq).header;
+    auto& seq = base(arr);
+    auto& header = seq.header;
     destroy(at(load(header).first));
     increment(at(header).first);
     if (load(header).first == load(header).limit_of_storage) {
         at(header).first = pointer_to(at(header).x);
     }
     decrement(at(header).size);
-    if (is_empty(load(arr.seq))) {
+    if (is_empty(seq)) {
         deallocate_array_circular(header);
         header = nullptr;
     }
@@ -468,16 +470,16 @@ template <Movable T>
 constexpr auto
 first(array_circular<T> const& x) -> Position_type<array_circular<T>>
 {
-    if (x.header == nullptr) return array_circular_position<T>{};
-    return array_circular_position<T>(const_cast<Pointer_type<array_circular<T>>>(pointer_to(x)));
+    if (x.header == nullptr) return {};
+    return array_circular_position{const_cast<Pointer_type<array_circular<T>>>(pointer_to(x))};
 }
 
 template <Movable T>
 constexpr auto
 limit(array_circular<T> const& x) -> Position_type<array_circular<T>>
 {
-    if (x.header == nullptr) return array_circular_position<T>{};
-    return array_circular_position<T>(const_cast<Pointer_type<array_circular<T>>>(pointer_to(x)), size(x));
+    if (x.header == nullptr) return {};
+    return array_circular_position{const_cast<Pointer_type<array_circular<T>>>(pointer_to(x)), size(x)};
 }
 
 template <Movable T>
