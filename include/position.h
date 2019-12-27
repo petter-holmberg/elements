@@ -970,4 +970,11 @@ struct position_type_t<forward_linker<P>>
     using type = P;
 };
 
+template <typename P>
+concept Linked_bidirectional_position =
+    Linked_forward_position<P> and
+    requires (P x) {
+        prev_link(x);
+    };
+
 }

@@ -182,12 +182,17 @@ Lists have regular semantics, lexicographic comparison operators, and supporting
 
 ###### Singly-linked lists
 
-`list_singly_linked_front` implements a singly-linked list that supports constant-time `insert` or `erase` at the front or after a given position. The header and position type are the size of a single pointer.
+`list_singly_linked_front` implements a singly-linked list that supports constant-time `insert` and `erase` at the front or after a given position. The header and position type are the size of a single pointer.
 
-`list_singly_linked_front_back` implements a singly-linked list that supports constant-time `insert` or `erase` at the front or after a given position, and constant-time insert at the back. The header is the size of two pointers and the position type is the size of a single pointer.
+`list_singly_linked_front_back` implements a singly-linked list that supports constant-time `insert` and `erase` at the front or after a given position, and constant-time `insert` at the back. The header is the size of two pointers and the position type is the size of a single pointer.
 
 `list_singly_linked_circular` implements a circular singly-linked list that supports constant-time
-`insert` or `erase` at the front or after a given position, and constant-time insert at the back. The header is the size of a single pointer and the position type is the size of two pointers. Iteration is slower than for `list_singly_linked_front` and `list_singly_linked_front_back`.
+`insert` and `erase` at the front or after a given position, and constant-time `insert` at the back. The header is the size of a single pointer and the position type is the size of two pointers. Iteration is slower than for `list_singly_linked_front` and `list_singly_linked_front_back`.
+
+###### Doubly-linked lists
+
+`list_doubly_linked_circular` implements a circular doubly-linked list that supports constant-time
+`insert` and `erase` at the front and back, or before and after a given position. The header is the size of a single pointer and the position type is the size of three pointers.
 
 #### Extent-based data structures
 
@@ -525,6 +530,8 @@ Index
 `list_singly_linked_front`
 `list_singly_linked_front_back`
 `list_singly_linked_circular`
+
+`list_doubly_linked_circular`
 
 `array_single_ended`
 `array_double_ended`

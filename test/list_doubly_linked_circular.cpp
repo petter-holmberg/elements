@@ -1,15 +1,15 @@
 #include "catch.hpp"
-
+#include <iostream>
 #include "affine_space.h"
-#include "list_singly_linked_circular.h"
+#include "list_doubly_linked_circular.h"
 
 namespace e = elements;
 
-SCENARIO ("Using circular singly linked list", "[list_singly_linked_circular]")
+SCENARIO ("Using circular doubly linked list", "[list_doubly_linked_circular]")
 {
-    e::list_singly_linked_circular<int> x{0, 1, 2, 3, 4};
+    e::list_doubly_linked_circular<int> x{0, 1, 2, 3, 4};
     static_assert(e::Dynamic_sequence<decltype(x), e::front<decltype(x)>>);
-    static_assert(e::Linked_forward_position<e::Position_type<decltype(x)>>);
+    static_assert(e::Linked_bidirectional_position<e::Position_type<decltype(x)>>);
 
     REQUIRE (e::axiom_Regular(x));
 
@@ -48,7 +48,7 @@ SCENARIO ("Using circular singly linked list", "[list_singly_linked_circular]")
         }
 
         {
-            e::list_singly_linked_circular<int> y{0, 1, 2, 3};
+            e::list_doubly_linked_circular<int> y{0, 1, 2, 3};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -59,7 +59,7 @@ SCENARIO ("Using circular singly linked list", "[list_singly_linked_circular]")
         }
 
         {
-            e::list_singly_linked_circular<int> y{0, 1, 2, 3, 4, 5};
+            e::list_doubly_linked_circular<int> y{0, 1, 2, 3, 4, 5};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -70,7 +70,7 @@ SCENARIO ("Using circular singly linked list", "[list_singly_linked_circular]")
         }
 
         {
-            e::list_singly_linked_circular<int> y{0, -1, -2, -3, -4};
+            e::list_doubly_linked_circular<int> y{0, -1, -2, -3, -4};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -81,7 +81,7 @@ SCENARIO ("Using circular singly linked list", "[list_singly_linked_circular]")
         }
 
         {
-            e::list_singly_linked_circular<int> y{5, 6, 7, 8, 9};
+            e::list_doubly_linked_circular<int> y{5, 6, 7, 8, 9};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -111,7 +111,7 @@ SCENARIO ("Using circular singly linked list", "[list_singly_linked_circular]")
         }
 
         {
-            e::list_singly_linked_circular<int> y{5, 6, 7, 8, 9};
+            e::list_doubly_linked_circular<int> y{5, 6, 7, 8, 9};
             e::swap(x, y);
 
             CHECK (x[0] == 5);
@@ -129,7 +129,7 @@ SCENARIO ("Using circular singly linked list", "[list_singly_linked_circular]")
 
     SECTION ("Inserting elements")
     {
-        e::list_singly_linked_circular<int> x0;
+        e::list_doubly_linked_circular<int> x0;
 
         REQUIRE (e::is_empty(x0));
         REQUIRE (e::size(x0) == 0);
@@ -158,17 +158,44 @@ SCENARIO ("Using circular singly linked list", "[list_singly_linked_circular]")
             CHECK (x0[2] == 0);
         }
 
-        SECTION ("Inserting after position")
+        SECTION ("Inserting before position")
         {
-            auto after = e::after{x0, e::first(x0)};
+            auto before = e::before{x0, e::first(x0)};
 
-            e::insert(after, 0);
+            before = e::insert(before, 0);
 
             REQUIRE (!e::is_empty(x0));
             REQUIRE (e::size(x0) == 1);
             CHECK (x0[0] == 0);
 
-            e::insert(after, 1);
+            before = e::insert(before, 1);
+
+            REQUIRE (!e::is_empty(x0));
+            REQUIRE (e::size(x0) == 2);
+            CHECK (x0[0] == 1);
+            CHECK (x0[1] == 0);
+
+            e::increment(before.pos);
+            e::insert(before, 2);
+
+            REQUIRE (!e::is_empty(x0));
+            REQUIRE (e::size(x0) == 3);
+            CHECK (x0[0] == 1);
+            CHECK (x0[1] == 2);
+            CHECK (x0[2] == 0);
+        }
+
+        SECTION ("Inserting after position")
+        {
+            auto after = e::after{x0, e::first(x0)};
+
+            after = e::insert(after, 0);
+
+            REQUIRE (!e::is_empty(x0));
+            REQUIRE (e::size(x0) == 1);
+            CHECK (x0[0] == 0);
+
+            after = e::insert(after, 1);
 
             REQUIRE (!e::is_empty(x0));
             REQUIRE (e::size(x0) == 2);
@@ -184,7 +211,7 @@ SCENARIO ("Using circular singly linked list", "[list_singly_linked_circular]")
             CHECK (x0[1] == 1);
             CHECK (x0[2] == 2);
 
-            after = e::insert(after, 3);
+            e::insert(after, 3);
 
             REQUIRE (!e::is_empty(x0));
             REQUIRE (e::size(x0) == 4);
@@ -197,8 +224,8 @@ SCENARIO ("Using circular singly linked list", "[list_singly_linked_circular]")
 
     SECTION ("Erasing elements")
     {
-        e::list_singly_linked_circular<int> x0{0, 1, 2};
-        e::list_singly_linked_circular<int> x1;
+        e::list_doubly_linked_circular<int> x0{0, 1, 2};
+        e::list_doubly_linked_circular<int> x1;
 
         SECTION ("Erasing at front")
         {
@@ -221,23 +248,68 @@ SCENARIO ("Using circular singly linked list", "[list_singly_linked_circular]")
             REQUIRE (e::size(x0) == 0);
         }
 
-        SECTION ("Erasing after position")
+        SECTION ("Erasing at back")
         {
-            auto after = e::after{x0, e::first(x0)};
-
-            e::erase(after);
+            e::pop_last(x0);
 
             REQUIRE (!e::is_empty(x0));
             REQUIRE (e::size(x0) == 2);
             CHECK (x0[0] == 0);
-            CHECK (x0[1] == 2);
-            e::erase(after);
+            CHECK (x0[1] == 1);
+
+            e::pop_last(x0);
 
             REQUIRE (!e::is_empty(x0));
             REQUIRE (e::size(x0) == 1);
             CHECK (x0[0] == 0);
 
-            e::erase(after);
+            e::pop_last(x0);
+
+            REQUIRE (e::is_empty(x0));
+            REQUIRE (e::size(x0) == 0);
+        }
+
+        SECTION ("Erasing before position")
+        {
+            auto before = e::before{x0, e::last(x0)};
+
+            before = e::erase(before);
+
+            REQUIRE (!e::is_empty(x0));
+            REQUIRE (e::size(x0) == 2);
+            CHECK (x0[0] == 0);
+            CHECK (x0[1] == 2);
+
+            before = e::erase(before);
+
+            REQUIRE (!e::is_empty(x0));
+            REQUIRE (e::size(x0) == 1);
+            CHECK (x0[0] == 2);
+
+            e::erase(before);
+
+            REQUIRE (e::is_empty(x0));
+            REQUIRE (e::size(x0) == 0);
+        }
+
+        SECTION ("Erasing after position")
+        {
+            auto after = e::after{x0, e::first(x0)};
+
+            after = e::erase(after);
+
+            REQUIRE (!e::is_empty(x0));
+            REQUIRE (e::size(x0) == 2);
+            CHECK (x0[0] == 0);
+            CHECK (x0[1] == 2);
+
+            after = e::erase(after);
+
+            REQUIRE (!e::is_empty(x0));
+            REQUIRE (e::size(x0) == 1);
+            CHECK (x0[0] == 0);
+
+            after = e::erase(after);
 
             REQUIRE (e::is_empty(x0));
             REQUIRE (e::size(x0) == 0);

@@ -226,14 +226,14 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
         {
             auto after = e::after{x0, e::first(x0)};
 
-            after = e::erase(after);
+            e::erase(after);
 
             REQUIRE (!e::is_empty(x0));
             REQUIRE (e::size(x0) == 2);
             CHECK (x0[0] == 0);
             CHECK (x0[1] == 2);
 
-            after = e::erase(after);
+            e::erase(after);
 
             REQUIRE (!e::is_empty(x0));
             REQUIRE (e::size(x0) == 1);
@@ -244,7 +244,6 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
             REQUIRE (e::is_empty(x0));
             REQUIRE (e::size(x0) == 0);
         }
-
 
         SECTION ("Erasing all")
         {

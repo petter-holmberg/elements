@@ -224,6 +224,80 @@ concept Dynamic_sequence =
 
 template <typename S>
     requires Dynamic_sequence<S, front<S>>
+struct before
+{
+    Pointer_type<S> seq;
+    Position_type<S> pos;
+
+    before(S& seq_, Position_type<S> pos_)
+        : seq(&seq_)
+        , pos(pos_)
+    {}
+};
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+struct value_type_t<before<S>>
+{
+    using type = Value_type<S>;
+};
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+struct position_type_t<before<S>>
+{
+    using type = Position_type<S>;
+};
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+struct size_type_t<before<S>>
+{
+    using type = Difference_type<Position_type<S>>;
+};
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+constexpr auto
+base(before<S>& pos) -> S&
+{
+    return at(pos.seq);
+}
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+constexpr auto
+current(before<S>& pos) -> Position_type<S>
+{
+    return {pos.pos};
+}
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+constexpr auto
+first(before<S>& pos) -> Position_type<S>
+{
+    return first(base(pos));
+}
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+constexpr auto
+last(before<S>& pos) -> Position_type<S>
+{
+    return last(base(pos));
+}
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
+constexpr auto
+limit(before<S>& pos) -> Position_type<S>
+{
+    return limit(base(pos));
+}
+
+template <typename S>
+    requires Dynamic_sequence<S, front<S>>
 struct after
 {
     Pointer_type<S> seq;

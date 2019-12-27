@@ -11,7 +11,7 @@ template <Movable T>
 struct list_singly_linked_circular_position
 {
     Pointer_type<list_node_singly_linked<T>> pos{};
-    Pointer_type<list_node_singly_linked<T>> tail{};
+    Pointer_type<list_node_singly_linked<T>> back{};
 
     constexpr
     list_singly_linked_circular_position() = default;
@@ -19,9 +19,9 @@ struct list_singly_linked_circular_position
     explicit constexpr
     list_singly_linked_circular_position(
         Pointer_type<list_node_singly_linked<T>> pos_,
-        Pointer_type<list_node_singly_linked<T>> tail_)
+        Pointer_type<list_node_singly_linked<T>> back_)
         : pos{pos_}
-        , tail{tail_}
+        , back{back_}
     {}
 };
 
@@ -40,14 +40,14 @@ struct difference_type_t<list_singly_linked_circular_position<T>>
 template <Movable T>
 bool operator==(list_singly_linked_circular_position<T> const& x, list_singly_linked_circular_position<T> const& y)
 {
-    return x.pos == y.pos and x.tail == y.tail;
+    return x.pos == y.pos and x.back == y.back;
 }
 
 template <Movable T>
 constexpr void
 increment(list_singly_linked_circular_position<T>& x)
 {
-    if (precedes(x.pos, x.tail)) {
+    if (precedes(x.pos, x.back)) {
         x.pos = next_link(x);
     } else {
         x = {};
