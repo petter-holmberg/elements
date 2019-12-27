@@ -178,11 +178,16 @@ In linked data structures, the elements are stored in nodes that are permanently
 
 ##### Lists
 
+Lists have regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
+
 ###### Singly-linked lists
 
 `list_singly_linked_front` implements a singly-linked list that supports constant-time `insert` or `erase` at the front or after a given position. The header and position type are the size of a single pointer.
 
 `list_singly_linked_front_back` implements a singly-linked list that supports constant-time `insert` or `erase` at the front or after a given position, and constant-time insert at the back. The header is the size of two pointers and the position type is the size of a single pointer.
+
+`list_singly_linked_circular` implements a circular singly-linked list that supports constant-time
+`insert` or `erase` at the front or after a given position, and constant-time insert at the back. The header is the size of a single pointer and the position type is the size of two pointers. Iteration is slower than for `list_singly_linked_front` and `list_singly_linked_front_back`.
 
 #### Extent-based data structures
 
@@ -190,24 +195,21 @@ In extent-based data structures, the elements are stored in one or more *extents
 
 ##### Arrays
 
+Arrays have regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
+Arrays also provides a monadic interface through the member functions `.map` and `.flat_map`.
+
 `array_single_ended` implements an array of elements contiguously allocated on the free store. It stores a single pointer on the stack, keeping the array size and capacity in a header
 to the array elements.
 `array_single_ended` supports insertion at the back in amortized constant time using `push`. If the capacity is exceeded it reallocates and moves its elements.
-`array_single_ended` has regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
-`array_single_ended` also provides a monadic interface through the member functions `.map` and `.flat_map`.
 
 `array_double_ended` implements an array of elements contiguously allocated on the free store. It stores a single pointer on the stack, keeping the array size and capacity in a header
 to the array elements.
 `array_double_ended` supports insertion at the back and the front in amortized constant time using `push` and `push_first`. If the capacity is exceeded it reallocates and moves its elements.
-`array_double_ended` has regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
-`array_double_ended` also provides a monadic interface through the member functions `.map` and `.flat_map`.
 
 `array_circular` implements an array of elements that are not necessarily contiguously allocated, as the elements are treated as if they may wrap around at the end of the reserved area.
 It stores a single pointer on the stack, keeping the array size and capacity in a header to the array elements.
-Positions of `array_circular` elements are larger and element access is slower than for `array` and `array_double_ended`.
+Positions of `array_circular` elements are larger and element access is slower than for `array_single_ended` and `array_double_ended`.
 `array_circular` supports insertion at the back and the front in amortized constant time using `push` and `push_first`. If the capacity is exceeded it reallocates and moves its elements.
-`array_circular` has regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
-`array_circular` also provides a monadic interface through the member functions `.map` and `.flat_map`.
 
 ## Sum types
 
@@ -522,6 +524,7 @@ Index
 
 `list_singly_linked_front`
 `list_singly_linked_front_back`
+`list_singly_linked_circular`
 
 `array_single_ended`
 `array_double_ended`

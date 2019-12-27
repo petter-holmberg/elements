@@ -3,8 +3,8 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/affine_space.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/algebra.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/array_double_ended.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array_circular.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/array_double_ended.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array_single_ended.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array_k.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/copy.cpp
@@ -15,6 +15,7 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/functional.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/invocable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lexicographical.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/list_singly_linked_circular.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/list_singly_linked_front.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/list_singly_linked_front_back.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/map.cpp

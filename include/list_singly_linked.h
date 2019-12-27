@@ -8,17 +8,18 @@ template <Movable T>
 struct list_node_singly_linked
 {
     T x;
-    Pointer_type<list_node_singly_linked<T>> pos_next = nullptr;
+    Pointer_type<list_node_singly_linked<T>> pos_next{};
 
+    constexpr
     list_node_singly_linked() = default;
 
-    explicit
+    explicit constexpr
     list_node_singly_linked(T const& x_, Pointer_type<list_node_singly_linked<T>> pos_next_ = nullptr)
         : x(x_)
         , pos_next(pos_next_)
     {}
 
-    explicit
+    explicit constexpr
     list_node_singly_linked(T&& x_, Pointer_type<list_node_singly_linked<T>> pos_next_ = nullptr)
         : x(fw<T>(x_))
         , pos_next(pos_next_)
@@ -28,11 +29,12 @@ struct list_node_singly_linked
 template <Movable T>
 struct list_singly_linked_position
 {
-    Pointer_type<list_node_singly_linked<T>> pos = nullptr;
+    Pointer_type<list_node_singly_linked<T>> pos{};
 
+    constexpr
     list_singly_linked_position() = default;
 
-    explicit
+    explicit constexpr
     list_singly_linked_position(Pointer_type<list_node_singly_linked<T>> pos_)
         : pos{pos_}
     {}
@@ -74,14 +76,14 @@ template <Movable T>
 constexpr void
 store(list_singly_linked_position<T>& x, T const& value)
 {
-    store(x.pos, value);
+    store(at(x.pos).x, value);
 }
 
 template <Movable T>
 constexpr void
 store(list_singly_linked_position<T>& x, T&& value)
 {
-    store(x.pos, fw<T>(value));
+    store(at(x.pos).x, fw<T>(value));
 }
 
 template <Movable T>
@@ -109,7 +111,7 @@ template <Movable T>
 constexpr auto
 precedes(list_singly_linked_position<T> const& x, list_singly_linked_position<T> const& y) -> bool
 {
-    return x.pos != y.pos;
+    return precedes(x.pos, y.pos);
 }
 
 }

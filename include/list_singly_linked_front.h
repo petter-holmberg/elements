@@ -12,13 +12,15 @@ struct list_singly_linked_front
 {
     list_singly_linked_position<T> front;
 
+    constexpr
     list_singly_linked_front() = default;
 
+    constexpr
     list_singly_linked_front(list_singly_linked_front const& x)
     {
         auto src = first(x);
         auto dst = pointer_to(at(this).front.pos);
-        while (src != limit(x)) {
+        while (precedes(src, limit(x))) {
             at(dst) = new list_node_singly_linked{load(src)};
             dst = pointer_to(at(at(dst)).pos_next);
             increment(src);
@@ -28,7 +30,7 @@ struct list_singly_linked_front
     list_singly_linked_front(list_singly_linked_front&& x)
     {
         front = x.front;
-        x.front = list_singly_linked_position<T>{};
+        x.front = {};
     }
 
     list_singly_linked_front(std::initializer_list<T> x)
@@ -36,7 +38,7 @@ struct list_singly_linked_front
         auto src = std::cbegin(x);
         auto dst = pointer_to(at(this).front.pos);
         while (src != std::cend(x)) {
-            at(dst) = new list_node_singly_linked<T>{load(src)};
+            at(dst) = new list_node_singly_linked{load(src)};
             dst = pointer_to(at(at(dst)).pos_next);
             increment(src);
         }
@@ -139,7 +141,7 @@ insert(front<list_singly_linked_front<T>> list, U&& x) -> front<list_singly_link
 {
     auto& seq = base(list);
     seq.front = list_singly_linked_position{
-        new list_node_singly_linked<T>(fw<U>(x), first(seq).pos)
+        new list_node_singly_linked{fw<U>(x), first(seq).pos}
     };
     return seq;
 }
@@ -149,7 +151,7 @@ constexpr auto
 insert(after<list_singly_linked_front<T>> list, U&& x) -> after<list_singly_linked_front<T>>
 {
     auto& seq = base(list);
-    auto node = list_singly_linked_position{new list_node_singly_linked<T>(fw<U>(x))};
+    auto node = list_singly_linked_position{new list_node_singly_linked<T>{fw<U>(x)}};
     if (precedes(current(list), limit(list))) {
         set_link_forward(node, successor(current(list)));
         set_link_forward(current(list), node);
@@ -157,21 +159,21 @@ insert(after<list_singly_linked_front<T>> list, U&& x) -> after<list_singly_link
         set_link_forward(node, first(list));
         seq.front = node;
     }
-    return after<list_singly_linked_front<T>>{seq, node};
+    return after{seq, node};
 }
 
 template <Movable T, Constructible_from<T> U>
 constexpr void
 emplace_first(list_singly_linked_front<T>& list, U&& x)
 {
-    insert(front<list_singly_linked_front<T>>(list), fw<U>(x));
+    insert(front{list}, fw<U>(x));
 }
 
 template <Movable T, Constructible_from<T> U>
 constexpr void
 push_first(list_singly_linked_front<T>& list, U x)
 {
-    insert(front<list_singly_linked_front<T>>(list), mv(x));
+    insert(front{list}, mv(x));
 }
 
 template <Movable T>
@@ -182,31 +184,31 @@ erase(front<list_singly_linked_front<T>> list) -> front<list_singly_linked_front
     auto pos = successor(first(seq));
     delete first(seq).pos;
     seq.front = pos;
-    return seq;
+    return list;
 }
 
 template <Movable T>
 constexpr auto
-erase(after<list_singly_linked_front<T>> list) -> list_singly_linked_position<T>
+erase(after<list_singly_linked_front<T>> list) -> after<list_singly_linked_front<T>>
 {
     auto rem_pos = successor(current(list));
     set_link_forward(current(list), successor(successor(current(list))));
     delete rem_pos.pos;
-    return successor(current(list));
+    return list;
 }
 
 template <Movable T>
 constexpr void
 erase_all(list_singly_linked_front<T>& x)
 {
-    while (!is_empty(x)) erase(front<list_singly_linked_front<T>>(x));
+    while (!is_empty(x)) erase(front{x});
 }
 
 template <Movable T>
 constexpr void
-pop_first(list_singly_linked_front<T>& arr)
+pop_first(list_singly_linked_front<T>& list)
 {
-    erase(front<list_singly_linked_front<T>>(arr));
+    erase(front{list});
 }
 
 template <Movable T>

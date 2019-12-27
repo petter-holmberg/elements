@@ -43,39 +43,45 @@ deallocate_array_double_ended(Pointer_type<array_double_ended_prefix<T>> prefix)
 template <Movable T>
 struct array_double_ended
 {
-    Pointer_type<array_double_ended_prefix<T>> header{nullptr};
+    Pointer_type<array_double_ended_prefix<T>> header{};
 
+    constexpr
     array_double_ended() = default;
 
+    constexpr
     array_double_ended(array_double_ended const& x)
         : header{allocate_array_double_ended<T>(size(x))}
     {
         insert_range(x, back{at(this)});
     }
 
+    constexpr
     array_double_ended(array_double_ended&& x)
     {
         header = x.header;
-        x.header = nullptr;
+        x.header = {};
     }
 
+    constexpr
     array_double_ended(std::initializer_list<T> x)
         : header{allocate_array_double_ended<T>(static_cast<pointer_diff>(std::size(x)))}
     {
         insert_range(x, back{at(this)});
     }
 
-    explicit
+    explicit constexpr
     array_double_ended(Size_type<array_double_ended<T>> capacity)
         : array_double_ended(capacity, Zero<Size_type<array_double_ended<T>>>)
     {}
 
+    constexpr
     array_double_ended(
         Size_type<array_double_ended<T>> capacity,
         Size_type<array_double_ended<T>> offset)
         : header{allocate_array_double_ended<T>(capacity, offset)}
     {}
 
+    constexpr
     array_double_ended(
         Size_type<array_double_ended<T>> capacity,
         Size_type<array_double_ended<T>> size,
@@ -83,6 +89,7 @@ struct array_double_ended
         : array_double_ended<T>(capacity, Zero<Size_type<array_double_ended<T>>>, size, x)
     {}
 
+    constexpr
     array_double_ended(
         Size_type<array_double_ended<T>> capacity,
         Size_type<array_double_ended<T>> offset,
@@ -96,7 +103,7 @@ struct array_double_ended
         }
     }
 
-    auto
+    constexpr auto
     operator=(array_double_ended const& x) -> array_double_ended&
     {
         array_double_ended temp(x);
@@ -104,7 +111,7 @@ struct array_double_ended
         return at(this);
     }
 
-    auto
+    constexpr auto
     operator=(array_double_ended&& x) -> array_double_ended&
     {
         if (this != pointer_to(x)) {
@@ -294,28 +301,28 @@ template <Movable T, typename U>
 constexpr void
 emplace(array_double_ended<T>& arr, U&& x)
 {
-    insert(back<array_double_ended<T>>(arr), fw<U>(x));
+    insert(back{arr}, fw<U>(x));
 }
 
 template <Movable T, typename U>
 constexpr void
 push(array_double_ended<T>& arr, U x)
 {
-    insert(back<array_double_ended<T>>(arr), T{mv(x)});
+    insert(back{arr}, T{mv(x)});
 }
 
 template <Movable T, typename U>
 constexpr void
 emplace_first(array_double_ended<T>& arr, U&& x)
 {
-    insert(front<array_double_ended<T>>(arr), fw<U>(x));
+    insert(front{arr}, fw<U>(x));
 }
 
 template <Movable T, typename U>
 constexpr void
 push_first(array_double_ended<T>& arr, U x)
 {
-    insert(front<array_double_ended<T>>(arr), T{mv(x)});
+    insert(front{arr}, T{mv(x)});
 }
 
 template <Movable T>
@@ -352,21 +359,21 @@ template <Movable T>
 constexpr void
 erase_all(array_double_ended<T>& x)
 {
-    while (!is_empty(x)) erase(back<array_double_ended<T>>(x));
+    while (!is_empty(x)) erase(back{x});
 }
 
 template <Movable T>
 constexpr void
 pop(array_double_ended<T>& arr)
 {
-    erase(back<array_double_ended<T>>(arr));
+    erase(back{arr});
 }
 
 template <Movable T>
 constexpr void
 pop_first(array_double_ended<T>& arr)
 {
-    erase(front<array_double_ended<T>>(arr));
+    erase(front{arr});
 }
 
 template <Movable T>

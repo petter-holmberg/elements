@@ -18,11 +18,8 @@ struct list_singly_linked_front_back
     list_singly_linked_front_back(list_singly_linked_front_back const& x)
     {
         auto src = first(x);
-        auto dst = pointer_to(at(this).front.pos);
-        while (src != limit(x)) {
-            at(dst) = new list_node_singly_linked{load(src)};
-            back = list_singly_linked_position{load(dst)};
-            dst = pointer_to(at(at(dst)).pos_next);
+        while (precedes(src, limit(x))) {
+            push_last(at(this), load(src));
             increment(src);
         }
     }
@@ -36,11 +33,8 @@ struct list_singly_linked_front_back
     list_singly_linked_front_back(std::initializer_list<T> x)
     {
         auto src = std::cbegin(x);
-        auto dst = pointer_to(at(this).front.pos);
         while (src != std::cend(x)) {
-            at(dst) = new list_node_singly_linked{load(src)};
-            back = list_singly_linked_position{load(dst)};
-            dst = pointer_to(at(at(dst)).pos_next);
+            push_last(at(this), load(src));
             increment(src);
         }
     }
@@ -134,6 +128,7 @@ constexpr void
 swap(list_singly_linked_front_back<T>& x, list_singly_linked_front_back<T>& y)
 {
     swap(x.front, y.front);
+    swap(x.back, y.back);
 }
 
 template <Movable T, typename U>
@@ -154,7 +149,7 @@ constexpr auto
 insert(back<list_singly_linked_front_back<T>> list, U&& x) -> front<list_singly_linked_front_back<T>>
 {
     auto& seq = base(list);
-    auto node = list_singly_linked_position{new list_node_singly_linked(fw<U>(x))};
+    auto node = list_singly_linked_position{new list_node_singly_linked{fw<U>(x)}};
     if (is_empty(seq)) {
         seq.front = node;
     } else {
@@ -181,35 +176,35 @@ insert(after<list_singly_linked_front_back<T>> list, U&& x) -> after<list_singly
         seq.front = node;
         seq.back = node;
     }
-    return after<list_singly_linked_front_back<T>>{seq, node};
+    return after{seq, node};
 }
 
 template <Movable T, Constructible_from<T> U>
 constexpr void
 emplace_first(list_singly_linked_front_back<T>& list, U&& x)
 {
-    insert(front<list_singly_linked_front_back<T>>(list), fw<U>(x));
+    insert(front{list}, fw<U>(x));
 }
 
 template <Movable T, Constructible_from<T> U>
 constexpr void
 push_first(list_singly_linked_front_back<T>& list, U x)
 {
-    insert(front<list_singly_linked_front_back<T>>(list), mv(x));
+    insert(front{list}, mv(x));
 }
 
 template <Movable T, Constructible_from<T> U>
 constexpr void
 emplace_last(list_singly_linked_front_back<T>& list, U&& x)
 {
-    insert(back<list_singly_linked_front_back<T>>(list), fw<U>(x));
+    insert(back{list}, fw<U>(x));
 }
 
 template <Movable T, Constructible_from<T> U>
 constexpr void
 push_last(list_singly_linked_front_back<T>& list, U x)
 {
-    insert(back<list_singly_linked_front_back<T>>(list), mv(x));
+    insert(back{list}, mv(x));
 }
 
 template <Movable T>
@@ -223,12 +218,12 @@ erase(front<list_singly_linked_front_back<T>> list) -> front<list_singly_linked_
         seq.back = pos;
     }
     seq.front = pos;
-    return seq;
+    return list;
 }
 
 template <Movable T>
 constexpr auto
-erase(after<list_singly_linked_front_back<T>> list) -> list_singly_linked_position<T>
+erase(after<list_singly_linked_front_back<T>> list) -> after<list_singly_linked_front_back<T>>
 {
     auto& seq = base(list);
     auto rem_pos = successor(current(list));
@@ -237,21 +232,21 @@ erase(after<list_singly_linked_front_back<T>> list) -> list_singly_linked_positi
         seq.back = current(list);
     }
     delete rem_pos.pos;
-    return successor(current(list));
+    return list;
 }
 
 template <Movable T>
 constexpr void
 erase_all(list_singly_linked_front_back<T>& x)
 {
-    while (!is_empty(x)) erase(front<list_singly_linked_front_back<T>>(x));
+    while (!is_empty(x)) erase(front{x});
 }
 
 template <Movable T>
 constexpr void
-pop_first(list_singly_linked_front_back<T>& arr)
+pop_first(list_singly_linked_front_back<T>& list)
 {
-    erase(front<list_singly_linked_front_back<T>>(arr));
+    erase(front{list});
 }
 
 template <Movable T>

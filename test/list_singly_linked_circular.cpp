@@ -1,13 +1,13 @@
 #include "catch.hpp"
 
 #include "affine_space.h"
-#include "list_singly_linked_front.h"
+#include "list_singly_linked_circular.h"
 
 namespace e = elements;
 
-SCENARIO ("Using singly linked list with front access", "[list_singly_linked_front]")
+SCENARIO ("Using circular singly linked list", "[list_singly_linked_circular]")
 {
-    e::list_singly_linked_front<int> x{0, 1, 2, 3, 4};
+    e::list_singly_linked_circular<int> x{0, 1, 2, 3, 4};
     static_assert(e::Dynamic_sequence<decltype(x), e::front<decltype(x)>>);
     static_assert(e::Linked_forward_position<e::Position_type<decltype(x)>>);
 
@@ -48,7 +48,7 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
         }
 
         {
-            e::list_singly_linked_front<int> y{0, 1, 2, 3};
+            e::list_singly_linked_circular<int> y{0, 1, 2, 3};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -59,7 +59,7 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
         }
 
         {
-            e::list_singly_linked_front<int> y{0, 1, 2, 3, 4, 5};
+            e::list_singly_linked_circular<int> y{0, 1, 2, 3, 4, 5};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -70,7 +70,7 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
         }
 
         {
-            e::list_singly_linked_front<int> y{0, -1, -2, -3, -4};
+            e::list_singly_linked_circular<int> y{0, -1, -2, -3, -4};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -81,7 +81,7 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
         }
 
         {
-            e::list_singly_linked_front<int> y{5, 6, 7, 8, 9};
+            e::list_singly_linked_circular<int> y{5, 6, 7, 8, 9};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -111,7 +111,7 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
         }
 
         {
-            e::list_singly_linked_front<int> y{5, 6, 7, 8, 9};
+            e::list_singly_linked_circular<int> y{5, 6, 7, 8, 9};
             e::swap(x, y);
 
             CHECK (x[0] == 5);
@@ -129,7 +129,7 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
 
     SECTION ("Inserting elements")
     {
-        e::list_singly_linked_front<int> x0;
+        e::list_singly_linked_circular<int> x0;
 
         REQUIRE (e::is_empty(x0));
         REQUIRE (e::size(x0) == 0);
@@ -198,8 +198,8 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
 
     SECTION ("Erasing elements")
     {
-        e::list_singly_linked_front<int> x0{0, 1, 2};
-        e::list_singly_linked_front<int> x1;
+        e::list_singly_linked_circular<int> x0{0, 1, 2};
+        e::list_singly_linked_circular<int> x1;
 
         SECTION ("Erasing at front")
         {
@@ -232,7 +232,6 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
             REQUIRE (e::size(x0) == 2);
             CHECK (x0[0] == 0);
             CHECK (x0[1] == 2);
-
             after = e::erase(after);
 
             REQUIRE (!e::is_empty(x0));
@@ -244,7 +243,6 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
             REQUIRE (e::is_empty(x0));
             REQUIRE (e::size(x0) == 0);
         }
-
 
         SECTION ("Erasing all")
         {

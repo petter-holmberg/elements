@@ -38,37 +38,43 @@ deallocate_array_single_ended(Pointer_type<array_single_ended_prefix<T>> prefix)
 template <Movable T>
 struct array_single_ended
 {
-    Pointer_type<array_single_ended_prefix<T>> header{nullptr};
+    Pointer_type<array_single_ended_prefix<T>> header{};
 
+    constexpr
     array_single_ended() = default;
 
+    constexpr
     array_single_ended(array_single_ended const& x)
         : header{allocate_array_single_ended<T>(size(x))}
     {
         insert_range(x, back{at(this)});
     }
 
+    constexpr
     array_single_ended(array_single_ended&& x)
     {
         header = x.header;
-        x.header = nullptr;
+        x.header = {};
     }
 
+    constexpr
     array_single_ended(std::initializer_list<T> x)
         : header{allocate_array_single_ended<T>(Size_type<array_single_ended<T>>{static_cast<pointer_diff>(std::size(x))})}
     {
         insert_range(x, back{at(this)});
     }
 
-    explicit
+    explicit constexpr
     array_single_ended(Size_type<array_single_ended<T>> capacity)
         : header{allocate_array_single_ended<T>(capacity)}
     {}
 
+    constexpr
     array_single_ended(Size_type<array_single_ended<T>> size, T const& x)
         : array_single_ended(size, size, x)
     {}
 
+    constexpr
     array_single_ended(Size_type<array_single_ended<T>> capacity, Size_type<array_single_ended<T>> size, T const& x)
         : header{allocate_array_single_ended<T>(capacity)}
     {
@@ -78,7 +84,7 @@ struct array_single_ended
         }
     }
 
-    auto
+    constexpr auto
     operator=(array_single_ended const& x) -> array_single_ended&
     {
         array_single_ended temp(x);
@@ -86,7 +92,7 @@ struct array_single_ended
         return at(this);
     }
 
-    auto
+    constexpr auto
     operator=(array_single_ended&& x) -> array_single_ended&
     {
         if (this != pointer_to(x)) {
@@ -241,14 +247,14 @@ template <Movable T, typename U>
 constexpr void
 emplace(array_single_ended<T>& arr, U&& x)
 {
-    insert(back<array_single_ended<T>>(arr), fw<U>(x));
+    insert(back{arr}, fw<U>(x));
 }
 
 template <Movable T, typename U>
 constexpr void
 push(array_single_ended<T>& arr, U x)
 {
-    insert(back<array_single_ended<T>>(arr), mv(x));
+    insert(back{arr}, mv(x));
 }
 
 template <Movable T>
@@ -270,14 +276,14 @@ template <Movable T>
 constexpr void
 erase_all(array_single_ended<T>& x)
 {
-    while (!is_empty(x)) erase(back<array_single_ended<T>>(x));
+    while (!is_empty(x)) erase(back{x});
 }
 
 template <Movable T>
 constexpr void
 pop(array_single_ended<T>& arr)
 {
-    erase(back<array_single_ended<T>>(arr));
+    erase(back{arr});
 }
 
 template <Movable T>

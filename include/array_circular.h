@@ -138,7 +138,7 @@ deallocate_array_circular(Pointer_type<array_circular_prefix<T>> prefix)
 template <Movable T>
 struct array_circular
 {
-    Pointer_type<array_circular_prefix<T>> header{nullptr};
+    Pointer_type<array_circular_prefix<T>> header{};
 
     constexpr
     array_circular() = default;
@@ -154,7 +154,7 @@ struct array_circular
     array_circular(array_circular&& x)
     {
         header = x.header;
-        x.header = nullptr;
+        x.header = {};
     }
 
     constexpr
@@ -365,10 +365,9 @@ template <Movable T, typename U>
 constexpr auto
 insert(front<array_circular<T>> arr, U&& x) -> front<array_circular<T>>
 {
-    using S = Size_type<array_circular<T>>;
     auto& seq = base(arr);
     if (size(seq) == capacity(seq)) {
-        reserve(seq, max(One<S>, twice(size(seq))), size(seq));
+        reserve(seq, max(One<Size_type<array_circular<T>>>, twice(size(seq))), size(seq));
     } else if (load(seq.header).first == pointer_to(load(seq.header).x)) {
         at(seq.header).first = load(seq.header).limit_of_storage;
     }
@@ -383,28 +382,28 @@ template <Movable T, typename U>
 constexpr void
 emplace(array_circular<T>& arr, U&& x)
 {
-    insert(back<array_circular<T>>(arr), fw<U>(x));
+    insert(back{arr}, fw<U>(x));
 }
 
 template <Movable T, typename U>
 constexpr void
 push(array_circular<T>& arr, U x)
 {
-    insert(back<array_circular<T>>(arr), mv(x));
+    insert(back{arr}, mv(x));
 }
 
 template <Movable T, typename U>
 constexpr void
 emplace_first(array_circular<T>& arr, U&& x)
 {
-    insert(front<array_circular<T>>(arr), fw<U>(x));
+    insert(front{arr}, fw<U>(x));
 }
 
 template <Movable T, typename U>
 constexpr void
 push_first(array_circular<T>& arr, T x)
 {
-    insert(front<array_circular<T>>(arr), mv(x));
+    insert(front{arr}, mv(x));
 }
 
 template <Movable T>
@@ -449,21 +448,21 @@ template <Movable T>
 constexpr void
 erase_all(array_circular<T>& x)
 {
-    while (!is_empty(x)) erase(back<array_circular<T>>(x));
+    while (!is_empty(x)) erase(back{x});
 }
 
 template <Movable T>
 constexpr void
 pop(array_circular<T>& arr)
 {
-    erase(back<array_circular<T>>(arr));
+    erase(back{arr});
 }
 
 template <Movable T>
 constexpr void
 pop_first(array_circular<T>& arr)
 {
-    erase(front<array_circular<T>>(arr));
+    erase(front{arr});
 }
 
 template <Movable T>
