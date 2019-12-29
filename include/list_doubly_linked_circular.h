@@ -129,8 +129,10 @@ struct list_doubly_linked_circular
 {
     Pointer_type<list_node_doubly_linked<T>> front{};
 
+    constexpr
     list_doubly_linked_circular() = default;
 
+    constexpr
     list_doubly_linked_circular(list_doubly_linked_circular const& x)
     {
         auto src = first(x);
@@ -140,21 +142,24 @@ struct list_doubly_linked_circular
         }
     }
 
+    constexpr
     list_doubly_linked_circular(list_doubly_linked_circular&& x)
     {
         front = x.front;
         x.front = {};
     }
 
+    constexpr
     list_doubly_linked_circular(std::initializer_list<T> x)
     {
         auto src = std::cbegin(x);
         while (src != std::cend(x)) {
-            push_last(at(this), load(src));
+            emplace_last(at(this), load(src));
             increment(src);
         }
     }
 
+    constexpr
     list_doubly_linked_circular(Size_type<list_doubly_linked_circular<T>> size, T const& x)
     {
         while (!is_zero(size)) {
@@ -163,7 +168,7 @@ struct list_doubly_linked_circular
         }
     }
 
-    auto
+    constexpr auto
     operator=(list_doubly_linked_circular const& x) -> list_doubly_linked_circular&
     {
         list_doubly_linked_circular temp(x);
@@ -171,7 +176,7 @@ struct list_doubly_linked_circular
         return at(this);
     }
 
-    auto
+    constexpr auto
     operator=(list_doubly_linked_circular&& x) -> list_doubly_linked_circular&
     {
         if (this != pointer_to(x)) {
@@ -265,7 +270,7 @@ insert(front<list_doubly_linked_circular<T>> list, U&& x) -> front<list_doubly_l
 
 template <Movable T, typename U>
 constexpr auto
-insert(back<list_doubly_linked_circular<T>> list, U&& x) -> front<list_doubly_linked_circular<T>>
+insert(back<list_doubly_linked_circular<T>> list, U&& x) -> back<list_doubly_linked_circular<T>>
 {
     auto& seq = base(list);
     auto node = new list_node_doubly_linked{fw<U>(x), first(seq).pos, last(seq).pos};

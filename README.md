@@ -182,6 +182,8 @@ Lists have regular semantics, lexicographic comparison operators, and supporting
 
 ###### Singly-linked lists
 
+Singly-linked lists provide a `Forward_position`.
+
 `list_singly_linked_front` implements a singly-linked list that supports constant-time `insert` and `erase` at the front or after a given position. The header and position type are the size of a single pointer.
 
 `list_singly_linked_front_back` implements a singly-linked list that supports constant-time `insert` and `erase` at the front or after a given position, and constant-time `insert` at the back. The header is the size of two pointers and the position type is the size of a single pointer.
@@ -192,7 +194,9 @@ Lists have regular semantics, lexicographic comparison operators, and supporting
 ###### Doubly-linked lists
 
 `list_doubly_linked_circular` implements a circular doubly-linked list that supports constant-time
-`insert` and `erase` at the front and back, or before and after a given position. The header is the size of a single pointer and the position type is the size of three pointers.
+`insert` and `erase` at the front and back, before and after a given position. The header is the size of a single pointer and the position type is the size of three pointers.
+
+`list_doubly_linked_sentinel` implements a doubly-linked list with a sentinel node linked at both ends. It supports constant-time `insert` and `erase` at the front and back, `insert` before and after a given position, and `erase` at a given position. The header and position type are the size of a single pointer. Iteration is faster than for `list_doubly_linked_circular` but construction of an empty list is more expensive as it requires allocation of the sentinel node.
 
 #### Extent-based data structures
 
@@ -356,7 +360,11 @@ When defined, positions have successors and predecessors that can be accessed wi
 
 `Linked_forward_position` describes a `Forward_position` type with a function `next_link` that returns a reference to the next linked element.
 
-`Forward_linker` describes a function object type that can be called with two `Linked_forward_position` objects and will relink the first one to the second one.
+`Forward_linker` describes a function object type that can be called with two `Linked_forward_position` objects and will link the first one to the second one.
+
+`Linked_bidirectional_position` describes a `Bidirectional_position` type with functions `next_link` and `prev_link` that return a reference to the adjacent linked
+
+`Bidirectional_linker` describes a function object type that can be called with two `Linked_bidirectional_position` objects and will link the first one to the second one.
 
 ### Access
 
@@ -532,6 +540,7 @@ Index
 `list_singly_linked_circular`
 
 `list_doubly_linked_circular`
+`list_doubly_linked_sentinel`
 
 `array_single_ended`
 `array_double_ended`
@@ -595,6 +604,8 @@ Index
 `Bidirectional_position`
 `Linked_forward_position`
 `Forward_linker`
+`Linked_bidirectional_position`
+`Bidirectional_linker`
 `Loadable`
 `Storable`
 `Mutable`

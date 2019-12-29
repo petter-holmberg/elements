@@ -16,6 +16,7 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/invocable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lexicographical.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/list_doubly_linked_circular.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/list_doubly_linked_sentinel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/list_singly_linked_circular.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/list_singly_linked_front.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/list_singly_linked_front_back.cpp

@@ -956,19 +956,18 @@ struct forward_linker
     }
 };
 
-template <typename P>
-    requires Linked_forward_position<P>
-constexpr void
-set_link_forward(P x, P y)
-{
-    forward_linker<P>{}(x, y);
-}
-
 template <Linked_forward_position P>
 struct position_type_t<forward_linker<P>>
 {
     using type = P;
 };
+
+template <Linked_forward_position P>
+constexpr void
+set_link_forward(P x, P y)
+{
+    forward_linker<P>{}(x, y);
+}
 
 template <typename P>
 concept Linked_bidirectional_position =
@@ -976,5 +975,28 @@ concept Linked_bidirectional_position =
     requires (P x) {
         prev_link(x);
     };
+
+template <Linked_bidirectional_position P>
+struct bidirectional_linker
+{
+    void operator()(P x, P y)
+    {
+        next_link(x) = y.pos;
+        prev_link(y) = x.pos;
+    }
+};
+
+template <Linked_bidirectional_position P>
+struct position_type_t<bidirectional_linker<P>>
+{
+    using type = P;
+};
+
+template <Linked_bidirectional_position P>
+constexpr void
+set_link_bidirectional(P x, P y)
+{
+    bidirectional_linker<P>{}(x, y);
+}
 
 }

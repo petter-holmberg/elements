@@ -34,7 +34,7 @@ struct list_singly_linked_front_back
     {
         auto src = std::cbegin(x);
         while (src != std::cend(x)) {
-            push_last(at(this), load(src));
+            emplace_last(at(this), load(src));
             increment(src);
         }
     }
