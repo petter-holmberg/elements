@@ -1,7 +1,9 @@
 #pragma once
 
+#include "functional.h"
 #include "list_singly_linked.h"
 #include "lexicographical.h"
+#include "map.h"
 #include "ordering.h"
 #include "swap.h"
 
@@ -106,32 +108,24 @@ precedes(list_singly_linked_circular_position<T> const& x, list_singly_linked_ci
 template <Movable T>
 struct list_singly_linked_circular
 {
-    Pointer_type<list_node_singly_linked<T>> back{};
+    Pointer_type<list_node_singly_linked<T>> tail{};
 
     list_singly_linked_circular() = default;
 
     list_singly_linked_circular(list_singly_linked_circular const& x)
     {
-        auto src = first(x);
-        while (precedes(src, limit(x))) {
-            push_last(at(this), load(src));
-            increment(src);
-        }
+        insert_range(x, back{at(this)});
     }
 
     list_singly_linked_circular(list_singly_linked_circular&& x)
     {
-        back = x.back;
-        x.back = {};
+        tail = x.tail;
+        x.tail = {};
     }
 
     list_singly_linked_circular(std::initializer_list<T> x)
     {
-        auto src = std::cbegin(x);
-        while (src != std::cend(x)) {
-            emplace_last(at(this), load(src));
-            increment(src);
-        }
+        insert_range(x, back{at(this)});
     }
 
     list_singly_linked_circular(Size_type<list_singly_linked_circular<T>> size, T const& x)
@@ -145,6 +139,7 @@ struct list_singly_linked_circular
     auto
     operator=(list_singly_linked_circular const& x) -> list_singly_linked_circular&
     {
+        using elements::swap;
         list_singly_linked_circular temp(x);
         swap(at(this), temp);
         return at(this);
@@ -153,9 +148,10 @@ struct list_singly_linked_circular
     auto
     operator=(list_singly_linked_circular&& x) -> list_singly_linked_circular&
     {
+        using elements::swap;
         if (this != pointer_to(x)) {
             erase_all(at(this));
-            swap(back, x.back);
+            swap(tail, x.tail);
         }
         return at(this);
     }
@@ -177,6 +173,53 @@ struct list_singly_linked_circular
     {
         auto pos = first(at(this)) + i;
         return load(pos);
+    }
+
+    template <Unary_function Fun>
+    requires
+        Same_as<Decay<T>, Domain<Fun>> and
+        Same_as<Decay<T>, Codomain<Fun>>
+    constexpr auto
+    map(Fun fun) -> list_singly_linked_circular<T>&
+    {
+        using elements::copy;
+        copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
+        return at(this);
+    }
+
+    template <Unary_function Fun>
+    requires Same_as<Decay<T>, Domain<Fun>>
+    constexpr auto
+    map(Fun fun) const -> list_singly_linked_circular<Codomain<Fun>>
+    {
+        using elements::map;
+        list_singly_linked_circular<Codomain<Fun>> x;
+        map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
+        return x;
+    }
+
+    template <Unary_function Fun>
+    requires
+        Same_as<Decay<T>, Domain<Fun>> and
+        Same_as<list_singly_linked_circular<Decay<T>>, Codomain<Fun>>
+    constexpr auto
+    flat_map(Fun fun) -> list_singly_linked_circular<T>&
+    {
+        using elements::flat_map;
+        auto x = flat_map(first(at(this)), limit(at(this)), fun);
+        swap(at(this), x);
+        return at(this);
+    }
+
+    template <Unary_function Fun>
+    requires
+        Same_as<Decay<T>, Domain<Fun>> and
+        Regular<T>
+    constexpr auto
+    flat_map(Fun fun) -> Codomain<Fun>
+    {
+        using elements::flat_map;
+        return flat_map(first(at(this)), limit(at(this)), fun);
     }
 };
 
@@ -208,21 +251,21 @@ template <Regular T>
 constexpr auto
 operator==(list_singly_linked_circular<T> const& x, list_singly_linked_circular<T> const& y) -> bool
 {
-    return equal_lexicographical(first(x), limit(x), first(y), limit(y));
+    return equal_range(x, y);
 }
 
 template <Default_totally_ordered T>
 constexpr auto
 operator<(list_singly_linked_circular<T> const& x, list_singly_linked_circular<T> const& y) -> bool
 {
-    return less_lexicographical(first(x), limit(x), first(y), limit(y));
+    return less_range(x, y);
 }
 
 template <Movable T>
 constexpr void
 swap(list_singly_linked_circular<T>& x, list_singly_linked_circular<T>& y)
 {
-    swap(x.back, y.back);
+    swap(x.tail, y.tail);
 }
 
 template <Movable T, typename U>
@@ -233,25 +276,25 @@ insert(front<list_singly_linked_circular<T>> list, U&& x) -> front<list_singly_l
     auto node = new list_node_singly_linked{fw<U>(x), first(seq).pos};
     if (is_empty(seq)) {
         at(node).pos_next = node;
-        seq.back = node;
+        seq.tail = node;
     } else {
-        at(seq.back).pos_next = node;
+        at(seq.tail).pos_next = node;
     }
     return seq;
 }
 
 template <Movable T, typename U>
 constexpr auto
-insert(back<list_singly_linked_circular<T>> list, U&& x) -> front<list_singly_linked_circular<T>>
+insert(back<list_singly_linked_circular<T>> list, U&& x) -> back<list_singly_linked_circular<T>>
 {
     auto& seq = base(list);
     auto node = new list_node_singly_linked{fw<U>(x), first(seq).pos};
     if (is_empty(seq)) {
         at(node).pos_next = node;
     } else {
-        at(seq.back).pos_next = node;
+        at(seq.tail).pos_next = node;
     }
-    seq.back = node;
+    seq.tail = node;
     return seq;
 }
 
@@ -265,15 +308,15 @@ insert(after<list_singly_linked_circular<T>> list, U&& x) -> after<list_singly_l
         at(node).pos_next = at(current(list).pos).pos_next;
         at(current(list).pos).pos_next = node;
         if (!precedes(current(list), last(list))) {
-            seq.back = node;
+            seq.tail = node;
         }
     } else {
         if (is_empty(seq)) {
             at(node).pos_next = node;
         } else {
-            at(seq.back).pos_next = node;
+            at(seq.tail).pos_next = node;
         }
-        seq.back = node;
+        seq.tail = node;
     }
     return after{seq, list_singly_linked_circular_position{node, last(seq).pos}};
 }
@@ -311,11 +354,11 @@ constexpr auto
 erase(front<list_singly_linked_circular<T>> list) -> front<list_singly_linked_circular<T>>
 {
     auto& seq = base(list);
-    auto pos = at(seq.back).pos_next;
-    if (precedes(seq.back, at(seq.back).pos_next)) {
-        at(seq.back).pos_next = at(pos).pos_next;
+    auto pos = at(seq.tail).pos_next;
+    if (precedes(seq.tail, at(seq.tail).pos_next)) {
+        at(seq.tail).pos_next = at(pos).pos_next;
     } else {
-        seq.back = {};
+        seq.tail = {};
     }
     delete pos;
     return list;
@@ -328,14 +371,14 @@ erase(after<list_singly_linked_circular<T>> list) -> after<list_singly_linked_ci
     auto& seq = base(list);
     auto& node = at(current(list).pos);
     auto pos = node.pos_next;
-    if (precedes(seq.back, at(seq.back).pos_next)) {
+    if (precedes(seq.tail, at(seq.tail).pos_next)) {
         node.pos_next = at(pos).pos_next;
-        if (!precedes(pos, seq.back)) {
-            at(seq.back).pos_next = seq.back;
-            seq.back = current(list).pos;
+        if (!precedes(pos, seq.tail)) {
+            at(seq.tail).pos_next = seq.tail;
+            seq.tail = current(list).pos;
         }
     } else {
-        seq.back = {};
+        seq.tail = {};
     }
     delete pos;
     return list;
@@ -362,7 +405,7 @@ first(list_singly_linked_circular<T> const& x) -> Position_type<list_singly_link
     if (is_empty(x)) {
         return {};
     } else {
-        return list_singly_linked_circular_position{at(x.back).pos_next, x.back};
+        return list_singly_linked_circular_position{at(x.tail).pos_next, x.tail};
     }
 }
 
@@ -373,7 +416,7 @@ last(list_singly_linked_circular<T> const& x) -> Position_type<list_singly_linke
     if (is_empty(x)) {
         return {};
     } else {
-        return list_singly_linked_circular_position{x.back, x.back};
+        return list_singly_linked_circular_position{x.tail, x.tail};
     }
 }
 
@@ -388,7 +431,7 @@ template <Movable T>
 constexpr auto
 is_empty(list_singly_linked_circular<T> const& x) -> bool
 {
-    return x.back == nullptr;
+    return x.tail == nullptr;
 }
 
 template <Movable T>

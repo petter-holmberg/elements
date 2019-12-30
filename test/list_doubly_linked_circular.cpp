@@ -328,4 +328,27 @@ SCENARIO ("Using circular doubly linked list", "[list_doubly_linked_circular]")
             REQUIRE (e::size(x1) == 0);
         }
     }
+
+    SECTION ("Monadic interface")
+    {
+        auto fn0 = [](int const& i){ return e::list_doubly_linked_circular<int>{i, -i}; };
+        auto fn1 = [](int const& i){ return i + 0.5; };
+
+        static_assert(e::Monad<decltype(x), decltype(fn0)>);
+        static_assert(e::Functor<decltype(x), decltype(fn1)>);
+
+        auto y = x.flat_map(fn0).map(fn1);
+
+        REQUIRE (e::size(y) == 10);
+        REQUIRE (y[0] == 0.5);
+        REQUIRE (y[1] == 0.5);
+        REQUIRE (y[2] == 1.5);
+        REQUIRE (y[3] == -0.5);
+        REQUIRE (y[4] == 2.5);
+        REQUIRE (y[5] == -1.5);
+        REQUIRE (y[6] == 3.5);
+        REQUIRE (y[7] == -2.5);
+        REQUIRE (y[8] == 4.5);
+        REQUIRE (y[9] == -3.5);
+    }
 }

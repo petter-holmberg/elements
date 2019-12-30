@@ -258,4 +258,51 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
             REQUIRE (e::size(x1) == 0);
         }
     }
+
+    SECTION ("Monadic interface")
+    {
+        auto fn0 = [](int const& i){ return e::list_singly_linked_front<int>{i, -i}; };
+        auto fn1 = [](int const& i){ return i + 0.5; };
+
+        static_assert(e::Monad<decltype(x), decltype(fn0)>);
+        static_assert(e::Functor<decltype(x), decltype(fn1)>);
+
+        auto y = x.map(fn1);
+
+        REQUIRE (e::size(y) == 5);
+        REQUIRE (y[0] == 0.5);
+        REQUIRE (y[1] == 1.5);
+        REQUIRE (y[2] == 2.5);
+        REQUIRE (y[3] == 3.5);
+        REQUIRE (y[4] == 4.5);
+
+        auto x0 = x;
+        auto z = x0.flat_map(fn0);
+
+        REQUIRE (e::size(z) == 10);
+        REQUIRE (z[0] == 0);
+        REQUIRE (z[1] == 0);
+        REQUIRE (z[2] == 1);
+        REQUIRE (z[3] == -1);
+        REQUIRE (z[4] == 2);
+        REQUIRE (z[5] == -2);
+        REQUIRE (z[6] == 3);
+        REQUIRE (z[7] == -3);
+        REQUIRE (z[8] == 4);
+        REQUIRE (z[9] == -4);
+
+        auto w = x.flat_map(fn0).map(fn1);
+
+        REQUIRE (e::size(w) == 10);
+        REQUIRE (w[0] == 0.5);
+        REQUIRE (w[1] == 0.5);
+        REQUIRE (w[2] == 1.5);
+        REQUIRE (w[3] == -0.5);
+        REQUIRE (w[4] == 2.5);
+        REQUIRE (w[5] == -1.5);
+        REQUIRE (w[6] == 3.5);
+        REQUIRE (w[7] == -2.5);
+        REQUIRE (w[8] == 4.5);
+        REQUIRE (w[9] == -3.5);
+    }
 }

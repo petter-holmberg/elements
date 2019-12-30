@@ -186,6 +186,7 @@ struct array_circular
     constexpr auto
     operator=(array_circular const& x) -> array_circular&
     {
+        using elements::swap;
         array_circular temp(x);
         swap(at(this), temp);
         return at(this);
@@ -194,6 +195,7 @@ struct array_circular
     constexpr auto
     operator=(array_circular&& x) -> array_circular&
     {
+        using elements::swap;
         if (this != pointer_to(x)) {
             erase_all(at(this));
             swap(header, x.header);
@@ -235,6 +237,7 @@ struct array_circular
     constexpr auto
     map(Fun fun) -> array_circular<T>&
     {
+        using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
         return at(this);
     }

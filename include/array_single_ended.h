@@ -87,6 +87,7 @@ struct array_single_ended
     constexpr auto
     operator=(array_single_ended const& x) -> array_single_ended&
     {
+        using elements::swap;
         array_single_ended temp(x);
         swap(at(this), temp);
         return at(this);
@@ -95,6 +96,7 @@ struct array_single_ended
     constexpr auto
     operator=(array_single_ended&& x) -> array_single_ended&
     {
+        using elements::swap;
         if (this != pointer_to(x)) {
             erase_all(at(this));
             swap(header, x.header);
@@ -126,6 +128,7 @@ struct array_single_ended
     constexpr auto
     map(Fun fun) -> array_single_ended<T>&
     {
+        using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
         return at(this);
     }

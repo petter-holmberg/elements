@@ -23,7 +23,8 @@ struct array_k
         //[[expects: x.size() == k]]
         : data{}
     {
-        copy(std::begin(x), std::end(x), data);
+        using elements::copy;
+        copy(first(x), limit(x), data);
     }
 
     constexpr auto
@@ -45,6 +46,7 @@ struct array_k
     constexpr auto
     map(Fun fun) -> array_k<T, k>&
     {
+        using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
         return at(this);
     }

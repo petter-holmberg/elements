@@ -42,4 +42,18 @@ mv(T&& x) noexcept -> Remove_ref<T>&&
     return std::move(x);
 }
 
+template <typename T>
+constexpr auto
+first(std::initializer_list<T> const& x) -> T const*
+{
+    return std::cbegin(x);
+}
+
+template <typename T>
+constexpr auto
+limit(std::initializer_list<T> const& x) -> T const*
+{
+    return std::cend(x);
+}
+
 }

@@ -7,9 +7,9 @@ namespace elements {
 template <Movable T>
 struct list_node_doubly_linked
 {
-    T x;
     Pointer_type<list_node_doubly_linked<T>> pos_next{};
     Pointer_type<list_node_doubly_linked<T>> pos_prev{};
+    T x;
 
     constexpr
     list_node_doubly_linked() = default;
@@ -19,15 +19,9 @@ struct list_node_doubly_linked
         T const& x_,
         Pointer_type<list_node_doubly_linked<T>> pos_next_ = nullptr,
         Pointer_type<list_node_doubly_linked<T>> pos_prev_ = nullptr)
-        : x(x_)
-        , pos_next(pos_next_)
+        : pos_next(pos_next_)
         , pos_prev(pos_prev_)
-    {}
-
-    explicit constexpr
-    list_node_doubly_linked(T&& x_, Pointer_type<list_node_doubly_linked<T>> pos_next_ = nullptr)
-        : x(fw<T>(x_))
-        , pos_next(pos_next_)
+        , x(x_)
     {}
 };
 

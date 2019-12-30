@@ -135,11 +135,7 @@ struct list_doubly_linked_circular
     constexpr
     list_doubly_linked_circular(list_doubly_linked_circular const& x)
     {
-        auto src = first(x);
-        while (precedes(src, limit(x))) {
-            push_last(at(this), load(src));
-            increment(src);
-        }
+        insert_range(x, back{at(this)});
     }
 
     constexpr
@@ -152,11 +148,7 @@ struct list_doubly_linked_circular
     constexpr
     list_doubly_linked_circular(std::initializer_list<T> x)
     {
-        auto src = std::cbegin(x);
-        while (src != std::cend(x)) {
-            emplace_last(at(this), load(src));
-            increment(src);
-        }
+        insert_range(x, back{at(this)});
     }
 
     constexpr
@@ -171,6 +163,7 @@ struct list_doubly_linked_circular
     constexpr auto
     operator=(list_doubly_linked_circular const& x) -> list_doubly_linked_circular&
     {
+        using elements::swap;
         list_doubly_linked_circular temp(x);
         swap(at(this), temp);
         return at(this);
@@ -179,6 +172,7 @@ struct list_doubly_linked_circular
     constexpr auto
     operator=(list_doubly_linked_circular&& x) -> list_doubly_linked_circular&
     {
+        using elements::swap;
         if (this != pointer_to(x)) {
             erase_all(at(this));
             swap(front, x.front);
@@ -203,6 +197,53 @@ struct list_doubly_linked_circular
     {
         auto pos = first(at(this)) + i;
         return load(pos);
+    }
+
+    template <Unary_function Fun>
+    requires
+        Same_as<Decay<T>, Domain<Fun>> and
+        Same_as<Decay<T>, Codomain<Fun>>
+    constexpr auto
+    map(Fun fun) -> list_doubly_linked_circular<T>&
+    {
+        using elements::copy;
+        copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
+        return at(this);
+    }
+
+    template <Unary_function Fun>
+    requires Same_as<Decay<T>, Domain<Fun>>
+    constexpr auto
+    map(Fun fun) const -> list_doubly_linked_circular<Codomain<Fun>>
+    {
+        using elements::map;
+        list_doubly_linked_circular<Codomain<Fun>> x;
+        map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
+        return x;
+    }
+
+    template <Unary_function Fun>
+    requires
+        Same_as<Decay<T>, Domain<Fun>> and
+        Same_as<list_doubly_linked_circular<Decay<T>>, Codomain<Fun>>
+    constexpr auto
+    flat_map(Fun fun) -> list_doubly_linked_circular<T>&
+    {
+        using elements::flat_map;
+        auto x = flat_map(first(at(this)), limit(at(this)), fun);
+        swap(at(this), x);
+        return at(this);
+    }
+
+    template <Unary_function Fun>
+    requires
+        Same_as<Decay<T>, Domain<Fun>> and
+        Regular<T>
+    constexpr auto
+    flat_map(Fun fun) -> Codomain<Fun>
+    {
+        using elements::flat_map;
+        return flat_map(first(at(this)), limit(at(this)), fun);
     }
 };
 
@@ -234,14 +275,14 @@ template <Regular T>
 constexpr auto
 operator==(list_doubly_linked_circular<T> const& x, list_doubly_linked_circular<T> const& y) -> bool
 {
-    return equal_lexicographical(first(x), limit(x), first(y), limit(y));
+    return equal_range(x, y);
 }
 
 template <Default_totally_ordered T>
 constexpr auto
 operator<(list_doubly_linked_circular<T> const& x, list_doubly_linked_circular<T> const& y) -> bool
 {
-    return less_lexicographical(first(x), limit(x), first(y), limit(y));
+    return less_range(x, y);
 }
 
 template <Movable T>

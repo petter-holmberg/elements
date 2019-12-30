@@ -179,6 +179,7 @@ In linked data structures, the elements are stored in nodes that are permanently
 ##### Lists
 
 Lists have regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
+Lists also provide a monadic interface through the member functions `.map` and `.flat_map`.
 
 ###### Singly-linked lists
 
@@ -189,14 +190,18 @@ Singly-linked lists provide a `Forward_position`.
 `list_singly_linked_front_back` implements a singly-linked list that supports constant-time `insert` and `erase` at the front or after a given position, and constant-time `insert` at the back. The header is the size of two pointers and the position type is the size of a single pointer.
 
 `list_singly_linked_circular` implements a circular singly-linked list that supports constant-time
-`insert` and `erase` at the front or after a given position, and constant-time `insert` at the back. The header is the size of a single pointer and the position type is the size of two pointers. Iteration is slower than for `list_singly_linked_front` and `list_singly_linked_front_back`.
+`insert` and `erase` at the front or after a given position, and constant-time `insert` at the back. The header is the size of a single pointer and the position type is the size of two pointers. Iteration is slower than for `list_singly_linked_front` and `list_singly_linked_front_back` because of special cases at the front and back of the list.
 
 ###### Doubly-linked lists
 
-`list_doubly_linked_circular` implements a circular doubly-linked list that supports constant-time
-`insert` and `erase` at the front and back, before and after a given position. The header is the size of a single pointer and the position type is the size of three pointers.
+Doubly-linked lists support constant-time `insert` and `erase` at the front and back and constant-time `insert` before and after a given position.
+Doubly-linked lists also provide a monadic interface through the member functions `.map` and `.flat_map`.
 
-`list_doubly_linked_sentinel` implements a doubly-linked list with a sentinel node linked at both ends. It supports constant-time `insert` and `erase` at the front and back, `insert` before and after a given position, and `erase` at a given position. The header and position type are the size of a single pointer. Iteration is faster than for `list_doubly_linked_circular` but construction of an empty list is more expensive as it requires allocation of the sentinel node.
+`list_doubly_linked_circular` implements a circular doubly-linked list. It supports constant-time `erase` before and after a given position. The header is the size of a single pointer and the position type is the size of three pointers. Iteration is slower than for `list_doubly_linked_front_back`and `list_doubly_linked_sentinel` because of special cases at the front and back of the list. Construction of an empty list is cheaper than for `list_doubly_linked_sentinel`.
+
+`list_doubly_linked_front_back` implements a doubly-linked list with both ends linked to its header. It supports constant-time `erase` at a given position. The header is the size of two pointers and the position type is the size of a single pointer. Construction of an empty list is cheaper than for `list_doubly_linked_sentinel`, but move construction, move assignment and `swap` is more expensive because of remote links to the header at the front and back of the list.
+
+`list_doubly_linked_sentinel` implements a doubly-linked list with a sentinel node linked at both ends. It supports constant-time `erase` at a given position. The header and position type are the size of a single pointer. Iteration is faster than for `list_doubly_linked_circular` but construction of an empty list is more expensive as it requires allocation of the sentinel node.
 
 #### Extent-based data structures
 
@@ -205,7 +210,7 @@ In extent-based data structures, the elements are stored in one or more *extents
 ##### Arrays
 
 Arrays have regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
-Arrays also provides a monadic interface through the member functions `.map` and `.flat_map`.
+Arrays also provide a monadic interface through the member functions `.map` and `.flat_map`.
 
 `array_single_ended` implements an array of elements contiguously allocated on the free store. It stores a single pointer on the stack, keeping the array size and capacity in a header
 to the array elements.
@@ -540,6 +545,7 @@ Index
 `list_singly_linked_circular`
 
 `list_doubly_linked_circular`
+`list_doubly_linked_front_back`
 `list_doubly_linked_sentinel`
 
 `array_single_ended`
