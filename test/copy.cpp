@@ -47,4 +47,33 @@ SCENARIO ("Copying", "[copy]")
         CHECK (x[3] == 4);
         CHECK (x[4] == 4);
     }
+
+    SECTION ("Copying with predicate")
+    {
+        auto is_even = [](int i){ return i % 2 == 0; };
+
+        SECTION ("Matching predicate")
+        {
+            auto pos = e::copy_if(x, x + 5, y, is_even);
+
+            REQUIRE(pos == y + 3);
+            CHECK (y[0] == 0);
+            CHECK (y[1] == 2);
+            CHECK (y[2] == 4);
+            CHECK (y[3] == 8);
+            CHECK (y[4] == 9);
+        }
+
+        SECTION ("Mismatching predicate")
+        {
+            auto pos = e::copy_if_not(x, x + 5, y, is_even);
+
+            REQUIRE(pos == y + 2);
+            CHECK (y[0] == 1);
+            CHECK (y[1] == 3);
+            CHECK (y[2] == 7);
+            CHECK (y[3] == 8);
+            CHECK (y[4] == 9);
+        }
+    }
 }

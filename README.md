@@ -60,6 +60,12 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 `copy` takes a loadable range as source and a storable position as destination. It performs copying from the first to the last element of the source, which implies that the range starting at the destination position can overlap with the source position, as long as no source position is read after an aliased destination position.
 
+`copy_select` takes a loadable range as source, a storable position as destination, and a `Unary_predicate` to determine which of the elements from the source that should be copied to the destination.
+
+`copy_if` takes a loadable range as source, a storable position as destination, and a `Unary_predicate` to determine which of the elements from the source that should be copied to the destination. The predicate is tested on the elements at the source positions.
+
+`copy_if_not` takes a loadable range as source, a storable position as destination, and a `Unary_predicate` to determine which of the elements from the source that should not be copied to the destination. The predicate is tested on the elements at the source positions.
+
 ## Map/Reduce
 
 The first version of `map` takes a loadable range as source, a storable position as destination, and a unary function to apply to every element in the source range, storing the result in the range starting at the destination position. It applies the function from the first to the last element of the source, which implies that the range starting at the destination position can overlap with the source position, as long as no source position is read after an aliased destination position.
@@ -492,6 +498,9 @@ Index
 `count_not`
 
 `copy`
+`copy_select`
+`copy_if`
+`copy_if_not`
 
 `map`
 `reduce`
