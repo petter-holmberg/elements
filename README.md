@@ -104,7 +104,7 @@ The functions in `search.h` implement algorithms based on binary search, as desc
 
 ### Linear search
 
-The functions in `search.h` implement algorithms based on linear search, as described in [Knuth3](#Knuth3), Chapter 6.1.
+The functions in `search.h` implement algorithms based on linear search, as described in [Knuth3](#Knuth3), Chapter 6.1, and [KnuthMorrisPratt](#KnuthMorrisPratt).
 
 `search` and `search_not` take a loadable range and a value that is equality-comparable with the elements of the range, stopping at the position of the first matching element, or at the limit of the range if no matching element is found.
 For `search`, a match is defined as the first element `y` in the range for which the given element `x` equals `y`.
@@ -120,6 +120,11 @@ For `search_not`, a match is defined as the first element `y` for which the give
 
 `search_adjacent_match` and `search_adjacent_mismatch` takes a loadable range and a relation,
 stopping at the first position where an element and its successor satisfy the relation, or does not satisfy the relation, respectively. The default relation is `equal`.
+
+### Subsequence search
+
+`search_subsequence` takes two loadable ranges, the position of a mutable buffer of the `Difference_type` of the range position, with a size not less than the size of the second range, and an optional relation. The default relation is `equal`
+It will return the position of the first subsequence in the first range that matches the second range, or the limit of the first range if no subsequence matching the second range is found.
 
 ## Permutations
 
@@ -677,6 +682,10 @@ References
 <a name="Knuth3"></a>
 [Knuth3]
 "The Art of Computer Programming, Volume 3, Sorting and Searching, Second Edition", ISBN 0-20189685-0
+
+<a name="KnuthMorrisPratt"></a>
+[KnuthMorrisPratt]
+"Fast Pattern Matching in Strings, SIAM Journal on Computing, Volume 6, Issue 2, pp. 323-350"
 
 <a name="StepanovMcJones"></a>
 [StepanovMcJones]

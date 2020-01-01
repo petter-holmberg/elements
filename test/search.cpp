@@ -268,3 +268,38 @@ SCENARIO ("Linear search", "[search]")
         }
     }
 }
+
+SCENARIO ("Sub-sequence search (Knuth-Morris-Pratt)", "[search]")
+{
+    SECTION ("Searching with two arrays of integers, the second being a short subsequence of the first")
+    {
+        int x[]{0, 1, 2, 3, 4};
+        int y[]{2, 3};
+        ptrdiff_t buffer[2];
+
+        auto pos = e::search_subsequence(x, x + 5, y, y + 2, buffer);
+        REQUIRE (pos == x + 2);
+    }
+
+    SECTION ("Searching with two arrays of integers, the second being a long subsequence of the first")
+    {
+        int x[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+        int y[]{0, 0, 0, 0, 0, 0, 0, 1};
+        ptrdiff_t buffer[8];
+
+        auto pos = e::search_subsequence(x, x + 15, y, y + 8, buffer);
+
+        REQUIRE (pos == x + 7);
+    }
+
+    SECTION ("Searching with two arrays of integers, the second not being a subsequence of the first")
+    {
+        int x[]{0, 1, 2, 3, 4};
+        int y[]{3, 2};
+        ptrdiff_t buffer[2];
+
+        auto pos = e::search_subsequence(x, x + 5, y, y + 2, buffer);
+
+        REQUIRE (pos == x + 5);
+    }
+}

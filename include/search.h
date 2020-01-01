@@ -129,7 +129,6 @@ search_mismatch(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel = equal<Value_type<P
 template <Position P, Limit<P> L, Relation Rel = equal<Value_type<P>>>
 requires
     Loadable<P> and
-    Relation<Rel> and
     Same_as<Decay<Value_type<P>>, Domain<Rel>>
 constexpr auto
 search_adjacent_match(P pos, L lim, Rel rel = equal<Value_type<P>>{}) -> P
@@ -149,7 +148,6 @@ search_adjacent_match(P pos, L lim, Rel rel = equal<Value_type<P>>{}) -> P
 template <Position P, Limit<P> L, Relation Rel = equal<Value_type<P>>>
 requires
     Loadable<P> and
-    Relation<Rel> and
     Same_as<Decay<Value_type<P>>, Domain<Rel>>
 constexpr auto
 search_adjacent_mismatch(P pos, L lim, Rel rel = equal<Value_type<P>>{}) -> P
@@ -161,7 +159,6 @@ search_adjacent_mismatch(P pos, L lim, Rel rel = equal<Value_type<P>>{}) -> P
 template <Forward_position P, Limit<P> L, Relation Rel = equal<Value_type<P>>>
 requires
     Loadable<P> and
-    Relation<Rel> and
     Same_as<Decay<Value_type<P>>, Domain<Rel>>
 constexpr auto
 search_adjacent_match(P pos, L lim, Rel rel = equal<Value_type<P>>{}) -> P
@@ -181,13 +178,71 @@ search_adjacent_match(P pos, L lim, Rel rel = equal<Value_type<P>>{}) -> P
 template <Forward_position P, Limit<P> L, Relation Rel = equal<Value_type<P>>>
 requires
     Loadable<P> and
-    Relation<Rel> and
     Same_as<Decay<Value_type<P>>, Domain<Rel>>
 constexpr auto
 search_adjacent_mismatch(P pos, L lim, Rel rel = equal<Value_type<P>>{}) -> P
 //[[expects axiom: loadable_range(pos, lim)]]
 {
     return search_adjacent_match(pos, lim, complement<Rel>{rel});
+}
+
+template <Indexed_position P, Indexed_position B, Relation Rel = equal<Value_type<P>>>
+requires
+    Loadable<P> and
+    Loadable<B> and
+    Same_as<Difference_type<P>, Value_type<B>> and
+    Same_as<Decay<Value_type<P>>, Domain<Rel>>
+constexpr auto
+kmp_next(Value_type<B> k, P pos0, P pos1, B buf, Rel rel = equal<Value_type<P>>{}) -> Value_type<B>
+{
+    while (!is_zero(k) and !rel(load(pos0), load(pos1 + k))) k = load(buf + predecessor(k));
+    if (rel(load(pos0), load(pos1 + k))) increment(k);
+    return k;
+}
+
+template <Indexed_position P, Limit<P> L, Indexed_position B, Relation Rel = equal<Value_type<P>>>
+requires
+    Loadable<P> and
+    Mutable<B> and
+    Same_as<Difference_type<P>, Value_type<B>> and
+    Same_as<Decay<Value_type<P>>, Domain<Rel>>
+constexpr void
+compute_kmp_next(P pos, L lim, B buf, Rel rel = equal<Value_type<P>>{})
+{
+    auto k{Zero<Value_type<B>>};
+    store(buf, k);
+
+    auto first_pos{pos};
+    increment(pos);
+    auto first_buf{buf};
+    while (precedes(pos, lim)) {
+        k = kmp_next(k, pos, first_pos, first_buf, rel);
+        increment(buf);
+        store(buf, k);
+        increment(pos);
+    }
+}
+
+template <Indexed_position P, Limit<P> L, Indexed_position B, Relation Rel = equal<Value_type<P>>>
+requires
+    Loadable<P> and
+    Mutable<B> and
+    Same_as<Difference_type<P>, Value_type<B>> and
+    Same_as<Decay<Value_type<P>>, Domain<Rel>>
+constexpr auto
+search_subsequence(P pos0, L lim0, P pos1, L lim1, B buf, Rel rel = equal<Value_type<P>>{}) -> P
+{
+    if (!precedes(pos1, lim1)) return pos0;
+
+    compute_kmp_next(pos1, lim1, buf, rel);
+    auto dist{lim1 - pos1};
+    auto k{Zero<Value_type<B>>};
+    while (precedes(pos0, lim0)) {
+        k = kmp_next(k, pos0, pos1, buf, rel);
+        if (k == dist) return pos0 - predecessor(k);
+        increment(pos0);
+    }
+    return pos0;
 }
 
 }

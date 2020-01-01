@@ -14,13 +14,13 @@ struct list_node_singly_linked
     list_node_singly_linked() = default;
 
     explicit constexpr
-    list_node_singly_linked(T const& x_, Pointer_type<list_node_singly_linked<T>> pos_next_ = nullptr)
+    list_node_singly_linked(T const& x_, Pointer_type<list_node_singly_linked<T>> pos_next_ = {})
         : pos_next(pos_next_)
         , x(x_)
     {}
 
     explicit constexpr
-    list_node_singly_linked(T&& x_, Pointer_type<list_node_singly_linked<T>> pos_next_ = nullptr)
+    list_node_singly_linked(T&& x_, Pointer_type<list_node_singly_linked<T>> pos_next_ = {})
         : pos_next(pos_next_)
         , x(fw<T>(x_))
     {}

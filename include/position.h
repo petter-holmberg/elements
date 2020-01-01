@@ -215,11 +215,6 @@ successor(Pointer_type<T> x) -> Pointer_type<T>
     return x;
 }
 
-template <typename P>
-concept Forward_position =
-    Regular<P> and
-    Position<P>;
-
 template <Constructible_from T>
 constexpr void
 decrement(Pointer_type<T>& x)
@@ -227,28 +222,45 @@ decrement(Pointer_type<T>& x)
     x = x - One<Difference_type<Pointer_type<T>>>;
 }
 
+template <Position P>
+constexpr auto
+operator+(P pos, Difference_type<P> dist) -> P
+//[[expects axiom: dist >= Zero<Difference_type<P>>]]
+//[[expects axiom: is_weak_range(pos, dist)]]
+{
+    while (!is_zero(dist)) {
+        increment(pos);
+        decrement(dist);
+    }
+    return pos;
+}
+
+template <Position P>
+constexpr auto
+operator+(Difference_type<P> dist, P pos) -> P
+//[[expects axiom: dist >= Zero<Difference_type<P>>]]
+//[[expects axiom: is_weak_range(pos, dist)]]
+{
+    return pos + dist;
+}
+
+template <Position P, Limit<P> L>
+constexpr auto
+operator-(L lim, P pos) -> Difference_type<P>
+//[[expects axiom: is_bounded_range(pos, lim)]]
+{
+    auto n(Zero<Difference_type<P>>);
+    while (precedes(pos, lim)) {
+        increment(n);
+        increment(pos);
+    }
+    return n;
+}
+
 template <typename P>
-concept Bidirectional_position =
-    Forward_position<P> and
-    requires (P x) {
-        decrement(x);
-    };
-
-template <Bidirectional_position P>
-constexpr auto
-predecessor(P x) -> P
-{
-    decrement(x);
-    return x;
-}
-
-template <Constructible_from T>
-constexpr auto
-predecessor(Pointer_type<T> x) -> Pointer_type<T>
-{
-    decrement(x);
-    return x;
-}
+concept Forward_position =
+    Regular<P> and
+    Position<P>;
 
 template <
     Position S0,
@@ -272,6 +284,29 @@ inner_product(S0 src0, L0 lim0, S1 src1, D dst, S_add_op add_op, S_mul_op mul_op
         map(mv(src0), mv(lim0), mv(src1), dst, mul_op),
         add_op,
         Zero<Value_type<D>>);
+}
+
+template <typename P>
+concept Bidirectional_position =
+    Forward_position<P> and
+    requires (P x) {
+        decrement(x);
+    };
+
+template <Bidirectional_position P>
+constexpr auto
+predecessor(P x) -> P
+{
+    decrement(x);
+    return x;
+}
+
+template <Constructible_from T>
+constexpr auto
+predecessor(Pointer_type<T> x) -> Pointer_type<T>
+{
+    decrement(x);
+    return x;
 }
 
 template <Bidirectional_position P>
@@ -379,6 +414,14 @@ precedes(reverse_position<P> const& pos0, reverse_position<P> const& pos1) -> bo
 {
     return pos0.pos != pos1.pos;
 }
+
+template <typename T>
+concept Indexed_position =
+    Forward_position<T> and
+    requires (T x, Difference_type<T> n) {
+        { x + n } -> T;
+        { x - x } -> Difference_type<T>;
+    };
 
 template <Position P>
 requires Loadable<P>
@@ -776,41 +819,6 @@ constexpr auto
 precedes(forward_position<P> const& pos, L const& lim) -> bool
 {
     return pos.pos != lim;
-}
-
-template <Forward_position P, Limit<P> L>
-constexpr auto
-operator-(L lim, P pos) -> Difference_type<P>
-//[[expects axiom: is_bounded_range(pos, lim)]]
-{
-    auto n(Zero<Difference_type<P>>);
-    while (precedes(pos, lim)) {
-        increment(n);
-        increment(pos);
-    }
-    return n;
-}
-
-template <Forward_position P>
-constexpr auto
-operator+(P pos, Difference_type<P> dist) -> P
-//[[expects axiom: dist >= Zero<Difference_type<P>>]]
-//[[expects axiom: is_weak_range(pos, dist)]]
-{
-    while (!is_zero(dist)) {
-        increment(pos);
-        decrement(dist);
-    }
-    return pos;
-}
-
-template <Forward_position P>
-constexpr auto
-operator+(Difference_type<P> dist, P pos) -> P
-//[[expects axiom: dist >= Zero<Difference_type<P>>]]
-//[[expects axiom: is_weak_range(pos, dist)]]
-{
-    return pos + dist;
 }
 
 template <Bidirectional_position P>
