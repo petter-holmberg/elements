@@ -114,11 +114,15 @@ For `search_not`, a match is defined as the first element `y` in the range for w
 For `search_if`, a match is defined as the first element `x` for which the given predicate is true.
 For `search_not`, a match is defined as the first element `y` for which the given predicate is false.
 
-`search_unguarded`, `search_not_unguarded`, `search_if_unguarded`, and `search_if_not_unguarded` are variations of the functions above that assume an element satisfying the applied predicate is known to exist in the given range. They take a position to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration.
+`search_unguarded`, `search_not_unguarded`, `search_if_unguarded`, and `search_if_not_unguarded` are variations of the functions above that assume an element satisfying the applied predicate is known to exist in the given range (which necessarily is nonempty). They take a position to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration. Iteration is faster because the end of the range doesn't need to be checked.
+
+`search_guarded`, `search_not_guarded`, `search_if_guarded`, and `search_if_not_guarded` are variations of the functions above that temporarily put a `sentinel` value at the last position of the range, to enable search nearly as fast as for the unguarded variations. They require the range to be `Mutable` and take the last position of the range instead of its limit. `search_not_guarded`, `search_if_guarded`, and `search_if_not_guarded` also take a sentinel value to be used to ensure termination.
+
+assume an element satisfying the applied predicate is known to exist in the given range. They take a position to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration.
 
 `search_match` and `search_mismatch` take two loadable ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `equal`.
 
-`search_adjacent_match` and `search_adjacent_mismatch` takes a loadable range and a relation,
+`search_adjacent_match` and `search_adjacent_mismatch` take a loadable range and a relation,
 stopping at the first position where an element and its successor satisfy the relation, or does not satisfy the relation, respectively. The default relation is `equal`.
 
 ### Subsequence search
@@ -525,12 +529,22 @@ Index
 `search_not`
 `search_if`
 `search_if_not`.
+
 `search_unguarded`,
 `search_not_unguarded`,
 `search_if_unguarded`
 `search_if_not_unguarded`
+
+`search_guarded`,
+`search_not_guarded`,
+`search_if_guarded`
+`search_if_not_guarded`
+
 `search_match`
 `search_mismatch`
+
+`search_adjacent_match`
+`search_adjacent_mismatch`
 
 `reverse`
 `rotate`

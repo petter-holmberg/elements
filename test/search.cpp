@@ -87,6 +87,90 @@ SCENARIO ("Linear search", "[search]")
         }
     }
 
+    SECTION ("search_guarded")
+    {
+        SECTION ("Searching for an existing element before the last element")
+        {
+            auto pos = e::search_guarded(x, x + 4, 2);
+            REQUIRE (pos == x + 2);
+        }
+
+        SECTION ("Searching for the last element")
+        {
+            auto pos = e::search_guarded(x, x + 4, 4);
+            REQUIRE (pos == x + 4);
+        }
+
+        SECTION ("Searching for a non-existing element")
+        {
+            auto pos = e::search_guarded(x, x + 4, 5);
+            REQUIRE (pos == x + 5);
+        }
+
+        SECTION ("Searching for the absence of an existing element before the last element")
+        {
+            auto pos = e::search_not_guarded(x, x + 4, 0, 1);
+            REQUIRE (pos == x + 1);
+        }
+
+        SECTION ("Searching for the absence of the last element")
+        {
+            int y[]{0, 0, 0, 0, 1};
+            auto pos = e::search_not_guarded(y, y + 4, 0, 1);
+            REQUIRE (pos == y + 4);
+        }
+
+        SECTION ("Searching for the absence of the only element")
+        {
+            int y[]{0, 0, 0, 0, 0};
+            auto pos = e::search_not_guarded(y, y + 4, 0, 1);
+            REQUIRE (pos == y + 5);
+        }
+    }
+
+    SECTION ("search_if_guarded")
+    {
+        SECTION ("Searching for an even element that exists before the last element")
+        {
+            auto pos = e::search_if_guarded(x, x + 4, is_even, 0);
+            REQUIRE (pos == +x);
+        }
+
+        SECTION ("Searching for an even element that is the last element")
+        {
+            int y[]{1, 3, 5, 7, 2};
+            auto pos = e::search_if_guarded(y, y + 4, is_even, 0);
+            REQUIRE (pos == y + 4);
+        }
+
+        SECTION ("Searching for an even element when none exists")
+        {
+            int y[]{1, 3, 5, 7, 9};
+            auto pos = e::search_if_guarded(y, y + 4, is_even, 0);
+            REQUIRE (pos == y + 5);
+        }
+
+        SECTION ("Searching for the absence of an even element that exists before the last element")
+        {
+            auto pos = e::search_if_not_guarded(x, x + 4, is_even, 1);
+            REQUIRE (pos == x + 1);
+        }
+
+        SECTION ("Searching for the absence of an even element that is the last element")
+        {
+            int y[]{0, 2, 4, 6, 1};
+            auto pos = e::search_if_not_guarded(y, y + 4, is_even, 1);
+            REQUIRE (pos == y + 4);
+        }
+
+        SECTION ("Searching for the absence of an even element when all are even")
+        {
+            int y[]{0, 2, 4, 6, 8};
+            auto pos = e::search_if_not_guarded(y, y + 4, is_even, 1);
+            REQUIRE (pos == y + 5);
+        }
+    }
+
     SECTION ("search_match")
     {
         SECTION ("Searcing for a match between two empty ranges")

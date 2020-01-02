@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pair.h"
+#include "swap.h"
 
 namespace elements {
 
@@ -27,7 +28,7 @@ constexpr auto
 search_if_not(P pos, L lim, U pred) -> P
 //[[expects axiom: loadable_range(pos, lim)]]
 {
-    return search_if(mv(pos), mv(lim), negation<U>{pred});
+    return search_if(mv(pos), mv(lim), negation{pred});
 }
 
 template <Position P, Limit<P> L, Equality_comparable_with<Value_type<P>> T>
@@ -36,7 +37,7 @@ constexpr auto
 search(P pos, L lim, T const& value) -> P
 //[[expects axiom: loadable_range(pos, lim)]]
 {
-    return search_if(mv(pos), mv(lim), equal_unary<Value_type<P>>{value});
+    return search_if(mv(pos), mv(lim), equal_unary{value});
 }
 
 template <Position P, Limit<P> L, Equality_comparable_with<Value_type<P>> T>
@@ -45,7 +46,7 @@ constexpr auto
 search_not(P pos, L lim, T const& value) -> P
 //[[expects axiom: loadable_range(pos, lim)]]
 {
-    return search_if_not(mv(pos), mv(lim), equal_unary<Value_type<P>>{value});
+    return search_if_not(mv(pos), mv(lim), equal_unary{value});
 }
 
 template <Position P, Unary_predicate U>
@@ -70,7 +71,7 @@ search_if_not_unguarded(P pos, U pred) -> P
 //[[expects axiom: loadable_range(pos, _)]]
 //[[expects axiom: any_not_of(pos, _, pred)]]
 {
-    return search_if_unguarded(mv(pos), negation<U>{pred});
+    return search_if_unguarded(mv(pos), negation{pred});
 }
 
 template <Position P, Equality_comparable_with<Value_type<P>> T>
@@ -80,7 +81,7 @@ search_unguarded(P pos, T const& value) -> P
 //[[expects axiom: loadable_range(pos, _)]]
 //[[expects axiom: search(pos, _, value) != _]]
 {
-    return search_if_unguarded(mv(pos), equal_unary<Value_type<P>>{value});
+    return search_if_unguarded(mv(pos), equal_unary{value});
 }
 
 template <Position P, Equality_comparable_with<Value_type<P>> T>
@@ -90,7 +91,55 @@ search_not_unguarded(P pos, T const& value) -> P
 //[[expects axiom: loadable_range(pos, _)]]
 //[[expects axiom: search_not(pos, _, value) != _]]
 {
-    return search_if_not_unguarded(mv(pos), equal_unary<Value_type<P>>{value});
+    return search_if_not_unguarded(mv(pos), equal_unary{value});
+}
+
+template <Forward_position P, Unary_predicate U>
+requires
+    Mutable<P> and
+    Same_as<Decay<Value_type<P>>, Domain<U>>
+constexpr auto
+search_if_guarded(P first, P last, U pred, Value_type<P> const& sentinel) -> P
+//[[expects axiom: mutable_range(pos, successor(last))]]
+{
+    if (!precedes(first, successor(last))) return first;
+    auto temp{load(last)};
+    store(last, sentinel);
+    auto pos = search_if_unguarded(first, pred);
+    swap(at(last), temp);
+    if (precedes(pos, last)) return pos;
+    if (pred(at(last))) return last;
+    return successor(last);
+}
+
+template <Forward_position P, Unary_predicate U>
+requires
+    Mutable<P> and
+    Same_as<Decay<Value_type<P>>, Domain<U>>
+constexpr auto
+search_if_not_guarded(P first, P last, U pred, Value_type<P> const& sentinel) -> P
+//[[expects axiom: mutable_range(pos, successor(last))]]
+{
+    return search_if_guarded(first, last, negation{pred}, sentinel);
+}
+
+template <Forward_position P, Equality_comparable_with<Value_type<P>> T>
+requires Mutable<P>
+constexpr auto
+search_guarded(P first, P last, T const& value) -> P
+//[[expects axiom: mutable_range(pos, successor(last))]]
+{
+    return search_if_guarded(first, last, equal_unary{value}, value);
+}
+
+template <Forward_position P, Equality_comparable_with<Value_type<P>> T>
+requires Mutable<P>
+constexpr auto
+search_not_guarded(P first, P last, T const& value, T const& sentinel) -> P
+//[[expects axiom: mutable_range(pos, successor(last))]]
+//[[expects axiom: value != sentinel]]
+{
+    return search_if_not_guarded(first, last, equal_unary{value}, sentinel);
 }
 
 template <Position P0, Limit<P0> L0, Position P1, Limit<P1> L1, Relation Rel = equal<Value_type<P0>>>
@@ -123,7 +172,7 @@ search_mismatch(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel = equal<Value_type<P
 //[[expects axiom: loadable_range(pos0, lim0)]]
 //[[expects axiom: loadable_range(pos0, lim1)]]
 {
-    return search_match(mv(pos0), mv(lim0), mv(pos1), mv(lim1), complement<Rel>{rel});
+    return search_match(mv(pos0), mv(lim0), mv(pos1), mv(lim1), complement{rel});
 }
 
 template <Position P, Limit<P> L, Relation Rel = equal<Value_type<P>>>
@@ -153,7 +202,7 @@ constexpr auto
 search_adjacent_mismatch(P pos, L lim, Rel rel = equal<Value_type<P>>{}) -> P
 //[[expects axiom: loadable_range(pos, lim)]]
 {
-    return search_adjacent_match(mv(pos), mv(lim), complement<Rel>{rel});
+    return search_adjacent_match(mv(pos), mv(lim), complement{rel});
 }
 
 template <Forward_position P, Limit<P> L, Relation Rel = equal<Value_type<P>>>
@@ -183,7 +232,7 @@ constexpr auto
 search_adjacent_mismatch(P pos, L lim, Rel rel = equal<Value_type<P>>{}) -> P
 //[[expects axiom: loadable_range(pos, lim)]]
 {
-    return search_adjacent_match(pos, lim, complement<Rel>{rel});
+    return search_adjacent_match(pos, lim, complement{rel});
 }
 
 template <Indexed_position P, Indexed_position B, Relation Rel = equal<Value_type<P>>>
