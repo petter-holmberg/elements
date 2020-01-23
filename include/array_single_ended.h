@@ -1,5 +1,6 @@
 #pragma once
 
+#include "flat_map.h"
 #include "functional.h"
 #include "lexicographical.h"
 #include "map.h"
@@ -237,7 +238,7 @@ constexpr auto
 insert(back<array_single_ended<T>> arr, U&& x) -> back<array_single_ended<T>>
 {
     auto& seq = base(arr);
-    if (limit(seq) == limit_of_storage(seq)) {
+    if (!precedes(limit(seq), limit_of_storage(seq))) {
         reserve(seq, max(One<Size_type<array_single_ended<T>>>, twice(size(seq))));
     }
     auto& header = at(seq.header);

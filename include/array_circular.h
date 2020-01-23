@@ -1,5 +1,6 @@
 #pragma once
 
+#include "flat_map.h"
 #include "functional.h"
 #include "lexicographical.h"
 #include "map.h"

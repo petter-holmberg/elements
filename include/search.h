@@ -20,6 +20,29 @@ search_if(P pos, L lim, U pred) -> P
     return pos;
 }
 
+template <Segmented_position P, Unary_predicate U>
+requires
+    Loadable<P> and
+    Same_as<Value_type<P>, Domain<U>>
+constexpr auto
+search_if(P pos, P lim, U pred) -> P
+{
+    auto index_pos = index_pos(pos);
+    auto index_lim = index_pos(lim);
+    if (!precedes(index_pos, index_lim)) {
+        return {index_pos, search_if(segment_pos(pos), segment_pos(lim), pred)};
+    } else {
+        auto segment_pos = search_if(segment_pos(pos), limit(load(index_pos)), pred);
+        if (!precedes(segment_pos, limit(load(index_pos)))) return {index_pos, segment_pos};
+        do {
+            increment(index_pos);
+            segment_pos = search_if(first(load(index_pos)), limit(load(index_pos)), pred);
+            if (!precedes(segment_pos, limit(load(index_pos)))) return {index_pos, segment_pos};
+        } while (precedes(index_pos, index_lim));
+        return {index_pos, segment_pos};
+    }
+}
+
 template <Position P, Limit<P> L, Unary_predicate U>
 requires
     Loadable<P> and
@@ -27,6 +50,16 @@ requires
 constexpr auto
 search_if_not(P pos, L lim, U pred) -> P
 //[[expects axiom: loadable_range(pos, lim)]]
+{
+    return search_if(mv(pos), mv(lim), negation{pred});
+}
+
+template <Segmented_position P, Unary_predicate U>
+requires
+    Loadable<P> and
+    Same_as<Value_type<P>, Domain<U>>
+constexpr auto
+search_if_not(P pos, P lim, U pred) -> P
 {
     return search_if(mv(pos), mv(lim), negation{pred});
 }
@@ -40,11 +73,27 @@ search(P pos, L lim, T const& value) -> P
     return search_if(mv(pos), mv(lim), equal_unary{value});
 }
 
+template <Segmented_position P, Equality_comparable_with<Value_type<P>> T>
+requires Loadable<P>
+constexpr auto
+search(P pos, P lim, T const& value) -> P
+{
+    return search_if(mv(pos), mv(lim), equal_unary{value});
+}
+
 template <Position P, Limit<P> L, Equality_comparable_with<Value_type<P>> T>
 requires Loadable<P>
 constexpr auto
 search_not(P pos, L lim, T const& value) -> P
 //[[expects axiom: loadable_range(pos, lim)]]
+{
+    return search_if_not(mv(pos), mv(lim), equal_unary{value});
+}
+
+template <Segmented_position P, Equality_comparable_with<Value_type<P>> T>
+requires Loadable<P>
+constexpr auto
+search_not(P pos, P lim, T const& value) -> P
 {
     return search_if_not(mv(pos), mv(lim), equal_unary{value});
 }

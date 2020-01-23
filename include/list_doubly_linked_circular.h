@@ -1,5 +1,6 @@
 #pragma once
 
+#include "flat_map.h"
 #include "list_doubly_linked.h"
 #include "lexicographical.h"
 #include "ordering.h"

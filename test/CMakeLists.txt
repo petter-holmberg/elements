@@ -5,6 +5,7 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/algebra.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array_circular.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array_double_ended.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/array_segmented_single_ended.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array_single_ended.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array_k.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/copy.cpp

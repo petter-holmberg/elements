@@ -1007,4 +1007,26 @@ set_link_bidirectional(P x, P y)
     bidirectional_linker<P>{}(x, y);
 }
 
+template <typename>
+struct index_position_type_t;
+
+template <typename T>
+using Index_position_type = typename index_position_type_t<T>::type;
+
+template <typename>
+struct segment_position_type_t;
+
+template <typename T>
+using Segment_position_type = typename segment_position_type_t<T>::type;
+
+template <typename P>
+concept Segmented_position =
+    Movable<P> and
+    requires (P x) {
+        Position<Index_position_type<P>>;
+        Position<Segment_position_type<P>>;
+        { index_pos(x) } -> Index_position_type<P>;
+        { segment_pos(x) } -> Segment_position_type<P>;
+    };
+
 }

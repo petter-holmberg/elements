@@ -66,11 +66,13 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 `copy_if_not` takes a loadable range as source, a storable position as destination, and a `Unary_predicate` to determine which of the elements from the source that should not be copied to the destination. The predicate is tested on the elements at the source positions.
 
-## Map/Reduce
+## Map
 
 The first version of `map` takes a loadable range as source, a storable position as destination, and a unary function to apply to every element in the source range, storing the result in the range starting at the destination position. It applies the function from the first to the last element of the source, which implies that the range starting at the destination position can overlap with the source position, as long as no source position is read after an aliased destination position.
 
 The second version of `map` takes a loadable range and a loadable position as sources, a storable position as destination, and a binary function to apply to every corresponding pair of elements in the source ranges, storing the result in the range starting at the destination position. It applies the function from the first to the last element of the sources, which implies that the range starting at the destination position can overlap with any of the source positions, as long as no source position is read after an aliased destination position.
+
+## Reduce
 
 `reduce` takes a loadable range, a binary operation, optionally a unary function, and a zero value. It starts with the zero value as the result, and, for each element in the range, applies the binary operation on the result and the return value of the unary function applied on the element. The default function is `load`.
 
@@ -81,6 +83,10 @@ function applied on an element of the range returns the zero value. The default 
 
 `reduce_balanced` takes a loadable range, a binary operation, optionally a unary function, and a zero value. It performs balanced reduction, storing intermediate reductions in a `binary_counter`. The default function is `load`.
 This algorithm minimizes the cost of applying the operation if the size of a reduced object is the sum of the sizes of the original objects and the complexity of applying the reduction operation grows linearly with the sizes of its arguments.
+
+## Flat map
+
+`flat_map` takes a loadable range as source and a unary function that returns a `Sequence`. It applies the function on every element in the source range, returning a `Sequence` of the concatenated sequences that the unary function returns.
 
 ## Partitioning
 
@@ -240,6 +246,9 @@ It stores a single pointer on the stack, keeping the array size and capacity in 
 Positions of `array_circular` elements are larger and element access is slower than for `array_single_ended` and `array_double_ended`.
 `array_circular` supports insertion at the back and the front in amortized constant time using `push` and `push_first`. If the capacity is exceeded it reallocates and moves its elements.
 
+`array_segmented_single_ended` implements a segmented array of elements, where elements are stored on the free store in multiple contiguously allocated blocks of a fixed size *k*, managed by an index of pointers, also contiguously allocated on the free store. All blocks in the array are full, except possibly the last one.
+`array_segmented_single_ended` supports insertion at the back in amortized constant time using `push`. If the last block is full, a new block is allocated and appended to the index. Existing elements are never moved when new allocations occur. Erasure at the back using `pop` deallocates the last block if it becomes empty.
+
 ## Sum types
 
 `result` implements a type that carries either a value or an error. The presence of a value can be checked by boolean evaluation. An expected object is `Mutable` if its `Value_type` is.
@@ -386,6 +395,10 @@ When defined, positions have successors and predecessors that can be accessed wi
 
 `Bidirectional_linker` describes a function object type that can be called with two `Linked_bidirectional_position` objects and will link the first one to the second one.
 
+#### Segmented traversal
+
+`Segmented_position` describes a position in a segmented range, consisting of an index position and a segment position at the current index, both of which are `Position` types.
+
 ### Access
 
 `Loadable` describes a type with a function `load` that returns a constant reference to its held object. For an object that represents the position of another object, `load` returns a reference to the other object. For other objects, load returns a reference to the object itself.
@@ -442,6 +455,8 @@ returns either a reference or a constant reference to its held object.
 `Size_type` is the type used to describe the size of an object of a given type.
 
 `Size` is the size of a given type (when known at compile time).
+
+`Index_position_type` and `Segment_position_type` describe the two `Position` types of a `Segment_position`.
 
 ## Algebra
 
@@ -512,10 +527,13 @@ Index
 `copy_if_not`
 
 `map`
+
 `reduce`
 `reduce_nonempty`
 `reduce_nonzeroes`
 `reduce_balanced`
+
+`flat_map`
 
 `is_partitioned`
 `partition_point_counted`
@@ -579,6 +597,8 @@ Index
 `array_single_ended`
 `array_double_ended`
 `array_circular`
+
+`array_segmented_single_ended`
 
 `result`
 
@@ -686,6 +706,8 @@ Index
 `Position_type`
 `Size_type`
 `Size`
+`Index_position_type`
+`Segment_position_type`
 
 `Zero`
 `One`

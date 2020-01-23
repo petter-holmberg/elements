@@ -1,5 +1,6 @@
 #pragma once
 
+#include "flat_map.h"
 #include "functional.h"
 #include "lexicographical.h"
 #include "map.h"
@@ -261,8 +262,8 @@ constexpr auto
 insert(back<array_double_ended<T>> arr, U&& x) -> back<array_double_ended<T>>
 {
     auto& seq = base(arr);
-    if (limit(seq) == limit_of_storage(seq)) {
-        if (first(seq) == first_of_storage(seq)) {
+    if (!precedes(limit(seq), limit_of_storage(seq))) {
+        if (!precedes(first(seq), first_of_storage(seq))) {
             reserve(seq, max(One<Size_type<array_double_ended<T>>>, twice(size(seq))));
         } else {
             auto pos = first_of_storage(seq) + half(first(seq) - first_of_storage(seq));
@@ -281,8 +282,8 @@ constexpr auto
 insert(front<array_double_ended<T>> arr, U&& x) -> front<array_double_ended<T>>
 {
     auto& seq = base(arr);
-    if (first(seq) == first_of_storage(seq)) {
-        if (limit(seq) == limit_of_storage(seq)) {
+    if (!precedes(first(seq), first_of_storage(seq))) {
+        if (!precedes(limit(seq), limit_of_storage(seq))) {
             auto n = size(seq);
             reserve(seq, max(One<Size_type<array_double_ended<T>>>, twice(n)), n);
         } else {

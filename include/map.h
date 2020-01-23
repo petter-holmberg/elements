@@ -22,6 +22,29 @@ map(S src, L lim, D dst, Fun fun) -> D
     return dst;
 }
 
+template <Segmented_position S, Position D, Unary_function Fun>
+requires
+    Loadable<S> and
+    Storable<D> and
+    Same_as<Decay<Value_type<S>>, Domain<Fun>> and
+    Same_as<Decay<Value_type<D>>, Codomain<Fun>>
+constexpr auto
+map(S src, S lim, D dst, Fun fun) -> D
+{
+    auto index_src = index_pos(src);
+    auto index_lim = index_pos(lim);
+    if (!precedes(index_src, index_lim)) {
+        return map(segment_pos(src), segment_pos(lim), dst, fun);
+    } else {
+        dst = map(segment_pos(src), limit(load(index_src)), dst, fun);
+        do {
+            increment(index_src);
+            dst = map(first(load(index_src)), limit(load(index_src)), dst, fun);
+        } while (precedes(index_src, index_lim));
+        return dst;
+    }
+}
+
 template <Position S0, Limit<S0> L0, Position S1, Position D, Binary_function Fun>
 requires
     Loadable<S0> and

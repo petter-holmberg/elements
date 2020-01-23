@@ -450,42 +450,4 @@ insert_range(std::initializer_list<T> seq, P pos) -> P
     return copy(first(seq), limit(seq), insert_sink{}(pos)).pos;
 }
 
-template <Position P, Limit<P> L, Unary_function Fun, typename I = back<Codomain<Fun>>>
-requires
-    Loadable<P> and
-    Same_as<Value_type<P>, Domain<Fun>> and
-    Sequence<Codomain<Fun>>
-constexpr auto
-flat_map(P src, L lim, Fun fun) -> Codomain<Fun>
-{
-    Codomain<Fun> x;
-    while (precedes(src, lim)) {
-        auto y = fun(load(src));
-        insert_range(y, I{x});
-        increment(src);
-    }
-    return x;
-}
-
-template <Position P, Limit<P> L, Unary_function Fun, typename I = back<Codomain<Fun>>>
-requires
-    Loadable<P> and
-    Same_as<Value_type<P>, Domain<Fun>> and
-    Sequence<Codomain<Fun>> and
-    requires (Codomain<Fun> x, Size_type<Codomain<Fun>> s) {
-        { reserve(x, s) }
-    }
-constexpr auto
-flat_map(P src, L lim, Fun fun) -> Codomain<Fun>
-{
-    Codomain<Fun> x;
-    while (precedes(src, lim)) {
-        auto y = fun(load(src));
-        reserve(x, size(x) + size(y));
-        insert_range(y, I{x});
-        increment(src);
-    }
-    return x;
-}
-
 }

@@ -30,6 +30,28 @@ copy(S src, L lim, D dst) -> D
     return dst;
 }
 
+template <Segmented_position S, Position D>
+requires
+    Loadable<S> and
+    Storable<D> and
+    Same_as<Decay<Value_type<S>>, Decay<Value_type<D>>>
+constexpr auto
+copy(S src, S lim, D dst) -> D
+{
+    auto index_src = index_pos(src);
+    auto index_lim = index_pos(lim);
+    if (!precedes(index_src, index_lim)) {
+        return copy(segment_pos(src), segment_pos(lim), dst);
+    } else {
+        dst = copy(segment_pos(src), limit(load(index_src)), dst);
+        do {
+            increment(index_src);
+            dst = copy(first(load(index_src)), limit(load(index_src)), dst);
+        } while (precedes(index_src, index_lim));
+        return dst;
+    }
+}
+
 template <Position S, Position D, Limit<S> L, Unary_predicate P>
 requires
     Loadable<S> and
