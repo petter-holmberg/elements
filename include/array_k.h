@@ -1,6 +1,7 @@
 #pragma once
 
 #include "copy.h"
+#include "fill.h"
 #include "functional.h"
 #include "lexicographical.h"
 #include "map.h"
@@ -27,6 +28,13 @@ struct array_k
         copy(first(x), limit(x), data);
     }
 
+    explicit constexpr
+    array_k(T const& x)
+        : data{}
+    {
+        fill(data, data + k, x);
+    }
+
     constexpr auto
     operator[](pointer_diff i) const -> T const&
     {
@@ -44,7 +52,7 @@ struct array_k
         Same_as<Decay<T>, Domain<Fun>> and
         Same_as<Decay<T>, Codomain<Fun>>
     constexpr auto
-    map(Fun fun) -> array_k<T, k>&
+    fmap(Fun fun) -> array_k<T, k>&
     {
         using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
@@ -54,7 +62,7 @@ struct array_k
     template <Unary_function Fun>
     requires Same_as<Decay<T>, Domain<Fun>>
     constexpr auto
-    map(Fun fun) const -> array_k<Codomain<Fun>, k>
+    fmap(Fun fun) const -> array_k<Codomain<Fun>, k>
     {
         using elements::map;
         array_k<Codomain<Fun>, k> x;

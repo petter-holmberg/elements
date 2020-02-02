@@ -29,7 +29,7 @@ struct pair
         Same_as<Decay<T0>, Domain<Fun>> and
         Same_as<Decay<T0>, Codomain<Fun>>
     constexpr auto
-    map(Fun fun) -> pair<T0>&
+    fmap(Fun fun) -> pair<T0>&
     {
         m0 = fun(mv(m0));
         m1 = fun(mv(m1));
@@ -41,7 +41,7 @@ struct pair
         Same_as<T0, T1> and
         Same_as<Decay<T0>, Domain<Fun>>
     constexpr auto
-    map(Fun fun) const -> pair<Codomain<Fun>>
+    fmap(Fun fun) const -> pair<Codomain<Fun>>
     {
         return {fun(m0), fun(m1)};
     }

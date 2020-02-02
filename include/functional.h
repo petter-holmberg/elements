@@ -1,26 +1,60 @@
 #pragma once
 
+#include "flat_map.h"
 #include "invocable.h"
-#include "position.h"
+#include "range.h"
 
 namespace elements {
 
-template <typename T, typename Fun>
+template <typename T>
 concept Functor =
     Movable<T> and
-    Unary_function<Fun> and
-    Same_as<Decay<Value_type<T>>, Domain<Fun>> and
-    requires (T x, Fun fun) {
-        x.map(fun);
+    requires (T&& x, Value_type<T>(&fun)(Value_type<T>)) {
+        fmap(fw<T>(x), fun);
     };
 
-template <typename T, typename Fun>
+template <typename T, Unary_function Fun>
+constexpr auto
+fmap(T&& x, Fun fun) -> decltype(x.fmap(fun))
+{
+    return x.fmap(fun);
+}
+
+template <typename T>
+constexpr auto
+unit(Value_type<T>&& x) -> T
+{
+    return T{fw<Value_type<T>>(x)};
+}
+
+template <typename M>
 concept Monad =
-    Functor<T, Fun> and
-    Default_constructible<T> and
-    requires (T x, Fun fun) {
-        x.flat_map(fun);
+    requires (M m, Value_type<M>&& x, M(&fun)(Value_type<M>)) {
+        { unit<M>(fw<Value_type<M>>(x)) } -> M;
+        m & fun;
     };
+
+template <Mutable_range R, Unary_function Fun>
+requires Convertible_to<Value_type<R>, Domain<Fun>>
+constexpr auto
+operator&(R& x, Fun fun) -> Codomain<Fun>
+{
+    return flat_map(first(x), limit(x), fun);
+}
+
+template <typename T, Unary_function Fun>
+constexpr auto
+operator&(T&& x, Fun fun) -> Codomain<Fun>
+{
+    return x.flat_map(fun);
+}
+
+template <typename T, Unary_function... Fs>
+constexpr auto
+chain(T x, Fs... funcs) -> Monad
+{
+    return (x & ... & funcs);
+}
 
 template <Position P, Unary_predicate U>
 requires

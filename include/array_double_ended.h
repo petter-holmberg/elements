@@ -1,6 +1,5 @@
 #pragma once
 
-#include "flat_map.h"
 #include "functional.h"
 #include "lexicographical.h"
 #include "map.h"
@@ -146,7 +145,7 @@ struct array_double_ended
         Same_as<Decay<T>, Domain<Fun>> and
         Same_as<Decay<T>, Codomain<Fun>>
     constexpr auto
-    map(Fun fun) -> array_double_ended<T>&
+    fmap(Fun fun) -> array_double_ended<T>&
     {
         using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
@@ -156,7 +155,7 @@ struct array_double_ended
     template <Unary_function Fun>
     requires Same_as<Decay<T>, Domain<Fun>>
     constexpr auto
-    map(Fun fun) const -> array_double_ended<Codomain<Fun>>
+    fmap(Fun fun) const -> array_double_ended<Codomain<Fun>>
     {
         using elements::map;
         array_double_ended<Codomain<Fun>> x;
@@ -164,30 +163,6 @@ struct array_double_ended
         map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
         at(x.header).limit = at(x.header).limit_of_storage;
         return x;
-    }
-
-    template <Unary_function Fun>
-    requires
-        Same_as<Decay<T>, Domain<Fun>> and
-        Same_as<array_double_ended<Decay<T>>, Codomain<Fun>>
-    constexpr auto
-    flat_map(Fun fun) -> array_double_ended<T>&
-    {
-        using elements::flat_map;
-        auto x = flat_map(first(at(this)), limit(at(this)), fun);
-        swap(at(this), x);
-        return at(this);
-    }
-
-    template <Unary_function Fun>
-    requires
-        Same_as<Decay<T>, Domain<Fun>> and
-        Regular<T>
-    constexpr auto
-    flat_map(Fun fun) -> Codomain<Fun>
-    {
-        using elements::flat_map;
-        return flat_map(first(at(this)), limit(at(this)), fun);
     }
 };
 

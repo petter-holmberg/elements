@@ -102,7 +102,7 @@ using Result_type = std::invoke_result_t<Fun, Args...>;
 template <typename F, typename... Args>
 concept Invocable =
     requires(F&& f, Args&&... args) {
-        std::invoke(fw<F>(f), fw(args)...);
+        std::invoke(fw<F>(f), fw<Args>(args)...);
     };
 
 template <typename P>

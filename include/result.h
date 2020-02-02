@@ -148,7 +148,7 @@ struct result
     template <Unary_operation Op>
     requires Same_as<Decay<T>, Domain<Op>>
     constexpr auto
-    map(Op op) -> result<T, E>&
+    fmap(Op op) -> result<T, E>&
     {
         if (has_value) data.value = op(data.value);
         return at(this);
@@ -157,26 +157,12 @@ struct result
     template <Unary_function Fun>
     requires Same_as<Decay<T>, Domain<Fun>>
     constexpr auto
-    map(Fun fun) const -> result<Codomain<Fun>, E>
+    fmap(Fun fun) const -> result<Codomain<Fun>, E>
     {
         if (has_value) {
             return result<Codomain<Fun>, E>(fun(data.value));
         } else {
             return result<Codomain<Fun>, E>(failure<E>(data.error));
-        }
-    }
-
-    template <Unary_function Fun>
-    requires
-        Same_as<Decay<T>, Domain<Fun>> and
-        Same_as<Decay<E>, Error_type<Codomain<Fun>>>
-    constexpr auto
-    flat_map(Fun fun) const -> Codomain<Fun>
-    {
-        if (has_value) {
-            return fun(data.value);
-        } else {
-            return Codomain<Fun>(failure<E>(data.error));
         }
     }
 };
@@ -356,6 +342,34 @@ at(result<T, E>& x) -> T&
     //[[expects: has_value(x)]]
 {
     return x.data.value;
+}
+
+template <Movable T, Movable E, Unary_function Fun>
+requires
+    Same_as<Decay<T>, Domain<Fun>> and
+    Same_as<Decay<E>, Error_type<Codomain<Fun>>>
+constexpr auto
+operator&(result<T, E> const& x, Fun fun) -> Codomain<Fun>
+{
+    if (x.has_value) {
+        return fun(x.data.value);
+    } else {
+        return Codomain<Fun>(failure<E>(x.data.error));
+    }
+}
+
+template <Movable T, Movable E, Unary_function Fun>
+requires
+    Same_as<Decay<T>, Domain<Fun>> and
+    Same_as<Decay<E>, Error_type<Codomain<Fun>>>
+constexpr auto
+operator&(result<T, E>& x, Fun fun) -> Codomain<Fun>
+{
+    if (x.has_value) {
+        return fun(x.data.value);
+    } else {
+        return Codomain<Fun>(failure<E>(x.data.error));
+    }
 }
 
 template <Movable T, Movable E>

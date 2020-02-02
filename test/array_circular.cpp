@@ -276,10 +276,10 @@ SCENARIO ("Using circular array", "[array_circular]")
         auto fn0 = [](int const& i){ return e::array_circular<int>{i, -i}; };
         auto fn1 = [](int const& i){ return i + 0.5; };
 
-        static_assert(e::Monad<decltype(x), decltype(fn0)>);
-        static_assert(e::Functor<decltype(x), decltype(fn1)>);
+        static_assert(e::Monad<decltype(x)>);
+        static_assert(e::Functor<decltype(x)>);
 
-        auto y = x.flat_map(fn0).map(fn1);
+        auto y = chain(x, fn0).fmap(fn1);
 
         REQUIRE (e::size(y) == 10);
         REQUIRE (y[0] == 0.5);
@@ -294,3 +294,4 @@ SCENARIO ("Using circular array", "[array_circular]")
         REQUIRE (y[9] == -3.5);
     }
 }
+

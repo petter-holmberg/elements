@@ -97,7 +97,7 @@ struct list_singly_linked_front
         Same_as<Decay<T>, Domain<Fun>> and
         Same_as<Decay<T>, Codomain<Fun>>
     constexpr auto
-    map(Fun fun) -> list_singly_linked_front<T>&
+    fmap(Fun fun) -> list_singly_linked_front<T>&
     {
         using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
@@ -107,7 +107,7 @@ struct list_singly_linked_front
     template <Unary_function Fun>
     requires Same_as<Decay<T>, Domain<Fun>>
     constexpr auto
-    map(Fun fun) const -> list_singly_linked_front<Codomain<Fun>>
+    fmap(Fun fun) const -> list_singly_linked_front<Codomain<Fun>>
     {
         using elements::map;
         list_singly_linked_front<Codomain<Fun>> x;

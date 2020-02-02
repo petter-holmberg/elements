@@ -166,7 +166,7 @@ struct shared_base
     }
 
     template <Invocable Fun>
-    void map(Fun&& fun)
+    void fmap(Fun&& fun)
     {
         bool resolved{false};
         {
@@ -227,12 +227,12 @@ struct future
     future() = default;
 
     template <Invocable Fun>
-    auto map(Fun&& fun)
+    auto fmap(Fun&& fun)
     {
         auto pack = package<Result_type<Fun(Res)>()>([header_ = header, fun_ = fw<Fun>(fun)](){
             return fun_(header_->_r.back());
         });
-        header->map(mv(pack.first));
+        header->fmap(mv(pack.first));
         return get<1>(pack);
     }
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "flat_map.h"
 #include "list_doubly_linked.h"
 #include "lexicographical.h"
 #include "ordering.h"
@@ -123,7 +122,7 @@ struct list_doubly_linked_sentinel
         Same_as<Decay<T>, Domain<Fun>> and
         Same_as<Decay<T>, Codomain<Fun>>
     constexpr auto
-    map(Fun fun) -> list_doubly_linked_sentinel<T>&
+    fmap(Fun fun) -> list_doubly_linked_sentinel<T>&
     {
         using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
@@ -133,36 +132,12 @@ struct list_doubly_linked_sentinel
     template <Unary_function Fun>
     requires Same_as<Decay<T>, Domain<Fun>>
     constexpr auto
-    map(Fun fun) const -> list_doubly_linked_sentinel<Codomain<Fun>>
+    fmap(Fun fun) const -> list_doubly_linked_sentinel<Codomain<Fun>>
     {
         using elements::map;
         list_doubly_linked_sentinel<Codomain<Fun>> x;
         map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
         return x;
-    }
-
-    template <Unary_function Fun>
-    requires
-        Same_as<Decay<T>, Domain<Fun>> and
-        Same_as<list_doubly_linked_sentinel<Decay<T>>, Codomain<Fun>>
-    constexpr auto
-    flat_map(Fun fun) -> list_doubly_linked_sentinel<T>&
-    {
-        using elements::flat_map;
-        auto x = flat_map(first(at(this)), limit(at(this)), fun);
-        swap(at(this), x);
-        return at(this);
-    }
-
-    template <Unary_function Fun>
-    requires
-        Same_as<Decay<T>, Domain<Fun>> and
-        Regular<T>
-    constexpr auto
-    flat_map(Fun fun) -> Codomain<Fun>
-    {
-        using elements::flat_map;
-        return flat_map(first(at(this)), limit(at(this)), fun);
     }
 };
 

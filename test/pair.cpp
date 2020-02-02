@@ -45,9 +45,9 @@ SCENARIO ("Using pairs", "[pair]")
 
         auto fn = [](int const& i){ return i + 0.5; };
 
-        static_assert(e::Functor<decltype(x), decltype(fn)>);
+        static_assert(e::Functor<decltype(x)>);
 
-        auto y = x.map(fn);
+        auto y = x.fmap(fn);
 
         REQUIRE (e::get<0>(y) == 0.5);
         REQUIRE (e::get<1>(y) == 1.5);

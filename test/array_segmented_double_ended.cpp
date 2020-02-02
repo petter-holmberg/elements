@@ -1,13 +1,13 @@
 #include "catch.hpp"
 
 #include "affine_space.h"
-#include "array_segmented_single_ended.h"
+#include "array_segmented_double_ended.h"
 
 namespace e = elements;
 
-SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]")
+SCENARIO ("Using segmented double-ended array", "[array_segmented_double_ended]")
 {
-    e::array_segmented_single_ended<int> x{0, 1, 2, 3, 4};
+    e::array_segmented_double_ended<int> x{0, 1, 2, 3, 4};
     static_assert(e::Dynamic_sequence<decltype(x), e::back<decltype(x)>>);
     static_assert(e::Affine_space<e::Index_position_type<e::Position_type<decltype(x)>>>);
     static_assert(e::Affine_space<e::Segment_position_type<e::Position_type<decltype(x)>>>);
@@ -49,7 +49,7 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
         }
 
         {
-            e::array_segmented_single_ended<int> y{0, 1, 2, 3};
+            e::array_segmented_double_ended<int> y{0, 1, 2, 3};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -60,7 +60,7 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
         }
 
         {
-            e::array_segmented_single_ended<int> y{0, 1, 2, 3, 4, 5};
+            e::array_segmented_double_ended<int> y{0, 1, 2, 3, 4, 5};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -71,7 +71,7 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
         }
 
         {
-            e::array_segmented_single_ended<int> y{0, -1, -2, -3, -4};
+            e::array_segmented_double_ended<int> y{0, -1, -2, -3, -4};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -82,7 +82,7 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
         }
 
         {
-            e::array_segmented_single_ended<int> y{5, 6, 7, 8, 9};
+            e::array_segmented_double_ended<int> y{5, 6, 7, 8, 9};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -112,7 +112,7 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
         }
 
         {
-            e::array_segmented_single_ended<int> y{5, 6, 7, 8, 9};
+            e::array_segmented_double_ended<int> y{5, 6, 7, 8, 9};
             e::swap(x, y);
 
             CHECK (x[0] == 5);
@@ -128,15 +128,77 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
         }
     }
 
+    SECTION("Growing array")
+    {
+        e::array_segmented_double_ended<int, 3> y;
+        REQUIRE (e::size(y) == 0);
+
+        e::push(y, 0);
+        REQUIRE (e::size(y) == 1);
+        REQUIRE (e::capacity(y) == 3);
+        REQUIRE (y[0] == 0);
+
+        e::push(y, 1);
+        REQUIRE (e::size(y) == 2);
+        REQUIRE (e::capacity(y) == 3);
+        REQUIRE (y[0] == 0);
+        REQUIRE (y[1] == 1);
+
+        e::push(y, 2);
+        REQUIRE (e::size(y) == 3);
+        REQUIRE (e::capacity(y) == 6);
+        REQUIRE (y[0] == 0);
+        REQUIRE (y[1] == 1);
+        REQUIRE (y[2] == 2);
+
+        e::push(y, 3);
+        REQUIRE (e::size(y) == 4);
+        REQUIRE (e::capacity(y) == 6);
+        REQUIRE (y[0] == 0);
+        REQUIRE (y[1] == 1);
+        REQUIRE (y[2] == 2);
+        REQUIRE (y[3] == 3);
+
+        e::push_first(y, -1);
+        REQUIRE (e::size(y) == 5);
+        REQUIRE (e::capacity(y) == 6);
+        REQUIRE (y[0] == -1);
+        REQUIRE (y[1] == 0);
+        REQUIRE (y[2] == 1);
+        REQUIRE (y[3] == 2);
+        REQUIRE (y[4] == 3);
+
+        e::push_first(y, -2);
+        REQUIRE (e::size(y) == 6);
+        REQUIRE (e::capacity(y) == 9);
+        REQUIRE (y[0] == -2);
+        REQUIRE (y[1] == -1);
+        REQUIRE (y[2] == 0);
+        REQUIRE (y[3] == 1);
+        REQUIRE (y[4] == 2);
+        REQUIRE (y[5] == 3);
+
+        e::push_first(y, -3);
+        REQUIRE (e::size(y) == 7);
+        REQUIRE (e::capacity(y) == 9);
+        REQUIRE (y[0] == -3);
+        REQUIRE (y[1] == -2);
+        REQUIRE (y[2] == -1);
+        REQUIRE (y[3] == 0);
+        REQUIRE (y[4] == 1);
+        REQUIRE (y[5] == 2);
+        REQUIRE (y[6] == 3);
+    }
+
     SECTION ("Monadic interface")
     {
-        auto fn0 = [](int const& i){ return e::array_segmented_single_ended<int>{i, -i}; };
+        auto fn0 = [](int const& i){ return e::array_segmented_double_ended<int>{i, -i}; };
         auto fn1 = [](int const& i){ return i + 0.5; };
 
         static_assert(e::Monad<decltype(x)>);
         static_assert(e::Functor<decltype(x)>);
 
-        auto y = e::chain(x, fn0).fmap(fn1);
+        auto y = x.flat_map(fn0).fmap(fn1);
 
         REQUIRE (e::size(y) == 10);
         REQUIRE (y[0] == 0.5);
@@ -150,10 +212,10 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
         REQUIRE (y[8] == 4.5);
         REQUIRE (y[9] == -3.5);
 
-        auto fn2 = [](int const& i){ return e::array_segmented_single_ended<int, 3>{i, -i}; };
-        e::array_segmented_single_ended<int, 3> z{0, 1, 2, 3, 4, 5, 6, 7};
+        auto fn2 = [](int const& i){ return e::array_segmented_double_ended<int, 3>{i, -i}; };
+        e::array_segmented_double_ended<int, 3> z{0, 1, 2, 3, 4, 5, 6, 7};
 
-        auto w = e::chain(z, fn2).fmap(fn1);
+        auto w = z.flat_map(fn2).fmap(fn1);
 
         REQUIRE (e::size(w) == 16);
         REQUIRE (w[0] == 0.5);

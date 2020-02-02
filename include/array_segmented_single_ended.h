@@ -68,9 +68,23 @@ operator==(array_segmented_single_ended_position<T, k> const& x, array_segmented
 
 template <Movable T, pointer_diff k>
 constexpr auto
+index_pos(array_segmented_single_ended_position<T, k> const& x) -> Index_position_type<array_segmented_single_ended_position<T, k>> const&
+{
+    return x.pos_index;
+}
+
+template <Movable T, pointer_diff k>
+constexpr auto
 index_pos(array_segmented_single_ended_position<T, k>& x) -> Index_position_type<array_segmented_single_ended_position<T, k>>&
 {
     return x.pos_index;
+}
+
+template <Movable T, pointer_diff k>
+constexpr auto
+segment_pos(array_segmented_single_ended_position<T, k> const& x) -> Segment_position_type<array_segmented_single_ended_position<T, k>> const&
+{
+    return x.pos_segment;
 }
 
 template <Movable T, pointer_diff k>
@@ -105,14 +119,14 @@ template <Movable T, pointer_diff k>
 constexpr auto
 at(array_segmented_single_ended_position<T, k> const& x) -> T const&
 {
-    return at(local(x));
+    return at(segment_pos(x));
 }
 
 template <Movable T, pointer_diff k>
 constexpr auto
 at(array_segmented_single_ended_position<T, k>& x) -> T&
 {
-    return at(local(x));
+    return at(segment_pos(x));
 }
 
 template <Movable T, pointer_diff k>
@@ -165,7 +179,7 @@ struct array_segmented_single_ended
         Same_as<Decay<T>, Domain<Fun>> and
         Same_as<Decay<T>, Codomain<Fun>>
     constexpr auto
-    map(Fun fun) -> array_segmented_single_ended<T, k>&
+    fmap(Fun fun) -> array_segmented_single_ended<T, k>&
     {
         using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
@@ -175,7 +189,7 @@ struct array_segmented_single_ended
     template <Unary_function Fun>
     requires Same_as<Decay<T>, Domain<Fun>>
     constexpr auto
-    map(Fun fun) const -> array_segmented_single_ended<Codomain<Fun>, k>
+    fmap(Fun fun) const -> array_segmented_single_ended<Codomain<Fun>, k>
     {
         using elements::map;
         array_segmented_single_ended<Codomain<Fun>, k> x;
@@ -207,6 +221,13 @@ struct array_segmented_single_ended
         return flat_map(first(at(this)), limit(at(this)), fun);
     }
 };
+
+template <Movable T, Unary_function Fun>
+constexpr auto
+chain(array_segmented_single_ended<T>& x, Fun fun) -> array_segmented_single_ended<Value_type<Codomain<Fun>>>
+{
+    return x.flat_map(fun);
+}
 
 template <Movable T, pointer_diff k>
 struct value_type_t<array_segmented_single_ended<T, k>>

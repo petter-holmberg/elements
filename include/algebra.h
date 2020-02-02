@@ -4,6 +4,13 @@
 
 namespace elements {
 
+template <Regular T>
+constexpr auto
+axiom_Commutative(T const& a, T const& b) noexcept -> bool
+{
+    return a + b == b + a;
+}
+
 // Group-like
 
 template <typename S, typename Op>
@@ -77,6 +84,9 @@ S const Zero = zero_type_t<S>::value;
 
 template <Additive_semigroup S>
 S const zero_type_t<S>::value = S(0);
+
+template <Additive_semigroup S>
+constexpr auto zero = S::zero_v;
 
 template <Additive_semigroup S>
 struct identity_element_t<S, sum<S>>

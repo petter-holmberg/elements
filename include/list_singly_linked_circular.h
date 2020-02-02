@@ -1,6 +1,5 @@
 #pragma once
 
-#include "flat_map.h"
 #include "functional.h"
 #include "list_singly_linked.h"
 #include "lexicographical.h"
@@ -181,7 +180,7 @@ struct list_singly_linked_circular
         Same_as<Decay<T>, Domain<Fun>> and
         Same_as<Decay<T>, Codomain<Fun>>
     constexpr auto
-    map(Fun fun) -> list_singly_linked_circular<T>&
+    fmap(Fun fun) -> list_singly_linked_circular<T>&
     {
         using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
@@ -191,36 +190,12 @@ struct list_singly_linked_circular
     template <Unary_function Fun>
     requires Same_as<Decay<T>, Domain<Fun>>
     constexpr auto
-    map(Fun fun) const -> list_singly_linked_circular<Codomain<Fun>>
+    fmap(Fun fun) const -> list_singly_linked_circular<Codomain<Fun>>
     {
         using elements::map;
         list_singly_linked_circular<Codomain<Fun>> x;
         map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
         return x;
-    }
-
-    template <Unary_function Fun>
-    requires
-        Same_as<Decay<T>, Domain<Fun>> and
-        Same_as<list_singly_linked_circular<Decay<T>>, Codomain<Fun>>
-    constexpr auto
-    flat_map(Fun fun) -> list_singly_linked_circular<T>&
-    {
-        using elements::flat_map;
-        auto x = flat_map(first(at(this)), limit(at(this)), fun);
-        swap(at(this), x);
-        return at(this);
-    }
-
-    template <Unary_function Fun>
-    requires
-        Same_as<Decay<T>, Domain<Fun>> and
-        Regular<T>
-    constexpr auto
-    flat_map(Fun fun) -> Codomain<Fun>
-    {
-        using elements::flat_map;
-        return flat_map(first(at(this)), limit(at(this)), fun);
     }
 };
 

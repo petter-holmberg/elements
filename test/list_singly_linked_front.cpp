@@ -264,10 +264,10 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
         auto fn0 = [](int const& i){ return e::list_singly_linked_front<int>{i, -i}; };
         auto fn1 = [](int const& i){ return i + 0.5; };
 
-        static_assert(e::Monad<decltype(x), decltype(fn0)>);
-        static_assert(e::Functor<decltype(x), decltype(fn1)>);
+        static_assert(e::Monad<decltype(x)>);
+        static_assert(e::Functor<decltype(x)>);
 
-        auto y = x.map(fn1);
+        auto y = x.fmap(fn1);
 
         REQUIRE (e::size(y) == 5);
         REQUIRE (y[0] == 0.5);
@@ -291,7 +291,7 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
         REQUIRE (z[8] == 4);
         REQUIRE (z[9] == -4);
 
-        auto w = x.flat_map(fn0).map(fn1);
+        auto w = x.flat_map(fn0).fmap(fn1);
 
         REQUIRE (e::size(w) == 10);
         REQUIRE (w[0] == 0.5);
