@@ -400,8 +400,6 @@ template <typename S>
 requires Semiring<S>
 constexpr auto
 axiom_Semiring(S const& a, S const& b, S const& c) noexcept -> bool
-    //[[expects: a != Zero<S> && b != Zero<S> && c != Zero<S>]]
-    //[[expects: a != One<S> && b != One<S> && c != One<S>]]
 {
     if (!axiom_Additive_monoid(a, b, c)) return false;
     if (!axiom_Multiplicative_monoid(a, b, c)) return false;
@@ -419,6 +417,19 @@ concept Commutative_semiring =
     // axiom commutative(Mul_op) {
     //     Mul_op(a, b) == Mul_op(b, a);
     // }
+
+template <typename S>
+requires Commutative_semiring<S>
+constexpr auto
+axiom_Commutative_semiring(S const& a, S const& b, S const& c) noexcept -> bool
+{
+    if (!axiom_Semiring(a, b, c)) return false;
+
+    // Distributive
+    if (a * b != b * a) return false;
+
+    return true;
+}
 
 template <typename R, typename Add_op = sum<R>, typename Mul_op = product<R>>
 concept Ring =

@@ -167,6 +167,8 @@ It will return the position of the first subsequence in the first range that mat
 
 ## Algebra
 
+`bit` implements a type supporting the algebra of Boole and propositional logic. It is a `Commutative_semiring`, with addition represented by "xor" and multiplication represented by "and". The 16 possible logical operations on two bits are implemented over this semiring by the following named functions, in binary counting order: `contradiction`, `conjunction`, `nonimplication`, `projection_left`, `converse_nonimplication`, `projection_right`, `nonequivalence`, `disjunction`, `nondisjunction`, `equivalence`, `nonprojection_right`, `converse_implication`, `nonprojection_left`, `implication`, `nonconjunction`, `tautology`.
+
 `affine_point` implements an affine point type for use in linear algebra. It is an `Affine_space` over a `Vector_space` and a `Sequence`. By default it uses `array_k` for storage of the coordinates.
 
 `affine_vector` implements an affine vector type for use in linear algebra. It is both a `Semimodule` over a `Semiring` and a `Sequence`. If the `Semiring` is a `Field` it supports all operations on a `Vector_space`. By default it uses `array_k` for storage of the elements. It takes two optional operators for addition and multiplication of the semiring elements.
@@ -575,8 +577,26 @@ Index
 `none_of`
 `any_of`
 
+`contradiction`
+`conjunction`
+`nonimplication`
+`projection_left`
+`converse_nonimplication`
+`projection_right`
+`nonequivalence`
+`disjunction`
+`nondisjunction`
+`equivalence`
+`nonprojection_right`
+`converse_implication`
+`nonprojection_left`
+`implication`
+`nonconjunction`
+`tautology`
+
 # Data structures
 
+`bit`
 `affine_point`
 `affine_vector`
 `rational`

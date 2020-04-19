@@ -9,6 +9,7 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/array_segmented_double_ended.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array_single_ended.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array_k.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/bit.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/copy.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/combinatorics.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/count.cpp
