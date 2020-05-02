@@ -102,13 +102,13 @@ using Result_type = std::invoke_result_t<Fun, Args...>;
 template <typename F, typename... Args>
 concept Invocable =
     requires(F&& f, Args&&... args) {
-        std::invoke(fw<F>(f), fw<Args>(args)...);
+        invoke(fw<F>(f), fw<Args>(args)...);
     };
 
 template <typename P>
 concept Procedure =
     requires (Domain<P> const& x) {
-        Same_as<Arity<P>, std::size_t>;
+        Same_as<decltype(Arity<P>), std::size_t>;
     };
 
 template <typename F>
@@ -161,14 +161,14 @@ struct transpose_op
     constexpr auto
     operator()(Domain<Op> const& x, Domain<Op> const& y) -> Domain<Op>
     {
-        return op(y, x);
+        return invoke(op, y, x);
     }
 };
 
 template <typename P>
 concept Predicate =
     Functional_procedure<P> and
-    Same_as<Codomain<P>, bool>;
+    Boolean_testable<Codomain<P>>;
 
 template <typename P>
 concept Unary_predicate =
@@ -186,7 +186,7 @@ struct negation
     constexpr auto
     operator()(Domain<P> const& x) -> bool
     {
-        return !pred(x);
+        return !invoke(pred, x);
     }
 };
 
@@ -211,7 +211,7 @@ struct identity_relation
     constexpr auto
     operator()(Domain<R> const& x, Domain<R> const& y) -> bool
     {
-        return rel(x, y);
+        return invoke(rel, x, y);
     }
 };
 
@@ -226,7 +226,7 @@ struct complement
     constexpr auto
     operator()(Domain<R> const& x, Domain<R> const& y) -> bool
     {
-        return !rel(x, y);
+        return !invoke(rel, x, y);
     }
 };
 
@@ -241,7 +241,7 @@ struct converse
     constexpr auto
     operator()(Domain<R> const& x, Domain<R> const& y) -> bool
     {
-        return rel(y, x);
+        return invoke(rel, y, x);
     }
 };
 
@@ -256,7 +256,7 @@ struct complement_of_converse
     constexpr auto
     operator()(Domain<R> const& x, Domain<R> const& y) -> bool
     {
-        return !rel(y, x);
+        return !invoke(rel, y, x);
     }
 };
 

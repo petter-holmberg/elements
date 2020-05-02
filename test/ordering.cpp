@@ -23,7 +23,7 @@ auto operator==(s const& x, s const& y) -> bool
 
 auto operator!=(s const& x, s const& y) -> bool
 {
-    return x != y;
+    return !(x == y);
 }
 
 namespace elements {

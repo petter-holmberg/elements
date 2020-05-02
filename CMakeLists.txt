@@ -14,7 +14,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/include/data_structures")
 include_directories ("${PROJECT_SOURCE_DIR}/include/concepts")
 include_directories ("${PROJECT_SOURCE_DIR}/include/type_functions")
 set (CMAKE_BUILD_TYPE Release)
-set (CMAKE_CXX_COMPILER g++)
+set (CMAKE_CXX_COMPILER clang++-11)
 
 add_custom_target (
     cppcheck

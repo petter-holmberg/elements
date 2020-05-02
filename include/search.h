@@ -14,7 +14,7 @@ search_if(P pos, L lim, U pred) -> P
 //[[expects axiom: loadable_range(pos, lim)]]
 {
     while (precedes(pos, lim)) {
-        if (pred(load(pos))) break;
+        if (invoke(pred, load(pos))) break;
         increment(pos);
     }
     return pos;
@@ -27,19 +27,19 @@ requires
 constexpr auto
 search_if(P pos, P lim, U pred) -> P
 {
-    auto index_pos = index_pos(pos);
-    auto index_lim = index_pos(lim);
-    if (!precedes(index_pos, index_lim)) {
-        return {index_pos, search_if(segment_pos(pos), segment_pos(lim), pred)};
+    auto index_pos_ = index_pos(pos);
+    auto index_lim_ = index_pos(lim);
+    if (!precedes(index_pos_, index_lim_)) {
+        return {index_pos_, search_if(segment_pos(pos), segment_pos(lim), pred)};
     } else {
-        auto segment_pos = search_if(segment_pos(pos), limit(load(index_pos)), pred);
-        if (!precedes(segment_pos, limit(load(index_pos)))) return {index_pos, segment_pos};
+        auto segment_pos_ = search_if(segment_pos(pos), limit(load(index_pos_)), pred);
+        if (!precedes(segment_pos_, limit(load(index_pos_)))) return {index_pos_, segment_pos_};
         do {
-            increment(index_pos);
-            segment_pos = search_if(first(load(index_pos)), limit(load(index_pos)), pred);
-            if (!precedes(segment_pos, limit(load(index_pos)))) return {index_pos, segment_pos};
-        } while (precedes(index_pos, index_lim));
-        return {index_pos, segment_pos};
+            increment(index_pos_);
+            segment_pos_ = search_if(first(load(index_pos_)), limit(load(index_pos_)), pred);
+            if (!precedes(segment_pos_, limit(load(index_pos_)))) return {index_pos_, segment_pos_};
+        } while (precedes(index_pos_, index_lim_));
+        return {index_pos_, segment_pos_};
     }
 }
 
@@ -107,7 +107,7 @@ search_if_unguarded(P pos, U pred) -> P
 //[[expects axiom: loadable_range(pos, _)]]
 //[[expects axiom: any_of(pos, _, pred)]]
 {
-    while (!pred(load(pos))) increment(pos);
+    while (!invoke(pred, load(pos))) increment(pos);
     return pos;
 }
 
@@ -157,7 +157,7 @@ search_if_guarded(P first, P last, U pred, Value_type<P> const& sentinel) -> P
     auto pos = search_if_unguarded(first, pred);
     swap(at(last), temp);
     if (precedes(pos, last)) return pos;
-    if (pred(at(last))) return last;
+    if (invoke(pred, at(last))) return last;
     return successor(last);
 }
 

@@ -14,7 +14,7 @@ flat_map(P src, L lim, Fun fun) -> Codomain<Fun>
 {
     Codomain<Fun> x;
     while (precedes(src, lim)) {
-        auto y = fun(load(src));
+        auto y = invoke(fun, load(src));
         insert_range(y, I{x});
         increment(src);
     }
@@ -27,14 +27,14 @@ requires
     Same_as<Value_type<P>, Domain<Fun>> and
     Sequence<Codomain<Fun>> and
     requires (Codomain<Fun> x, Size_type<Codomain<Fun>> s) {
-        { reserve(x, s) }
+        reserve(x, s);
     }
 constexpr auto
 flat_map(P src, L lim, Fun fun) -> Codomain<Fun>
 {
     Codomain<Fun> x;
     while (precedes(src, lim)) {
-        auto y = fun(load(src));
+        auto y = invoke(fun, load(src));
         reserve(x, size(x) + size(y));
         insert_range(y, I{x});
         increment(src);

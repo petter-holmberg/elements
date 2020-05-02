@@ -266,13 +266,16 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 `Same_as` describes a pair of types that are the same.
 
-`Weakly_equality_comparable` describes a type with equality comparison operators that may not necessarily be callable twice.
-`Equality_comparable` describes a type with equality comparison operators that can be called multiple times.
+`Convertible_to` describes a pair of types where the first is implicitly and explicitly convertible to the second.
+
+`Boolean_testable` describes a type that is implicitly and explicitly convertible to `bool`.
+
+`Equality_comparable` describes a type with equality comparison operators.
 `Equality_comparable_with` describes two types with equality comparison operators defined between them.
 
 `Destructible` describes a type with a destructor.
 `Constructible` describes a type with a constructor.
-`Default_constructible` describes a type with a default constructor.
+`Default_initializable` describes a type for which the variable initialization `T t` is valid.
 `Move_constructible` describes a type with a move constructor.
 `Copy_constructible` describes a type with a copy constructor.
 `Assignable` describes a type with assignment operator.
@@ -360,7 +363,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 `Unary_operation` describes an `Operation` of `Arity` 1.
 `Binary_operation` describes an `Operation` of `Arity` 2.
 
-`Predicate` describes a `Functional_procedure` where the `Codomain` is `bool`.
+`Predicate` describes a `Functional_procedure` where the `Codomain` is `Boolean_testable`.
 `Unary_predicate` describes a `Predicate` of `Arity` 1.
 `Binary_predicate` describes a `Predicate` of `Arity` 2.
 
@@ -692,12 +695,11 @@ Index
 `Dynamic_sequence`
 
 `Same_as`
-`Weakly_equality_comparable`
 `Equality_comparable`
 `Equality_comparable_with`
 `Destructible`
 `Constructible`
-`Default_constructible`
+`Default_initializable`
 `Move_constructible`
 `Copy_constructible`
 `Assignable`

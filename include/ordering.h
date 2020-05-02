@@ -14,7 +14,7 @@ select_0_2(
     R rel) -> Domain<R>&
 //[[expects axiom: weak_ordering(rel)]]
 {
-    if (rel(b, a)) return b;
+    if (invoke(rel, b, a)) return b;
     return a;
 }
 
@@ -26,7 +26,7 @@ select_0_2(
     R rel) -> Domain<R> const&
 //[[expects axiom: weak_ordering(rel)]]
 {
-    if (rel(b, a)) return b;
+    if (invoke(rel, b, a)) return b;
     return a;
 }
 
@@ -56,7 +56,7 @@ select_1_2(
     R rel) -> Domain<R> const&
 //[[expects axiom: weak_ordering(rel)]]
 {
-    if (rel(b, a)) return a;
+    if (invoke(rel, b, a)) return a;
     return b;
 }
 
@@ -68,7 +68,7 @@ select_1_2(
     R rel) -> Domain<R>&
 //[[expects axiom: weak_ordering(rel)]]
 {
-    if (rel(b, a)) return a;
+    if (invoke(rel, b, a)) return a;
     return b;
 }
 
@@ -146,7 +146,7 @@ select_1_3_ab(
 //[[expects axiom: weak_ordering(rel)]]
 //[[expects: select_0_1(a, b, rel) == a]]
 {
-    if (!rel(c, b)) return b;
+    if (!invoke(rel, c, b)) return b;
     return select_1_2(a, c, rel);
 }
 
@@ -160,7 +160,7 @@ select_1_3_ab(
 //[[expects axiom: weak_ordering(rel)]]
 //[[expects: select_0_1(a, b, rel) == a]]
 {
-    if (!rel(c, b)) return b;
+    if (!invoke(rel, c, b)) return b;
     return select_1_2(a, c, rel);
 }
 
@@ -173,7 +173,7 @@ select_1_3(
     R rel) -> Domain<R> const&
 //[[expects axiom: weak_ordering(rel)]]
 {
-    if (rel(b, a))
+    if (invoke(rel, b, a))
         return select_1_3_ab(b, a, c, rel);
     else
         return select_1_3_ab(a, b, c, rel);
@@ -188,7 +188,7 @@ select_1_3(
     R rel) -> Domain<R>&
 //[[expects axiom: weak_ordering(rel)]]
 {
-    if (rel(b, a))
+    if (invoke(rel, b, a))
         return select_1_3_ab(b, a, c, rel);
     else
         return select_1_3_ab(a, b, c, rel);

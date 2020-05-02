@@ -109,15 +109,14 @@ is_empty(bounded_range<P, L> const& x) -> bool
 
 template <typename R>
 concept Range =
-    requires (R&& x) {
-        { first(x) } -> Position_type<R>;
+    requires (R& x) {
+        first(x);
         limit(x);
     } and
-    requires (R x, Size_type<R> i) {
-        { is_empty(x) } -> bool;
-        { size(x) } -> Size_type<R>;
-        { x[i] } -> Value_type<R> const&;
-        { x[i] } -> Value_type<R>&;
+    requires (R& x, Size_type<R> i) {
+        { is_empty(x) } -> Boolean_testable;
+        { size(x) } -> Same_as<Size_type<R>>;
+        { x[i] } -> Same_as<Value_type<R>&>;
         // axiom {
         //     is_empty(x) == limit(x) - first(x);
         // }
@@ -218,8 +217,8 @@ template <typename S, typename I = back<S>>
 concept Dynamic_sequence =
     Sequence<S> and
     requires (I s, Value_type<S> x) {
-        { insert(s, x) } -> I;
-        { erase(s) } -> I;
+        { insert(s, x) } -> Same_as<I>;
+        { erase(s) } -> Same_as<I>;
     };
 
 template <typename S>

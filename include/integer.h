@@ -5,7 +5,7 @@
 namespace elements {
 
 template <typename T>
-concept Integral = std::is_integral<T>::value;
+concept Integral = exposition_only::Is_integral<T>;
 
 template <Integral I>
 constexpr void

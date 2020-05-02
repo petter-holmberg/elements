@@ -13,7 +13,7 @@
 namespace elements {
 
 template <Movable T, pointer_diff k = 256>
-requires 0 < k and k <= std::numeric_limits<pointer_diff>::max() / sizeof(T)
+requires (0 < k) and (k <= std::numeric_limits<pointer_diff>::max() / sizeof(T))
 struct array_segmented_single_ended;
 
 template <Movable T, pointer_diff k>
@@ -137,7 +137,7 @@ precedes(array_segmented_single_ended_position<T, k> const& x, array_segmented_s
 }
 
 template <Movable T, pointer_diff k>
-requires 0 < k and k <= std::numeric_limits<pointer_diff>::max() / sizeof(T)
+requires (0 < k) and (k <= std::numeric_limits<pointer_diff>::max() / sizeof(T))
 struct array_segmented_single_ended
 {
     array_single_ended<array_single_ended<T>> index;

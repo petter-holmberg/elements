@@ -42,9 +42,10 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/swap.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/zip.cpp)
 
+
 add_executable (tests ${TEST_SOURCES})
 target_link_libraries (tests -lpthread Catch)
-#set_property (TARGET tests PROPERTY CXX_STANDARD 20)
+set_property (TARGET tests PROPERTY CXX_STANDARD 20)
 target_compile_options (
     tests
     PUBLIC
@@ -53,22 +54,21 @@ target_compile_options (
     -Wextra
     -Wshadow
     -Wnon-virtual-dtor
-    -Wno-old-style-cast
+    -Wold-style-cast
     -Wcast-align
     -Wunused
     -Woverloaded-virtual
     -Wpedantic
     -Wconversion
     -Wsign-conversion
-    -Wlogical-op
-    -Wuseless-cast
+    #-Wlogical-op
+    #-Wuseless-cast
     -Wdouble-promotion
     -Wformat=2
     #-Weffc++
     -Wno-unused-variable
     -pedantic
-    -std=c++2a
-    -fconcepts
+    -std=c++20
 )
 
 add_test (elements tests)

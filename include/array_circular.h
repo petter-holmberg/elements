@@ -11,7 +11,7 @@ namespace elements {
 template <Movable T>
 struct array_circular;
 
-template <Movable T>
+template <Constructible_from T>
 struct array_circular_position
 {
     Pointer_type<array_circular<T>> arr{};
@@ -29,13 +29,13 @@ struct array_circular_position
     {}
 };
 
-template <Movable T>
+template <Constructible_from T>
 struct value_type_t<array_circular_position<T>>
 {
     using type = T;
 };
 
-template <Movable T>
+template <Constructible_from T>
 struct difference_type_t<array_circular_position<T>>
 {
     using type = Difference_type<Pointer_type<T>>;

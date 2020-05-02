@@ -30,7 +30,7 @@ unit(Value_type<T>&& x) -> T
 template <typename M>
 concept Monad =
     requires (M m, Value_type<M>&& x, M(&fun)(Value_type<M>)) {
-        { unit<M>(fw<Value_type<M>>(x)) } -> M;
+        { unit<M>(fw<Value_type<M>>(x)) } -> Same_as<M>;
         m & fun;
     };
 
@@ -50,8 +50,8 @@ operator&(T&& x, Fun fun) -> Codomain<Fun>
 }
 
 template <typename T, Unary_function... Fs>
-constexpr auto
-chain(T x, Fs... funcs) -> Monad
+constexpr Monad auto
+chain(T x, Fs... funcs)
 {
     return (x & ... & funcs);
 }

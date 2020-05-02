@@ -35,13 +35,13 @@ struct position_type_t
 };
 
 template <typename T>
-using Position_type = typename position_type_t<T>::type;
-
-template <typename T>
 struct position_type_t<T const>
 {
-    using type = Position_type<T const>;
+    using type = Pointer_type<T const>;
 };
+
+template <typename T>
+using Position_type = typename position_type_t<T>::type;
 
 template <typename>
 struct size_type_t;
@@ -85,7 +85,7 @@ template <typename L>
 concept Loadable =
     Move_constructible<L> and
     requires (L const& x) {
-        { load(x) } -> Value_type<L> const&;
+        { load(x) } -> Same_as<Value_type<L> const&>;
     };
 
 template <typename T>
@@ -156,11 +156,11 @@ concept Mutable =
     Loadable<M> and
     Storable<M> and
     requires (M& x) {
-        { at(x) } -> Value_type<M>&;
-    } and
-    requires (M const& x) {
-        { at(x) } -> Value_type<M> const&;
+        { at(x) } -> Same_as<Value_type<M>&>;
     };
+
+static_assert(Mutable<int>);
+static_assert(Mutable<int*>);
 
 template <Constructible_from T>
 constexpr void
@@ -196,7 +196,7 @@ concept Limit =
     Regular<L> and
     Position<P> and
     requires (P const& pos, L const& lim) {
-        { precedes(pos, lim) } -> bool;
+        { precedes(pos, lim) } -> Boolean_testable;
     };
 
 template <Position P>
@@ -419,8 +419,8 @@ template <typename T>
 concept Indexed_position =
     Forward_position<T> and
     requires (T x, Difference_type<T> n) {
-        { x + n } -> T;
-        { x - x } -> Difference_type<T>;
+        { x + n } -> Same_as<T>;
+        { x - x } -> Same_as<Difference_type<T>>;
     };
 
 template <Position P>
@@ -1025,8 +1025,8 @@ concept Segmented_position =
     requires (P x) {
         Position<Index_position_type<P>>;
         Position<Segment_position_type<P>>;
-        { index_pos(x) } -> Index_position_type<P>;
-        { segment_pos(x) } -> Segment_position_type<P>;
+        { index_pos(x) } -> Same_as<Index_position_type<P>&>;
+        { segment_pos(x) } -> Same_as<Segment_position_type<P>&>;
     };
 
 }

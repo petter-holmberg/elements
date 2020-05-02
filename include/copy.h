@@ -64,7 +64,7 @@ copy_select(S src, L lim, D dst, P pred) -> D
 {
     auto pos{src};
     while (precedes(pos, lim)) {
-        if (pred(pos)) {
+        if (invoke(pred, pos)) {
             copy_step(pos, dst);
         } else {
             increment(pos);
@@ -87,7 +87,7 @@ struct predicate_load
     constexpr auto
     operator()(L const& x) -> bool
     {
-        return pred(load(x));
+        return invoke(pred, load(x));
     }
 };
 

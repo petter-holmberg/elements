@@ -139,7 +139,7 @@ struct list_singly_linked_front
         Same_as<Decay<T>, Domain<Fun>> and
         Regular<T>
     constexpr auto
-    flat_map(Fun fun) -> Codomain<Fun>
+    flat_map(Fun fun) const -> Codomain<Fun>
     {
         using elements::flat_map;
         return flat_map(first(at(this)), limit(at(this)), fun);

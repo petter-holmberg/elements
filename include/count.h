@@ -19,7 +19,7 @@ struct counter
     constexpr void
     operator()(Domain<U> const& x)
     {
-        if (pred(x)) increment(count);
+        if (invoke(pred, x)) increment(count);
     }
 };
 

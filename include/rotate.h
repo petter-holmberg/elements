@@ -5,8 +5,6 @@
 #include "reverse.h"
 #include "swap.h"
 
-#define concept concept bool // Use C++20 syntax
-
 namespace elements {
 
 template <Forward_position P, Limit<P> L>

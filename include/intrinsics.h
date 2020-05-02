@@ -8,9 +8,38 @@
 #include <type_traits>
 #include <utility>
 
-#define concept concept bool // Use C++20 syntax
-
 namespace elements {
+
+namespace exposition_only {
+
+template <typename T, typename U>
+constexpr auto Is_same = std::is_same_v<T, U>;
+
+template <typename T, typename U>
+constexpr auto Is_convertible = std::is_convertible_v<T, U>;
+
+template <typename T>
+constexpr auto Is_nothrow_destructible = std::is_nothrow_destructible_v<T>;
+
+template <typename T, typename ...Args>
+constexpr auto Is_constructible = std::is_constructible_v<T, Args...>;
+
+template <typename T>
+constexpr auto Is_lvalue_ref = std::is_lvalue_reference_v<T>;
+
+template <typename T>
+constexpr auto Is_integral = std::is_integral_v<T>;
+
+template <typename F, typename... Args>
+constexpr auto Is_nothrow_invocable = std::is_nothrow_invocable_v<F, Args...>;
+
+template <typename T, typename U>
+concept Same_as = std::is_same_v<T, U>;
+
+}
+
+template <typename T>
+using Add_rv_ref = std::add_rvalue_reference_t<T>;
 
 template <typename T>
 using Remove_const = std::remove_cv_t<T>;
@@ -40,6 +69,16 @@ constexpr auto
 mv(T&& x) noexcept -> Remove_ref<T>&&
 {
     return std::move(x);
+}
+
+template <typename F, typename... Args>
+using Invoke_result = std::invoke_result_t<F, Args...>;
+
+template <typename F, typename... Args>
+constexpr auto
+invoke(F&& f, Args&&... args) noexcept(exposition_only::Is_nothrow_invocable<F, Args...>) -> Invoke_result<F, Args...>
+{
+    return std::invoke(fw<F>(f), fw<Args>(args)...);
 }
 
 template <typename T>

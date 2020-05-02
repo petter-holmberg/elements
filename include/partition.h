@@ -28,7 +28,7 @@ partition_point_counted(P pos, Difference_type<P> dist, U pred) -> P
     {
         auto const half_dist = half(dist);
         auto const mid = pos + half_dist;
-        if (pred(load(mid))) {
+        if (invoke(pred, load(mid))) {
             dist = half_dist;
         } else {
             dist = dist - successor(half_dist);

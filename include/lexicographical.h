@@ -47,8 +47,8 @@ compare_lexicographical(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel) -> bool
     while (true) {
         if (!precedes(pos1, lim1)) return false;
         if (!precedes(pos0, lim0)) return true;
-        if (rel(load(pos0), load(pos1))) return true;
-        if (rel(load(pos1), load(pos0))) return false;
+        if (invoke(rel, load(pos0), load(pos1))) return true;
+        if (invoke(rel, load(pos1), load(pos0))) return false;
         increment(pos0);
         increment(pos1);
     }

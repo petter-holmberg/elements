@@ -15,10 +15,10 @@ reduce_nonempty(P pos, L lim, Op op, Fun fun) -> Domain<Op>
 //[[expects: precedes(pos, lim)]]
 //[[expects axiom: partially_associative(op)]]
 {
-    auto x = fun(pos);
+    auto x = invoke(fun, pos);
     increment(pos);
     while (precedes(pos, lim)) {
-        store(x, op(x, fun(pos)));
+        store(x, op(x, invoke(fun, pos)));
         increment(pos);
     }
     return x;
@@ -75,11 +75,11 @@ reduce_nonzeroes(P pos, L lim, Op op, Fun fun, Domain<Op> const& zero) -> Domain
     Domain<Op> x;
     do {
         if (!(precedes(pos, lim))) return zero;
-        store(x, fun(pos));
+        store(x, invoke(fun, pos));
         increment(pos);
     } while (x == zero);
     while (precedes(pos, lim)) {
-        auto y = fun(pos);
+        auto y = invoke(fun, pos);
         if (y != zero) store(x, op(x, y));
         increment(pos);
     }
@@ -108,7 +108,7 @@ reduce_balanced(P pos, L lim, Op op, Fun fun, Domain<Op> const& zero) -> Domain<
 {
     binary_counter<Op> counter(op, zero);
     while (precedes(pos, lim)) {
-        counter(fun(pos));
+        counter(invoke(fun, pos));
         increment(pos);
     }
     transpose_op<Op> transposed_op(op);

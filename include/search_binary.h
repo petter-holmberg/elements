@@ -21,7 +21,7 @@ struct search_binary_lower_predicate
     constexpr auto
     operator()(Domain<Rel> const& x)
     {
-        return !rel(x, value);
+        return !invoke(rel, x, value);
     }
 };
 
@@ -40,7 +40,7 @@ struct search_binary_upper_predicate
     constexpr auto
     operator()(Domain<Rel> const& x)
     {
-        return rel(value, x);
+        return invoke(rel, value, x);
     }
 };
 

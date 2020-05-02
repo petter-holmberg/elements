@@ -15,7 +15,7 @@ map(S src, L lim, D dst, Fun fun) -> D
 //[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (lim - src))]]
 {
     while (precedes(src, lim)) {
-        store(dst, fun(load(src)));
+        store(dst, invoke(fun, load(src)));
         increment(src);
         increment(dst);
     }
@@ -59,7 +59,7 @@ map(S0 src0, L0 lim0, S1 src1, D dst, Fun fun) -> D
 //[[expects axiom: not_overlapped_forward(src1, _, dst, dst + (_ - src1))]]
 {
     while (precedes(src0, lim0)) {
-        store(dst, fun(load(src0), load(src1)));
+        store(dst, invoke(fun, load(src0), load(src1)));
         increment(src0);
         increment(src1);
         increment(dst);

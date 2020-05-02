@@ -33,7 +33,7 @@ template <typename S>
 concept Additive_semigroup =
     Regular<S> and
     requires (S const& a) {
-        { a + a } -> S;
+        { a + a } -> Same_as<S>;
     };
     // axiom associative(+) {
     //     (a + b) + c == a + (b + c);
@@ -101,7 +101,7 @@ template <typename S>
 concept Multiplicative_semigroup =
     Regular<S> and
     requires (S const& a) {
-        { a * a } -> S;
+        { a * a } -> Same_as<S>;
     };
     // axiom associative(*) {
     //     (a * b) * c == a * (b * c);
@@ -292,8 +292,8 @@ template <typename G>
 concept Additive_group =
     Additive_monoid<G> and
     requires (G const& a) {
-        { -a } -> G;
-        { a - a } -> G;
+        { -a } -> Same_as<G>;
+        { a - a } -> Same_as<G>;
     };
     // axiom inverse(-, +, Zero<G>) {
     //     a + -a == Zero<G>;
@@ -342,8 +342,8 @@ template <typename G>
 concept Multiplicative_group =
     Multiplicative_monoid<G> and
     requires (G const& a) {
-        { reciprocal<G>{}(a) } -> G;
-        { a / a } -> G;
+        { reciprocal<G>{}(a) } -> Same_as<G>;
+        { a / a } -> Same_as<G>;
     };
     // axiom inverse(reciprocal, product<G>, One<G>) {
     //     a * reciprocal(a) == One<G>;
@@ -484,7 +484,7 @@ concept Left_semimodule =
     Monoid<V, V_add_op> and
     Commutative_semiring<S, S_add_op, S_mul_op> and
     requires (V const& v, S const& s) {
-        { s * v } -> V;
+        { s * v } -> Same_as<V>;
     };
     // axiom commutative(V_add_op) {
     //     V_add_op(a, b) == V_add_op(b, a);
@@ -509,7 +509,7 @@ concept Right_semimodule =
     Monoid<V, V_add_op> and
     Commutative_semiring<S, S_add_op, S_mul_op> and
     requires (V const& v, S const& s) {
-        { v * s } -> V;
+        { v * s } -> Same_as<V>;
     };
     // axiom commutative(V_add_op) {
     //     V_add_op(a, b) == V_add_op(b, a);

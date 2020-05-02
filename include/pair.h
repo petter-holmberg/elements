@@ -31,8 +31,8 @@ struct pair
     constexpr auto
     fmap(Fun fun) -> pair<T0>&
     {
-        m0 = fun(mv(m0));
-        m1 = fun(mv(m1));
+        m0 = invoke(fun, mv(m0));
+        m1 = invoke(fun, mv(m1));
         return *this;
     }
 
@@ -43,7 +43,7 @@ struct pair
     constexpr auto
     fmap(Fun fun) const -> pair<Codomain<Fun>>
     {
-        return {fun(m0), fun(m1)};
+        return {invoke(fun, m0), invoke(fun, m1)};
     }
 };
 

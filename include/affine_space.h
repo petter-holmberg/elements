@@ -11,10 +11,10 @@ concept Affine_space =
     Regular<P> and
     Vector_space<V, S> and
     requires (P const& p, V const& v) {
-        { p - p } -> V;
-        { p + v } -> P;
-        { v + p } -> P;
-        { p - v } -> P;
+        { p - p } -> Same_as<V>;
+        { p + v } -> Same_as<P>;
+        { v + p } -> Same_as<P>;
+        { p - v } -> Same_as<P>;
     };
 
 template <typename P, typename V = Difference_type<P>, typename S = Value_type<V>>
