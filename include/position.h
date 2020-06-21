@@ -821,6 +821,20 @@ precedes(forward_position<P> const& pos, L const& lim) -> bool
     return pos.pos != lim;
 }
 
+template <Forward_position P>
+constexpr void
+advance(P& pos, P lim)
+{
+    pos = lim;
+}
+
+template <Forward_position P, Limit<P> L>
+constexpr void
+advance(P& pos, L lim)
+{
+    while (precedes(pos, lim)) increment(pos);
+}
+
 template <Bidirectional_position P>
 constexpr auto
 operator-(P pos, Difference_type<P> dist) -> P
@@ -885,14 +899,14 @@ template <Bidirectional_position P>
 constexpr auto
 successor(bidirectional_position<P> const& pos) -> bidirectional_position<P>
 {
-    return {successor(pos.pos)};
+    return successor(pos.pos);
 }
 
 template <Bidirectional_position P>
 constexpr auto
 predecessor(bidirectional_position<P> const& pos) -> bidirectional_position<P>
 {
-    return {predecessor(pos.pos)};
+    return predecessor(pos.pos);
 }
 
 template <Bidirectional_position P>

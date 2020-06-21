@@ -96,6 +96,12 @@ This algorithm minimizes the cost of applying the operation if the size of a red
 
 `partition_point` takes a loadable forward range and a unary predicate, assuming that the range is partitioned according to the predicate. Using bisection, it returns the position of the first element satisfying the predicate.
 
+`partition_semistable` takes a mutable forward range and a unary prediate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It preserves the relative ordering of the elements not satisfying the predicate, but not the relative ordering of the elements satisfying the predicate. It returns the partition point, i.e. the position of the first element satisfying the predicate.
+
+`partition_with_buffer` takes a mutable forward range, the position of the first element of a mutable buffer with a size not less than the size of the forward range, and a unary prediate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It preserves the relative ordering of the elements on both sides of the partition point. It returns the partition point.
+
+`partition` takes a mutable bidirectional range and a unary prediate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It preserves the relative ordering of the elements on both sides of the partition point. It returns the partition point.
+
 ## Searching
 
 ### Binary search
@@ -120,6 +126,8 @@ For `search_not`, a match is defined as the first element `y` in the range for w
 For `search_if`, a match is defined as the first element `x` for which the given predicate is true.
 For `search_not`, a match is defined as the first element `y` for which the given predicate is false.
 
+`search_backward`, `search_backward_not`, `search_backward_if`, and `search_backward_if_not` are variations of the functions above that search backward through the loadable range.
+
 `search_unguarded`, `search_not_unguarded`, `search_if_unguarded`, and `search_if_not_unguarded` are variations of the functions above that assume an element satisfying the applied predicate is known to exist in the given range (which necessarily is nonempty). They take a position to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration. Iteration is faster because the end of the range doesn't need to be checked.
 
 `search_guarded`, `search_not_guarded`, `search_if_guarded`, and `search_if_not_guarded` are variations of the functions above that temporarily put a `sentinel` value at the last position of the range, to enable search nearly as fast as for the unguarded variations. They require the range to be `Mutable` and take the last position of the range instead of its limit. `search_not_guarded`, `search_if_guarded`, and `search_if_not_guarded` also take a sentinel value to be used to ensure termination.
@@ -133,7 +141,7 @@ stopping at the first position where an element and its successor satisfy the re
 
 ### Subsequence search
 
-`search_subsequence` takes two loadable ranges, the position of a mutable buffer of the `Difference_type` of the range position, with a size not less than the size of the second range, and an optional relation. The default relation is `equal`
+`search_subsequence` takes two loadable ranges, the position of the first element of a mutable buffer of the `Difference_type` of the range position, with a size not less than the size of the second range, and an optional relation. The default relation is `equal`
 It will return the position of the first subsequence in the first range that matches the second range, or the limit of the first range if no subsequence matching the second range is found.
 
 ## Permutations
@@ -544,6 +552,9 @@ Index
 `is_partitioned`
 `partition_point_counted`
 `partition_point`
+`partition_semistable`
+`partition_with_buffer`
+`partition`
 
 `search_binary_lower`
 `search_binary_upper`
@@ -553,6 +564,11 @@ Index
 `search_not`
 `search_if`
 `search_if_not`.
+
+`search_backward`
+`search_backward_not`
+`search_backward_if`
+`search_backward_if_not`
 
 `search_unguarded`,
 `search_not_unguarded`,

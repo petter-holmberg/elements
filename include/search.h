@@ -43,6 +43,23 @@ search_if(P pos, P lim, U pred) -> P
     }
 }
 
+template <Bidirectional_position P, Limit<P> L, Unary_predicate U>
+requires
+    Loadable<P> and
+    Same_as<Decay<Value_type<P>>, Domain<U>>
+constexpr auto
+search_backward_if(P pos, L lim, U pred) -> P
+//[[expects axiom: loadable_range(pos, lim)]]
+{
+    auto backward_lim = pos;
+    advance(pos, lim);
+    while (precedes(backward_lim, pos)) {
+        if (invoke(pred, load(predecessor(pos)))) break;
+        decrement(pos);
+    }
+    return pos;
+}
+
 template <Position P, Limit<P> L, Unary_predicate U>
 requires
     Loadable<P> and
@@ -64,6 +81,17 @@ search_if_not(P pos, P lim, U pred) -> P
     return search_if(mv(pos), mv(lim), negation{pred});
 }
 
+template <Bidirectional_position P, Limit<P> L, Unary_predicate U>
+requires
+    Loadable<P> and
+    Same_as<Decay<Value_type<P>>, Domain<U>>
+constexpr auto
+search_backward_if_not(P pos, L lim, U pred) -> P
+//[[expects axiom: loadable_range(pos, lim)]]
+{
+    return search_backward_if(mv(pos), mv(lim), negation{pred});
+}
+
 template <Position P, Limit<P> L, Equality_comparable_with<Value_type<P>> T>
 requires Loadable<P>
 constexpr auto
@@ -81,6 +109,15 @@ search(P pos, P lim, T const& value) -> P
     return search_if(mv(pos), mv(lim), equal_unary{value});
 }
 
+template <Bidirectional_position P, Limit<P> L, Equality_comparable_with<Value_type<P>> T>
+requires Loadable<P>
+constexpr auto
+search_backward(P pos, L lim, T const& value) -> P
+//[[expects axiom: loadable_range(pos, lim)]]
+{
+    return search_backward_if(mv(pos), mv(lim), equal_unary{value});
+}
+
 template <Position P, Limit<P> L, Equality_comparable_with<Value_type<P>> T>
 requires Loadable<P>
 constexpr auto
@@ -96,6 +133,15 @@ constexpr auto
 search_not(P pos, P lim, T const& value) -> P
 {
     return search_if_not(mv(pos), mv(lim), equal_unary{value});
+}
+
+template <Bidirectional_position P, Limit<P> L, Equality_comparable_with<Value_type<P>> T>
+requires Loadable<P>
+constexpr auto
+search_backward_not(P pos, L lim, T const& value) -> P
+//[[expects axiom: loadable_range(pos, lim)]]
+{
+    return search_backward_if_not(mv(pos), mv(lim), equal_unary{value});
 }
 
 template <Position P, Unary_predicate U>

@@ -36,6 +36,33 @@ SCENARIO ("Linear search", "[search]")
         }
     }
 
+    SECTION ("search_backward")
+    {
+        SECTION ("Searcing backward for an existing element")
+        {
+            auto pos = e::search_backward(x, x + 5, 2);
+            REQUIRE (!e::precedes(pos, x + 3));
+        }
+
+        SECTION ("Searching backward for a non-existing element")
+        {
+            auto pos = e::search_backward(x, x + 5, 5);
+            REQUIRE (pos == x);
+        }
+
+        SECTION ("Searching backward for the absence of an existing element")
+        {
+            auto pos = e::search_backward_not(x, x + 5, 0);
+            REQUIRE (!e::precedes(pos, x + 5));
+        }
+
+        SECTION ("Searching backward for the absence of a non-existing element")
+        {
+            auto pos = e::search_backward_not(x, x + 5, 5);
+            REQUIRE (pos == x + 5);
+        }
+    }
+
     SECTION ("search_if")
     {
         SECTION ("Searcing for an even element")
@@ -48,6 +75,21 @@ SCENARIO ("Linear search", "[search]")
         {
             auto pos = e::search_if_not(x, x + 5, is_even);
             REQUIRE (pos == x + 1);
+        }
+    }
+
+    SECTION ("search_backward_if")
+    {
+        SECTION ("Searcing for an even element")
+        {
+            auto pos = e::search_backward_if(x, x + 5, is_even);
+            REQUIRE (!e::precedes(pos, x + 5));
+        }
+
+        SECTION ("Searcing for an odd element")
+        {
+            auto pos = e::search_backward_if_not(x, x + 5, is_even);
+            REQUIRE (pos == x + 4);
         }
     }
 
