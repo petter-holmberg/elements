@@ -17,123 +17,123 @@ requires (0 < k) and (k <= std::numeric_limits<pointer_diff>::max() / sizeof(T))
 struct array_segmented_single_ended;
 
 template <Movable T, pointer_diff k>
-struct array_segmented_single_ended_position
+struct array_segmented_single_ended_cursor
 {
-    Pointer_type<array_single_ended<T>> pos_index{};
-    Pointer_type<T> pos_segment{};
+    Pointer_type<array_single_ended<T>> index{};
+    Pointer_type<T> segment{};
 
     constexpr
-    array_segmented_single_ended_position() = default;
+    array_segmented_single_ended_cursor() = default;
 
     constexpr
-    array_segmented_single_ended_position(
-        Pointer_type<array_single_ended<T>> index,
-        Pointer_type<T> segment
+    array_segmented_single_ended_cursor(
+        Pointer_type<array_single_ended<T>> index_,
+        Pointer_type<T> segment_
     )
-        : pos_index{index}
-        , pos_segment{segment}
+        : index{index_}
+        , segment{segment_}
     {}
 };
 
 template <Movable T, pointer_diff k>
-struct value_type_t<array_segmented_single_ended_position<T, k>>
+struct value_type_t<array_segmented_single_ended_cursor<T, k>>
 {
     using type = T;
 };
 
 template <Movable T, pointer_diff k>
-struct difference_type_t<array_segmented_single_ended_position<T, k>>
+struct difference_type_t<array_segmented_single_ended_cursor<T, k>>
 {
     using type = Difference_type<Pointer_type<T>>;
 };
 
 template <Movable T, pointer_diff k>
-struct index_position_type_t<array_segmented_single_ended_position<T, k>>
+struct index_cursor_type_t<array_segmented_single_ended_cursor<T, k>>
 {
     using type = Pointer_type<array_single_ended<T>>;
 };
 
 template <Movable T, pointer_diff k>
-struct segment_position_type_t<array_segmented_single_ended_position<T, k>>
+struct segment_cursor_type_t<array_segmented_single_ended_cursor<T, k>>
 {
     using type = Pointer_type<T>;
 };
 
 template <Movable T, pointer_diff k>
 constexpr auto
-operator==(array_segmented_single_ended_position<T, k> const& x, array_segmented_single_ended_position<T, k> const& y) -> bool
+operator==(array_segmented_single_ended_cursor<T, k> const& cur0, array_segmented_single_ended_cursor<T, k> const& cur1) -> bool
 {
-    return x.pos_index == y.pos_index and x.pos_segment == y.pos_segment;
+    return cur0.index == cur1.index and cur0.segment == cur1.segment;
 }
 
 template <Movable T, pointer_diff k>
 constexpr auto
-index_pos(array_segmented_single_ended_position<T, k> const& x) -> Index_position_type<array_segmented_single_ended_position<T, k>> const&
+index_cursor(array_segmented_single_ended_cursor<T, k> const& cur) -> Index_cursor_type<array_segmented_single_ended_cursor<T, k>> const&
 {
-    return x.pos_index;
+    return cur.index;
 }
 
 template <Movable T, pointer_diff k>
 constexpr auto
-index_pos(array_segmented_single_ended_position<T, k>& x) -> Index_position_type<array_segmented_single_ended_position<T, k>>&
+index_cursor(array_segmented_single_ended_cursor<T, k>& cur) -> Index_cursor_type<array_segmented_single_ended_cursor<T, k>>&
 {
-    return x.pos_index;
+    return cur.index;
 }
 
 template <Movable T, pointer_diff k>
 constexpr auto
-segment_pos(array_segmented_single_ended_position<T, k> const& x) -> Segment_position_type<array_segmented_single_ended_position<T, k>> const&
+segment_cursor(array_segmented_single_ended_cursor<T, k> const& cur) -> Segment_cursor_type<array_segmented_single_ended_cursor<T, k>> const&
 {
-    return x.pos_segment;
+    return cur.segment;
 }
 
 template <Movable T, pointer_diff k>
 constexpr auto
-segment_pos(array_segmented_single_ended_position<T, k>& x) -> Segment_position_type<array_segmented_single_ended_position<T, k>>&
+segment_cursor(array_segmented_single_ended_cursor<T, k>& cur) -> Segment_cursor_type<array_segmented_single_ended_cursor<T, k>>&
 {
-    return x.pos_segment;
+    return cur.segment;
 }
 
 template <Movable T, pointer_diff k>
 constexpr auto
-load(array_segmented_single_ended_position<T, k> const& x) -> T const&
+load(array_segmented_single_ended_cursor<T, k> const& cur) -> T const&
 {
-    return load(x.pos_segment);
+    return load(cur.segment);
 }
 
 template <Movable T, pointer_diff k>
 constexpr void
-store(array_segmented_single_ended_position<T, k>& x, T const& value)
+store(array_segmented_single_ended_cursor<T, k>& cur, T const& value)
 {
-    store(x.pos_segment, value);
+    store(cur.segment, value);
 }
 
 template <Movable T, pointer_diff k>
 constexpr void
-store(array_segmented_single_ended_position<T, k>& x, Value_type<T>&& value)
+store(array_segmented_single_ended_cursor<T, k>& cur, Value_type<T>&& value)
 {
-    store(x.pos_segment, fw<T>(value));
+    store(cur.segment, fw<T>(value));
 }
 
 template <Movable T, pointer_diff k>
 constexpr auto
-at(array_segmented_single_ended_position<T, k> const& x) -> T const&
+at(array_segmented_single_ended_cursor<T, k> const& cur) -> T const&
 {
-    return at(segment_pos(x));
+    return at(segment_cursor(cur));
 }
 
 template <Movable T, pointer_diff k>
 constexpr auto
-at(array_segmented_single_ended_position<T, k>& x) -> T&
+at(array_segmented_single_ended_cursor<T, k>& cur) -> T&
 {
-    return at(segment_pos(x));
+    return at(segment_cursor(cur));
 }
 
 template <Movable T, pointer_diff k>
 constexpr auto
-precedes(array_segmented_single_ended_position<T, k> const& x, array_segmented_single_ended_position<T, k> const& y) -> bool
+precedes(array_segmented_single_ended_cursor<T, k> const& cur0, array_segmented_single_ended_cursor<T, k> const& cur1) -> bool
 {
-    return precedes(x.pos_index, y.pos_index) or precedes(x.pos_segment, y.pos_segment);
+    return precedes(cur0.index, cur1.index) or precedes(cur0.segment, cur1.segment);
 }
 
 template <Movable T, pointer_diff k>
@@ -174,35 +174,35 @@ struct array_segmented_single_ended
         return index[i / k][i % k];
     }
 
-    template <Unary_function Fun>
+    template <Unary_function F>
     requires
-        Same_as<Decay<T>, Domain<Fun>> and
-        Same_as<Decay<T>, Codomain<Fun>>
+        Same_as<Decay<T>, Domain<F>> and
+        Same_as<Decay<T>, Codomain<F>>
     constexpr auto
-    fmap(Fun fun) -> array_segmented_single_ended<T, k>&
+    fmap(F fun) -> array_segmented_single_ended<T, k>&
     {
         using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
         return at(this);
     }
 
-    template <Unary_function Fun>
-    requires Same_as<Decay<T>, Domain<Fun>>
+    template <Unary_function F>
+    requires Same_as<Decay<T>, Domain<F>>
     constexpr auto
-    fmap(Fun fun) const -> array_segmented_single_ended<Codomain<Fun>, k>
+    fmap(F fun) const -> array_segmented_single_ended<Codomain<F>, k>
     {
         using elements::map;
-        array_segmented_single_ended<Codomain<Fun>, k> x;
+        array_segmented_single_ended<Codomain<F>, k> x;
         map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
         return x;
     }
 
-    template <Unary_function Fun>
+    template <Unary_function F>
     requires
-        Same_as<Decay<T>, Domain<Fun>> and
-        Same_as<array_segmented_single_ended<Decay<T>>, Codomain<Fun>>
+        Same_as<Decay<T>, Domain<F>> and
+        Same_as<array_segmented_single_ended<Decay<T>>, Codomain<F>>
     constexpr auto
-    flat_map(Fun fun) -> array_segmented_single_ended<T, k>&
+    flat_map(F fun) -> array_segmented_single_ended<T, k>&
     {
         using elements::flat_map;
         auto x = flat_map(first(at(this)), limit(at(this)), fun);
@@ -210,21 +210,21 @@ struct array_segmented_single_ended
         return at(this);
     }
 
-    template <Unary_function Fun>
+    template <Unary_function F>
     requires
-        Same_as<Decay<T>, Domain<Fun>> and
+        Same_as<Decay<T>, Domain<F>> and
         Regular<T>
     constexpr auto
-    flat_map(Fun fun) const -> Codomain<Fun>
+    flat_map(F fun) const -> Codomain<F>
     {
         using elements::flat_map;
         return flat_map(first(at(this)), limit(at(this)), fun);
     }
 };
 
-template <Movable T, Unary_function Fun>
+template <Movable T, Unary_function F>
 constexpr auto
-chain(array_segmented_single_ended<T>& x, Fun fun) -> array_segmented_single_ended<Value_type<Codomain<Fun>>>
+chain(array_segmented_single_ended<T>& x, F fun) -> array_segmented_single_ended<Value_type<Codomain<F>>>
 {
     return x.flat_map(fun);
 }
@@ -236,21 +236,21 @@ struct value_type_t<array_segmented_single_ended<T, k>>
 };
 
 template <Movable T, pointer_diff k>
-struct position_type_t<array_segmented_single_ended<T, k>>
+struct cursor_type_t<array_segmented_single_ended<T, k>>
 {
-    using type = array_segmented_single_ended_position<T, k>;
+    using type = array_segmented_single_ended_cursor<T, k>;
 };
 
 template <Movable T, pointer_diff k>
-struct position_type_t<array_segmented_single_ended<T, k> const>
+struct cursor_type_t<array_segmented_single_ended<T, k> const>
 {
-    using type = array_segmented_single_ended_position<T const, k>;
+    using type = array_segmented_single_ended_cursor<T const, k>;
 };
 
 template <Movable T, pointer_diff k>
 struct size_type_t<array_segmented_single_ended<T, k>>
 {
-    using type = Difference_type<array_segmented_single_ended_position<T, k>>;
+    using type = Difference_type<array_segmented_single_ended_cursor<T, k>>;
 };
 
 template <Movable T, pointer_diff k>
@@ -305,9 +305,9 @@ constexpr auto
 erase(back<array_segmented_single_ended<T, k>> arr) -> back<array_segmented_single_ended<T, k>>
 {
     auto& seq = base(arr);
-    auto pos{limit(seq)};
-    pop(at(index_pos(pos)));
-    if (is_empty(load(index_pos(pos)))) {
+    auto cur{limit(seq)};
+    pop(at(index_cursor(cur)));
+    if (is_empty(load(index_cursor(cur)))) {
         pop(seq.index);
     }
     return arr;
@@ -329,7 +329,7 @@ pop(array_segmented_single_ended<T, k>& arr)
 
 template <Movable T, pointer_diff k>
 constexpr auto
-first(array_segmented_single_ended<T, k> const& x) -> Position_type<array_segmented_single_ended<T, k>>
+first(array_segmented_single_ended<T, k> const& x) -> Cursor_type<array_segmented_single_ended<T, k>>
 {
     if (is_empty(x)) return {nullptr, nullptr};
     return {first(x.index), first(at(first(x.index)))};
@@ -337,7 +337,7 @@ first(array_segmented_single_ended<T, k> const& x) -> Position_type<array_segmen
 
 template <Movable T, pointer_diff k>
 constexpr auto
-limit(array_segmented_single_ended<T, k> const& x) -> Position_type<array_segmented_single_ended<T, k>>
+limit(array_segmented_single_ended<T, k> const& x) -> Cursor_type<array_segmented_single_ended<T, k>>
 {
     if (is_empty(x)) return {nullptr, nullptr};
     return {predecessor(limit(x.index)), limit(at(predecessor(limit(x.index))))};
@@ -345,7 +345,7 @@ limit(array_segmented_single_ended<T, k> const& x) -> Position_type<array_segmen
 
 template <Movable T, pointer_diff k>
 constexpr auto
-limit_of_storage(array_segmented_single_ended<T, k> const& x) -> Position_type<array_segmented_single_ended<T, k>>
+limit_of_storage(array_segmented_single_ended<T, k> const& x) -> Cursor_type<array_segmented_single_ended<T, k>>
 {
     if (is_empty(x)) return {nullptr, nullptr};
     return {predecessor(limit(x.index)), limit_of_storage(at(predecessor(limit(x.index))))};

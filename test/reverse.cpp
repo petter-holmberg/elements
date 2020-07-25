@@ -8,10 +8,10 @@ SCENARIO ("Using reverse", "[reverse]")
 {
     int x[]{0, 1, 2, 3, 4};
 
-    SECTION ("Bidirectional position")
+    SECTION ("Bidirectional cursor")
     {
-        auto first = e::bidirectional_position{x};
-        auto limit = e::bidirectional_position{x + 5};
+        auto first = e::bidirectional_cursor{x};
+        auto limit = e::bidirectional_cursor{x + 5};
 
         SECTION ("Reversing")
         {

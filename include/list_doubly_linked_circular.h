@@ -8,120 +8,120 @@
 namespace elements {
 
 template <Movable T>
-struct list_doubly_linked_circular_position
+struct list_doubly_linked_circular_cursor
 {
-    Pointer_type<list_node_doubly_linked<T>> pos{};
+    Pointer_type<list_node_doubly_linked<T>> cur{};
     Pointer_type<list_node_doubly_linked<T>> front{};
     Pointer_type<list_node_doubly_linked<T>> back{};
 
     constexpr
-    list_doubly_linked_circular_position() = default;
+    list_doubly_linked_circular_cursor() = default;
 
     explicit constexpr
-    list_doubly_linked_circular_position(
-        Pointer_type<list_node_doubly_linked<T>> pos_,
+    list_doubly_linked_circular_cursor(
+        Pointer_type<list_node_doubly_linked<T>> cur_,
         Pointer_type<list_node_doubly_linked<T>> front_,
         Pointer_type<list_node_doubly_linked<T>> back_)
-        : pos{pos_}
+        : cur{cur_}
         , front{front_}
         , back{back_}
     {}
 };
 
 template <Movable T>
-struct value_type_t<list_doubly_linked_circular_position<T>>
+struct value_type_t<list_doubly_linked_circular_cursor<T>>
 {
     using type = T;
 };
 
 template <Movable T>
-struct difference_type_t<list_doubly_linked_circular_position<T>>
+struct difference_type_t<list_doubly_linked_circular_cursor<T>>
 {
     using type = Difference_type<Pointer_type<list_node_doubly_linked<T>>>;
 };
 
 template <Movable T>
-bool operator==(list_doubly_linked_circular_position<T> const& x, list_doubly_linked_circular_position<T> const& y)
+bool operator==(list_doubly_linked_circular_cursor<T> const& cur0, list_doubly_linked_circular_cursor<T> const& cur1)
 {
-    return x.pos == y.pos and x.front == y.front and x.back == y.back;
+    return cur0.cur == cur1.cur and cur0.front == cur1.front and cur0.back == cur1.back;
 }
 
 template <Movable T>
 constexpr void
-increment(list_doubly_linked_circular_position<T>& x)
+increment(list_doubly_linked_circular_cursor<T>& cur)
 {
-    if (precedes(x.pos, x.back)) {
-        x.pos = next_link(x);
+    if (precedes(cur.cur, cur.back)) {
+        cur.cur = next_link(cur);
     } else {
-        x = {};
+        cur = {};
     }
 }
 
 template <Movable T>
 constexpr void
-decrement(list_doubly_linked_circular_position<T>& x)
+decrement(list_doubly_linked_circular_cursor<T>& cur)
 {
-    if (precedes(x.front, x.pos)) {
-        x.pos = prev_link(x);
+    if (precedes(cur.front, cur.cur)) {
+        cur.cur = prev_link(cur);
     } else {
-        x = {};
+        cur = {};
     }
 }
 
 template <Movable T>
 constexpr auto
-load(list_doubly_linked_circular_position<T> x) -> T const&
+load(list_doubly_linked_circular_cursor<T> cur) -> T const&
 {
-    return load(x.pos).x;
+    return load(cur.cur).x;
 }
 
 template <Movable T>
 constexpr void
-store(list_doubly_linked_circular_position<T>& x, T const& value)
+store(list_doubly_linked_circular_cursor<T>& cur, T const& value)
 {
-    store(x.pos, value);
+    store(cur.cur, value);
 }
 
 template <Movable T>
 constexpr void
-store(list_doubly_linked_circular_position<T>& x, T&& value)
+store(list_doubly_linked_circular_cursor<T>& cur, T&& value)
 {
-    store(x.pos, fw<T>(value));
+    store(cur.cur, fw<T>(value));
 }
 
 template <Movable T>
 constexpr auto
-at(list_doubly_linked_circular_position<T> const& x) -> T const&
+at(list_doubly_linked_circular_cursor<T> const& cur) -> T const&
 {
-    return load(x.pos).x;
+    return load(cur.cur).x;
 }
 
 template <Movable T>
 constexpr auto
-at(list_doubly_linked_circular_position<T>& x) -> T&
+at(list_doubly_linked_circular_cursor<T>& cur) -> T&
 {
-    return at(x.pos).x;
+    return at(cur.cur).x;
 }
 
 template <Movable T>
 constexpr auto
-next_link(list_doubly_linked_circular_position<T> const& x) -> Pointer_type<list_node_doubly_linked<T>>&
+next_link(list_doubly_linked_circular_cursor<T> const& cur) -> Pointer_type<list_node_doubly_linked<T>>&
 {
-    return at(x.pos).pos_next;
+    return at(cur.cur).next;
 }
 
 template <Movable T>
 constexpr auto
-prev_link(list_doubly_linked_circular_position<T> const& x) -> Pointer_type<list_node_doubly_linked<T>>&
+prev_link(list_doubly_linked_circular_cursor<T> const& cur) -> Pointer_type<list_node_doubly_linked<T>>&
 {
-    return at(x.pos).pos_prev;
+    return at(cur.cur).prev;
 }
 
 template <Movable T>
 constexpr auto
-precedes(list_doubly_linked_circular_position<T> const& x, list_doubly_linked_circular_position<T> const& y) -> bool
+precedes(list_doubly_linked_circular_cursor<T> const& cur0, list_doubly_linked_circular_cursor<T> const& cur1) -> bool
 {
-    return precedes(x.pos, y.pos);
+    return precedes(cur0.cur, cur1.cur);
 }
 
 template <Movable T>
@@ -186,38 +186,38 @@ struct list_doubly_linked_circular
     }
 
     constexpr auto
-    operator[](Difference_type<list_doubly_linked_circular_position<T>> i) -> T&
+    operator[](Difference_type<list_doubly_linked_circular_cursor<T>> i) -> T&
     {
-        auto pos = first(at(this)) + i;
-        return at(pos);
+        auto cur = first(at(this)) + i;
+        return at(cur);
     }
 
     constexpr auto
-    operator[](Difference_type<list_doubly_linked_circular_position<T>> i) const -> T const&
+    operator[](Difference_type<list_doubly_linked_circular_cursor<T>> i) const -> T const&
     {
-        auto pos = first(at(this)) + i;
-        return load(pos);
+        auto cur = first(at(this)) + i;
+        return load(cur);
     }
 
-    template <Unary_function Fun>
+    template <Unary_function F>
     requires
-        Same_as<Decay<T>, Domain<Fun>> and
-        Same_as<Decay<T>, Codomain<Fun>>
+        Same_as<Decay<T>, Domain<F>> and
+        Same_as<Decay<T>, Codomain<F>>
     constexpr auto
-    fmap(Fun fun) -> list_doubly_linked_circular<T>&
+    fmap(F fun) -> list_doubly_linked_circular<T>&
     {
         using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
         return at(this);
     }
 
-    template <Unary_function Fun>
-    requires Same_as<Decay<T>, Domain<Fun>>
+    template <Unary_function F>
+    requires Same_as<Decay<T>, Domain<F>>
     constexpr auto
-    fmap(Fun fun) const -> list_doubly_linked_circular<Codomain<Fun>>
+    fmap(F fun) const -> list_doubly_linked_circular<Codomain<F>>
     {
         using elements::map;
-        list_doubly_linked_circular<Codomain<Fun>> x;
+        list_doubly_linked_circular<Codomain<F>> x;
         map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
         return x;
     }
@@ -230,15 +230,15 @@ struct value_type_t<list_doubly_linked_circular<T>>
 };
 
 template <Movable T>
-struct position_type_t<list_doubly_linked_circular<T>>
+struct cursor_type_t<list_doubly_linked_circular<T>>
 {
-    using type = list_doubly_linked_circular_position<T>;
+    using type = list_doubly_linked_circular_cursor<T>;
 };
 
 template <Movable T>
-struct position_type_t<list_doubly_linked_circular<T const>>
+struct cursor_type_t<list_doubly_linked_circular<T const>>
 {
-    using type = list_doubly_linked_circular_position<T const>;
+    using type = list_doubly_linked_circular_cursor<T const>;
 };
 
 template <Movable T>
@@ -273,13 +273,13 @@ constexpr auto
 insert(front<list_doubly_linked_circular<T>> list, U&& x) -> front<list_doubly_linked_circular<T>>
 {
     auto& seq = base(list);
-    auto node = new list_node_doubly_linked{fw<U>(x), first(seq).pos, last(seq).pos};
+    auto node = new list_node_doubly_linked{fw<U>(x), first(seq).cur, last(seq).cur};
     if (is_empty(seq)) {
-        at(node).pos_next = node;
-        at(node).pos_prev = node;
+        at(node).next = node;
+        at(node).prev = node;
     } else {
-        at(at(seq.front).pos_prev).pos_next = node;
-        at(seq.front).pos_prev = node;
+        at(at(seq.front).prev).next = node;
+        at(seq.front).prev = node;
     }
     seq.front = node;
     return seq;
@@ -290,14 +290,14 @@ constexpr auto
 insert(back<list_doubly_linked_circular<T>> list, U&& x) -> back<list_doubly_linked_circular<T>>
 {
     auto& seq = base(list);
-    auto node = new list_node_doubly_linked{fw<U>(x), first(seq).pos, last(seq).pos};
+    auto node = new list_node_doubly_linked{fw<U>(x), first(seq).cur, last(seq).cur};
     if (is_empty(seq)) {
-        at(node).pos_next = node;
-        at(node).pos_prev = node;
+        at(node).next = node;
+        at(node).prev = node;
         seq.front = node;
     } else {
-        at(at(seq.front).pos_prev).pos_next = node;
-        at(seq.front).pos_prev = node;
+        at(at(seq.front).prev).next = node;
+        at(seq.front).prev = node;
     }
     return seq;
 }
@@ -307,26 +307,26 @@ constexpr auto
 insert(before<list_doubly_linked_circular<T>> list, U&& x) -> before<list_doubly_linked_circular<T>>
 {
     auto& seq = base(list);
-    auto node = new list_node_doubly_linked{fw<U>(x), first(seq).pos, last(seq).pos};
+    auto node = new list_node_doubly_linked{fw<U>(x), first(seq).cur, last(seq).cur};
     if (precedes(current(list), limit(list))) {
-        if (!precedes(seq.front, current(list).pos)) {
+        if (!precedes(seq.front, current(list).cur)) {
             seq.front = node;
         }
-        at(prev_link(current(list))).pos_next = node;
-        at(node).pos_prev = prev_link(current(list));
+        at(prev_link(current(list))).next = node;
+        at(node).prev = prev_link(current(list));
         prev_link(current(list)) = node;
-        at(node).pos_next = current(list).pos;
+        at(node).next = current(list).cur;
     } else {
         if (is_empty(seq)) {
-            at(node).pos_next = node;
-            at(node).pos_prev = node;
+            at(node).next = node;
+            at(node).prev = node;
             seq.front = node;
         } else {
-            at(seq.front).pos_prev = node;
-            at(at(node).pos_prev).pos_next = node;
+            at(seq.front).prev = node;
+            at(at(node).prev).next = node;
         }
     }
-    return before{seq, list_doubly_linked_circular_position{node, first(seq).pos, last(seq).pos}};
+    return before{seq, list_doubly_linked_circular_cursor{node, first(seq).cur, last(seq).cur}};
 }
 
 template <Movable T, Constructible_from<T> U>
@@ -334,23 +334,23 @@ constexpr auto
 insert(after<list_doubly_linked_circular<T>> list, U&& x) -> after<list_doubly_linked_circular<T>>
 {
     auto& seq = base(list);
-    auto node = new list_node_doubly_linked{fw<U>(x), first(seq).pos, last(seq).pos};
+    auto node = new list_node_doubly_linked{fw<U>(x), first(seq).cur, last(seq).cur};
     if (precedes(current(list), limit(list))) {
-        at(next_link(current(list))).pos_prev = node;
-        at(node).pos_next = next_link(current(list));
-        at(current(list).pos).pos_next = node;
-        at(node).pos_prev = current(list).pos;
+        at(next_link(current(list))).prev = node;
+        at(node).next = next_link(current(list));
+        at(current(list).cur).next = node;
+        at(node).prev = current(list).cur;
     } else {
         if (is_empty(seq)) {
-            at(node).pos_next = node;
-            at(node).pos_prev = node;
+            at(node).next = node;
+            at(node).prev = node;
             seq.front = node;
         } else {
-            at(seq.front).pos_prev = node;
-            at(at(node).pos_prev).pos_next = node;
+            at(seq.front).prev = node;
+            at(at(node).prev).next = node;
         }
     }
-    return after{seq, list_doubly_linked_circular_position{node, first(seq).pos, last(seq).pos}};
+    return after{seq, list_doubly_linked_circular_cursor{node, first(seq).cur, last(seq).cur}};
 }
 
 template <Movable T, Constructible_from<T> U>
@@ -386,15 +386,15 @@ constexpr auto
 erase(front<list_doubly_linked_circular<T>> list) -> front<list_doubly_linked_circular<T>>
 {
     auto& seq = base(list);
-    auto pos = seq.front;
-    if (precedes(seq.front, at(seq.front).pos_next)) {
-        at(at(pos).pos_prev).pos_next = at(pos).pos_next;
-        at(at(pos).pos_next).pos_prev = at(pos).pos_prev;
-        seq.front = at(pos).pos_next;
+    auto cur = seq.front;
+    if (precedes(seq.front, at(seq.front).next)) {
+        at(at(cur).prev).next = at(cur).next;
+        at(at(cur).next).prev = at(cur).prev;
+        seq.front = at(cur).next;
     } else {
         seq.front = {};
     }
-    delete pos;
+    delete cur;
     return list;
 }
 
@@ -403,14 +403,14 @@ constexpr auto
 erase(back<list_doubly_linked_circular<T>> list) -> back<list_doubly_linked_circular<T>>
 {
     auto& seq = base(list);
-    auto pos = at(seq.front).pos_prev;
-    if (precedes(seq.front, at(seq.front).pos_next)) {
-        at(at(pos).pos_prev).pos_next = seq.front;
-        at(seq.front).pos_prev = at(pos).pos_prev;
+    auto cur = at(seq.front).prev;
+    if (precedes(seq.front, at(seq.front).next)) {
+        at(at(cur).prev).next = seq.front;
+        at(seq.front).prev = at(cur).prev;
     } else {
         seq.front = {};
     }
-    delete pos;
+    delete cur;
     return list;
 }
 
@@ -419,18 +419,18 @@ constexpr auto
 erase(before<list_doubly_linked_circular<T>> list) -> before<list_doubly_linked_circular<T>>
 {
     auto& seq = base(list);
-    auto& node = at(current(list).pos);
-    auto pos = node.pos_prev;
-    if (precedes(seq.front, at(seq.front).pos_next)) {
-        if (!precedes(seq.front, pos)) {
-            seq.front = current(list).pos;
+    auto& node = at(current(list).cur);
+    auto cur = node.prev;
+    if (precedes(seq.front, at(seq.front).next)) {
+        if (!precedes(seq.front, cur)) {
+            seq.front = current(list).cur;
         }
-        node.pos_prev = at(pos).pos_prev;
-        at(at(pos).pos_prev).pos_next = current(list).pos;
+        node.prev = at(cur).prev;
+        at(at(cur).prev).next = current(list).cur;
     } else {
         seq.front = {};
     }
-    delete pos;
+    delete cur;
     return list;
 }
 
@@ -439,18 +439,18 @@ constexpr auto
 erase(after<list_doubly_linked_circular<T>> list) -> after<list_doubly_linked_circular<T>>
 {
     auto& seq = base(list);
-    auto& node = at(current(list).pos);
-    auto pos = node.pos_next;
-    if (precedes(seq.front, at(seq.front).pos_next)) {
-        if (!precedes(seq.front, pos)) {
-            seq.front = at(pos).pos_next;
+    auto& node = at(current(list).cur);
+    auto cur = node.next;
+    if (precedes(seq.front, at(seq.front).next)) {
+        if (!precedes(seq.front, cur)) {
+            seq.front = at(cur).next;
         }
-        node.pos_next = at(pos).pos_next;
-        at(at(pos).pos_next).pos_prev = at(pos).pos_prev;
+        node.next = at(cur).next;
+        at(at(cur).next).prev = at(cur).prev;
     } else {
         seq.front = {};
     }
-    delete pos;
+    delete cur;
     return list;
 }
 
@@ -477,29 +477,29 @@ pop_last(list_doubly_linked_circular<T>& list)
 
 template <Movable T>
 constexpr auto
-first(list_doubly_linked_circular<T> const& x) -> Position_type<list_doubly_linked_circular<T>>
+first(list_doubly_linked_circular<T> const& x) -> Cursor_type<list_doubly_linked_circular<T>>
 {
     if (is_empty(x)) {
         return {};
     } else {
-        return list_doubly_linked_circular_position{x.front, x.front, at(x.front).pos_prev};
+        return list_doubly_linked_circular_cursor{x.front, x.front, at(x.front).prev};
     }
 }
 
 template <Movable T>
 constexpr auto
-last(list_doubly_linked_circular<T> const& x) -> Position_type<list_doubly_linked_circular<T>>
+last(list_doubly_linked_circular<T> const& x) -> Cursor_type<list_doubly_linked_circular<T>>
 {
     if (is_empty(x)) {
         return {};
     } else {
-        return list_doubly_linked_circular_position{at(x.front).pos_prev, x.front, at(x.front).pos_prev};
+        return list_doubly_linked_circular_cursor{at(x.front).prev, x.front, at(x.front).prev};
     }
 }
 
 template <Movable T>
 constexpr auto
-limit(list_doubly_linked_circular<T> const&) -> Position_type<list_doubly_linked_circular<T>>
+limit(list_doubly_linked_circular<T> const&) -> Cursor_type<list_doubly_linked_circular<T>>
 {
     return {};
 }

@@ -12,16 +12,16 @@ template <Movable T>
 struct array_circular;
 
 template <Constructible_from T>
-struct array_circular_position
+struct array_circular_cursor
 {
     Pointer_type<array_circular<T>> arr{};
     Difference_type<Pointer_type<T>> i{Zero<Difference_type<Pointer_type<T>>>};
 
     constexpr
-    array_circular_position() = default;
+    array_circular_cursor() = default;
 
     explicit constexpr
-    array_circular_position(
+    array_circular_cursor(
         Pointer_type<array_circular<T>> arr_,
         Difference_type<Pointer_type<T>> i_ = Zero<Difference_type<Pointer_type<T>>>)
         : arr{arr_}
@@ -30,78 +30,78 @@ struct array_circular_position
 };
 
 template <Constructible_from T>
-struct value_type_t<array_circular_position<T>>
+struct value_type_t<array_circular_cursor<T>>
 {
     using type = T;
 };
 
 template <Constructible_from T>
-struct difference_type_t<array_circular_position<T>>
+struct difference_type_t<array_circular_cursor<T>>
 {
     using type = Difference_type<Pointer_type<T>>;
 };
 
 template <Movable T>
 constexpr auto
-operator==(array_circular_position<T> const& x, array_circular_position<T> const& y) -> bool
+operator==(array_circular_cursor<T> const& cur0, array_circular_cursor<T> const& cur1) -> bool
 {
-    return x.arr == y.arr and x.i == y.i;
+    return cur0.arr == cur1.arr and cur0.i == cur1.i;
 }
 
 template <Movable T>
 constexpr void
-increment(array_circular_position<T>& x)
+increment(array_circular_cursor<T>& cur)
 {
-    increment(x.i);
+    increment(cur.i);
 }
 
 template <Movable T>
 constexpr void
-decrement(array_circular_position<T>& x)
+decrement(array_circular_cursor<T>& cur)
 {
-    decrement(x.i);
+    decrement(cur.i);
 }
 
 template <Movable T>
 constexpr auto
-load(array_circular_position<T> const& x) -> T const&
+load(array_circular_cursor<T> const& cur) -> T const&
 {
-    return load(x.arr)[x.i];
+    return load(cur.arr)[cur.i];
 }
 
 template <Movable T>
 constexpr void
-store(array_circular_position<T>& x, T const& value)
+store(array_circular_cursor<T>& cur, T const& value)
 {
-    at(x.arr)[x.i] = value;
+    at(cur.arr)[cur.i] = value;
 }
 
 template <Movable T>
 constexpr void
-store(array_circular_position<T>& x, Value_type<T>&& value)
+store(array_circular_cursor<T>& cur, Value_type<T>&& value)
 {
-    at(x.arr)[x.i] = fw<T>(value);
+    at(cur.arr)[cur.i] = fw<T>(value);
 }
 
 template <Movable T>
 constexpr auto
-at(array_circular_position<T> const& x) -> T const&
+at(array_circular_cursor<T> const& cur) -> T const&
 {
-    return load(x.arr)[x.i];
+    return load(cur.arr)[cur.i];
 }
 
 template <Movable T>
 constexpr auto
-at(array_circular_position<T>& x) -> T&
+at(array_circular_cursor<T>& cur) -> T&
 {
-    return at(x.arr)[x.i];
+    return at(cur.arr)[cur.i];
 }
 
 template <Movable T>
 constexpr auto
-precedes(array_circular_position<T> const& x, array_circular_position<T> const& y) -> bool
+precedes(array_circular_cursor<T> const& cur0, array_circular_cursor<T> const& cur1) -> bool
 {
-    return x.i != y.i;
+    return cur0.i != cur1.i;
 }
 
 template <Movable T>
@@ -230,25 +230,25 @@ struct array_circular
         }
     }
 
-    template <Unary_function Fun>
+    template <Unary_function F>
     requires
-        Same_as<Decay<T>, Domain<Fun>> and
-        Same_as<Decay<T>, Codomain<Fun>>
+        Same_as<Decay<T>, Domain<F>> and
+        Same_as<Decay<T>, Codomain<F>>
     constexpr auto
-    fmap(Fun fun) -> array_circular<T>&
+    fmap(F fun) -> array_circular<T>&
     {
         using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
         return at(this);
     }
 
-    template <Unary_function Fun>
-    requires Same_as<Decay<T>, Domain<Fun>>
+    template <Unary_function F>
+    requires Same_as<Decay<T>, Domain<F>>
     constexpr auto
-    fmap(Fun fun) const -> array_circular<Codomain<Fun>>
+    fmap(F fun) const -> array_circular<Codomain<F>>
     {
         using elements::map;
-        array_circular<Codomain<Fun>> x;
+        array_circular<Codomain<F>> x;
         reserve(x, size(at(this)));
         map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
         at(x.header).limit = at(x.header).limit_of_storage;
@@ -263,15 +263,15 @@ struct value_type_t<array_circular<T>>
 };
 
 template <Movable T>
-struct position_type_t<array_circular<T>>
+struct cursor_type_t<array_circular<T>>
 {
-    using type = array_circular_position<T>;
+    using type = array_circular_cursor<T>;
 };
 
 template <Movable T>
-struct position_type_t<array_circular<T> const>
+struct cursor_type_t<array_circular<T> const>
 {
-    using type = array_circular_position<T const>;
+    using type = array_circular_cursor<T const>;
 };
 
 template <Movable T>
@@ -310,11 +310,11 @@ reserve(
 {
     if (n < size(x) or n == capacity(x)) return;
     array_circular<T> temp(n);
-    auto pos = first(x);
+    auto cur = first(x);
     auto dst = first(temp) + offset;
-    while (precedes(pos, limit(x))) {
-        construct(at(dst), mv(at(pos)));
-        increment(pos);
+    while (precedes(cur, limit(x))) {
+        construct(at(dst), mv(at(cur)));
+        increment(cur);
         increment(dst);
     }
     at(temp.header).first = at(temp.header).first + offset;
@@ -446,18 +446,18 @@ pop_first(array_circular<T>& arr)
 
 template <Movable T>
 constexpr auto
-first(array_circular<T> const& x) -> Position_type<array_circular<T>>
+first(array_circular<T> const& x) -> Cursor_type<array_circular<T>>
 {
     if (x.header == nullptr) return {};
-    return array_circular_position{const_cast<Pointer_type<array_circular<T>>>(pointer_to(x))};
+    return array_circular_cursor{const_cast<Pointer_type<array_circular<T>>>(pointer_to(x))};
 }
 
 template <Movable T>
 constexpr auto
-limit(array_circular<T> const& x) -> Position_type<array_circular<T>>
+limit(array_circular<T> const& x) -> Cursor_type<array_circular<T>>
 {
     if (x.header == nullptr) return {};
-    return array_circular_position{const_cast<Pointer_type<array_circular<T>>>(pointer_to(x)), size(x)};
+    return array_circular_cursor{const_cast<Pointer_type<array_circular<T>>>(pointer_to(x)), size(x)};
 }
 
 template <Movable T>

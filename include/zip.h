@@ -5,7 +5,7 @@
 
 namespace elements {
 
-template <Position S0, Limit<S0> L0, Position S1, Limit<S1> L1, Position D>
+template <Cursor S0, Limit<S0> L0, Cursor S1, Limit<S1> L1, Cursor D>
 requires
     Loadable<S0> and
     Loadable<S1> and
@@ -25,7 +25,7 @@ zip(S0 src0, L0 lim0, S1 src1, L1 lim1, D dst) -> D
     return copy(src1, lim1, dst);
 }
 
-template <Position S, Limit<S> L, Position D0, Position D1>
+template <Cursor S, Limit<S> L, Cursor D0, Cursor D1>
 requires
     Loadable<S> and
     Storable<D0> and

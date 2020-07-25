@@ -9,8 +9,8 @@ SCENARIO ("Using segmented double-ended array", "[array_segmented_double_ended]"
 {
     e::array_segmented_double_ended<int> x{0, 1, 2, 3, 4};
     static_assert(e::Dynamic_sequence<decltype(x), e::back<decltype(x)>>);
-    static_assert(e::Affine_space<e::Index_position_type<e::Position_type<decltype(x)>>>);
-    static_assert(e::Affine_space<e::Segment_position_type<e::Position_type<decltype(x)>>>);
+    static_assert(e::Affine_space<e::Index_cursor_type<e::Cursor_type<decltype(x)>>>);
+    static_assert(e::Affine_space<e::Segment_cursor_type<e::Cursor_type<decltype(x)>>>);
 
     REQUIRE (e::axiom_Regular(x));
 

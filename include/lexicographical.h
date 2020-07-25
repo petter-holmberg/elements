@@ -5,64 +5,64 @@
 
 namespace elements {
 
-template <Position P0, Limit<P0> L0, Position P1, Limit<P1> L1, Relation Rel>
+template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation R>
 requires
-    Loadable<P0> and
-    Loadable<P1> and
-    Same_as<Decay<Value_type<P0>>, Decay<Value_type<P1>>> and
-    Same_as<Decay<Value_type<P0>>, Domain<Rel>>
+    Loadable<C0> and
+    Loadable<C1> and
+    Same_as<Decay<Value_type<C0>>, Decay<Value_type<C1>>> and
+    Same_as<Decay<Value_type<C0>>, Domain<R>>
 constexpr auto
-equivalent_lexicographical(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel) -> bool
-//[[expects axiom: loadable_range(pos0, lim0)]]
-//[[expects axiom: loadable_range(pos0, lim1)]]
+equivalent_lexicographical(C0 cur0, L0 lim0, C1 cur1, L1 lim1, R rel) -> bool
+//[[expects axiom: loadable_range(cur0, lim0)]]
+//[[expects axiom: loadable_range(cur0, lim1)]]
 //[[expects axiom: equivalence(rel)]]
 {
-    auto pos{search_mismatch(mv(pos0), lim0, mv(pos1), lim1, rel)};
-    return !precedes(get<0>(pos), lim0) and !precedes(get<1>(pos), lim1);
+    auto cur{search_mismatch(mv(cur0), lim0, mv(cur1), lim1, rel)};
+    return !precedes(get<0>(cur), lim0) and !precedes(get<1>(cur), lim1);
 }
 
-template <Position P0, Limit<P0> L0, Position P1, Limit<P1> L1>
+template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1>
 requires
-    Loadable<P0> and
-    Loadable<P1> and
-    Same_as<Decay<Value_type<P0>>, Decay<Value_type<P1>>>
+    Loadable<C0> and
+    Loadable<C1> and
+    Same_as<Decay<Value_type<C0>>, Decay<Value_type<C1>>>
 constexpr auto
-equal_lexicographical(P0 pos0, L0 lim0, P1 pos1, L1 lim1) -> bool
+equal_lexicographical(C0 cur0, L0 lim0, C1 cur1, L1 lim1) -> bool
 {
-    return equivalent_lexicographical(mv(pos0), lim0, mv(pos1), lim1, equal<Value_type<P0>>{});
+    return equivalent_lexicographical(mv(cur0), lim0, mv(cur1), lim1, equal<Value_type<C0>>{});
 }
 
-template <Position P0, Limit<P0> L0, Position P1, Limit<P1> L1, Relation Rel>
+template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation R>
 requires
-    Loadable<P0> and
-    Loadable<P1> and
-    Same_as<Decay<Value_type<P0>>, Decay<Value_type<P1>>> and
-    Same_as<Decay<Value_type<P0>>, Domain<Rel>>
+    Loadable<C0> and
+    Loadable<C1> and
+    Same_as<Decay<Value_type<C0>>, Decay<Value_type<C1>>> and
+    Same_as<Decay<Value_type<C0>>, Domain<R>>
 constexpr auto
-compare_lexicographical(P0 pos0, L0 lim0, P1 pos1, L1 lim1, Rel rel) -> bool
-//[[expects axiom: loadable_range(pos0, lim0)]]
-//[[expects axiom: loadable_range(pos0, lim1)]]
+compare_lexicographical(C0 cur0, L0 lim0, C1 cur1, L1 lim1, R rel) -> bool
+//[[expects axiom: loadable_range(cur0, lim0)]]
+//[[expects axiom: loadable_range(cur0, lim1)]]
 //[[expects axiom: weak_ordering(rel)]]
 {
     while (true) {
-        if (!precedes(pos1, lim1)) return false;
-        if (!precedes(pos0, lim0)) return true;
-        if (invoke(rel, load(pos0), load(pos1))) return true;
-        if (invoke(rel, load(pos1), load(pos0))) return false;
-        increment(pos0);
-        increment(pos1);
+        if (!precedes(cur1, lim1)) return false;
+        if (!precedes(cur0, lim0)) return true;
+        if (invoke(rel, load(cur0), load(cur1))) return true;
+        if (invoke(rel, load(cur1), load(cur0))) return false;
+        increment(cur0);
+        increment(cur1);
     }
 }
 
-template <Position P0, Limit<P0> L0, Position P1, Limit<P1> L1>
+template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1>
 requires
-    Loadable<P0> and
-    Loadable<P1> and
-    Same_as<Decay<Value_type<P0>>, Decay<Value_type<P1>>>
+    Loadable<C0> and
+    Loadable<C1> and
+    Same_as<Decay<Value_type<C0>>, Decay<Value_type<C1>>>
 constexpr auto
-less_lexicographical(P0 pos0, L0 lim0, P1 pos1, L1 lim1) -> bool
+less_lexicographical(C0 cur0, L0 lim0, C1 cur1, L1 lim1) -> bool
 {
-    return compare_lexicographical(mv(pos0), lim0, mv(pos1), lim1, less<Value_type<P0>>{});
+    return compare_lexicographical(mv(cur0), lim0, mv(cur1), lim1, less<Value_type<C0>>{});
 }
 
 template <Range R>

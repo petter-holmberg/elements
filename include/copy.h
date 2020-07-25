@@ -1,10 +1,10 @@
 #pragma once
 
-#include "position.h"
+#include "cursor.h"
 
 namespace elements {
 
-template <Position S, Position D>
+template <Cursor S, Cursor D>
 requires
     Loadable<S> and
     Storable<D> and
@@ -17,7 +17,7 @@ copy_step(S& src, D& dst)
     increment(src);
 }
 
-template <Position S, Limit<S> L, Position D>
+template <Cursor S, Limit<S> L, Cursor D>
 requires
     Loadable<S> and
     Storable<D> and
@@ -30,7 +30,7 @@ copy(S src, L lim, D dst) -> D
     return dst;
 }
 
-template <Segmented_position S, Position D>
+template <Segmented_cursor S, Cursor D>
 requires
     Loadable<S> and
     Storable<D> and
@@ -38,12 +38,12 @@ requires
 constexpr auto
 copy(S src, S lim, D dst) -> D
 {
-    auto index_src = index_pos(src);
-    auto index_lim = index_pos(lim);
+    auto index_src = index_cursor(src);
+    auto index_lim = index_cursor(lim);
     if (!precedes(index_src, index_lim)) {
-        return copy(segment_pos(src), segment_pos(lim), dst);
+        return copy(segment_cursor(src), segment_cursor(lim), dst);
     } else {
-        dst = copy(segment_pos(src), limit(load(index_src)), dst);
+        dst = copy(segment_cursor(src), limit(load(index_src)), dst);
         do {
             increment(index_src);
             dst = copy(first(load(index_src)), limit(load(index_src)), dst);
@@ -52,7 +52,7 @@ copy(S src, S lim, D dst) -> D
     }
 }
 
-template <Position S, Position D, Limit<S> L, Unary_predicate P>
+template <Cursor S, Cursor D, Limit<S> L, Unary_predicate P>
 requires
     Loadable<S> and
     Storable<D> and
@@ -62,12 +62,12 @@ constexpr auto
 copy_select(S src, L lim, D dst, P pred) -> D
 //[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (# of iterators satisfying pred))]]
 {
-    auto pos{src};
-    while (precedes(pos, lim)) {
-        if (invoke(pred, pos)) {
-            copy_step(pos, dst);
+    auto cur{src};
+    while (precedes(cur, lim)) {
+        if (invoke(pred, cur)) {
+            copy_step(cur, dst);
         } else {
-            increment(pos);
+            increment(cur);
         }
     }
     return dst;
@@ -91,7 +91,7 @@ struct predicate_load
     }
 };
 
-template <Position S, Position D, Limit<S> L, Unary_predicate P>
+template <Cursor S, Cursor D, Limit<S> L, Unary_predicate P>
 requires
     Loadable<S> and
     Storable<D> and
@@ -104,7 +104,7 @@ copy_if(S src, L lim, D dst, P pred) -> D
     return copy_select(src, lim, dst, predicate_load<S, P>{pred});
 }
 
-template <Position S, Position D, Limit<S> L, Unary_predicate P>
+template <Cursor S, Cursor D, Limit<S> L, Unary_predicate P>
 requires
     Loadable<S> and
     Storable<D> and

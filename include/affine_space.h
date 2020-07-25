@@ -79,16 +79,16 @@ struct value_type_t<affine_vector<S, k, E, S_add_op, S_mul_op>>
 
 template <typename S, int32_t k, typename E, typename S_add_op, typename S_mul_op>
 requires Semiring<S, S_add_op, S_mul_op>
-struct position_type_t<affine_vector<S, k, E, S_add_op, S_mul_op>>
+struct cursor_type_t<affine_vector<S, k, E, S_add_op, S_mul_op>>
 {
-    using type = Position_type<E>;
+    using type = Cursor_type<E>;
 };
 
 template <typename S, int32_t k, typename E, typename S_add_op, typename S_mul_op>
 requires Semiring<S, S_add_op, S_mul_op>
-struct position_type_t<affine_vector<S, k, E, S_add_op, S_mul_op> const>
+struct cursor_type_t<affine_vector<S, k, E, S_add_op, S_mul_op> const>
 {
-    using type = Position_type<E const>;
+    using type = Cursor_type<E const>;
 };
 
 template <typename S, int32_t k, typename E, typename S_add_op, typename S_mul_op>
@@ -125,7 +125,7 @@ struct less<affine_vector<S, k, E, S_add_op, S_mul_op>>
 template <typename S, int32_t k, Range E, typename S_add_op, typename S_mul_op>
 requires Semiring<S, S_add_op, S_mul_op>
 constexpr auto
-first(affine_vector<S, k, E, S_add_op, S_mul_op> const& x) -> Position_type<E const>
+first(affine_vector<S, k, E, S_add_op, S_mul_op> const& x) -> Cursor_type<E const>
 {
     return first(x.elements);
 }
@@ -133,7 +133,7 @@ first(affine_vector<S, k, E, S_add_op, S_mul_op> const& x) -> Position_type<E co
 template <typename S, int32_t k, Range E, typename S_add_op, typename S_mul_op>
 requires Semiring<S, S_add_op, S_mul_op>
 constexpr auto
-first(affine_vector<S, k, E, S_add_op, S_mul_op>& x) -> Position_type<E>
+first(affine_vector<S, k, E, S_add_op, S_mul_op>& x) -> Cursor_type<E>
 {
     return first(x.elements);
 }
@@ -141,7 +141,7 @@ first(affine_vector<S, k, E, S_add_op, S_mul_op>& x) -> Position_type<E>
 template <typename S, int32_t k, Range E, typename S_add_op, typename S_mul_op>
 requires Semiring<S, S_add_op, S_mul_op>
 constexpr auto
-limit(affine_vector<S, k, E, S_add_op, S_mul_op> const& x) -> Position_type<E const>
+limit(affine_vector<S, k, E, S_add_op, S_mul_op> const& x) -> Cursor_type<E const>
 {
     return limit(x.elements);
 }
@@ -149,7 +149,7 @@ limit(affine_vector<S, k, E, S_add_op, S_mul_op> const& x) -> Position_type<E co
 template <typename S, int32_t k, Range E, typename S_add_op, typename S_mul_op>
 requires Semiring<S, S_add_op, S_mul_op>
 constexpr auto
-limit(affine_vector<S, k, E, S_add_op, S_mul_op>& x) -> Position_type<E>
+limit(affine_vector<S, k, E, S_add_op, S_mul_op>& x) -> Cursor_type<E>
 {
     return limit(x.elements);
 }
@@ -321,9 +321,9 @@ requires
     Sequence<C> and
     Vector_space<V> and
     Sequence<V>
-struct position_type_t<affine_point<S, k, C, V>>
+struct cursor_type_t<affine_point<S, k, C, V>>
 {
-    using type = Position_type<C>;
+    using type = Cursor_type<C>;
 };
 
 template <typename S, int32_t k, typename C, typename V>
@@ -332,9 +332,9 @@ requires
     Sequence<C> and
     Vector_space<V> and
     Sequence<V>
-struct position_type_t<affine_point<S, k, C, V> const>
+struct cursor_type_t<affine_point<S, k, C, V> const>
 {
-    using type = Position_type<C const>;
+    using type = Cursor_type<C const>;
 };
 
 template <typename S, int32_t k, typename C, typename V>
@@ -368,28 +368,28 @@ struct less<affine_point<S, k, C, V>>
 
 template <typename S, int32_t k, Range C, typename V>
 constexpr auto
-first(affine_point<S, k, C, V> const& x) -> Position_type<V const>
+first(affine_point<S, k, C, V> const& x) -> Cursor_type<V const>
 {
     return first(x.coordinates);
 }
 
 template <typename S, int32_t k, Range C, typename V>
 constexpr auto
-first(affine_point<S, k, C, V>& x) -> Position_type<V>
+first(affine_point<S, k, C, V>& x) -> Cursor_type<V>
 {
     return first(x.coordinates);
 }
 
 template <typename S, int32_t k, Range C, typename V>
 constexpr auto
-limit(affine_point<S, k, C, V> const& x) -> Position_type<V const>
+limit(affine_point<S, k, C, V> const& x) -> Cursor_type<V const>
 {
     return limit(x.coordinates);
 }
 
 template <typename S, int32_t k, Range C, typename V>
 constexpr auto
-limit(affine_point<S, k, C, V>& x) -> Position_type<V>
+limit(affine_point<S, k, C, V>& x) -> Cursor_type<V>
 {
     return limit(x.coordinates);
 }

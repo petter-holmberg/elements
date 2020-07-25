@@ -6,98 +6,98 @@
 
 namespace elements {
 
-template <Relation Rel>
+template <Relation R>
 struct search_binary_lower_predicate
 {
-    Domain<Rel> const& value;
-    Rel rel;
+    Domain<R> const& value;
+    R rel;
 
     constexpr
-    search_binary_lower_predicate(Domain<Rel> const& value_, Rel rel_)
+    search_binary_lower_predicate(Domain<R> const& value_, R rel_)
         : value{value_}
         , rel{rel_}
     {}
 
     constexpr auto
-    operator()(Domain<Rel> const& x)
+    operator()(Domain<R> const& x)
     {
         return !invoke(rel, x, value);
     }
 };
 
-template <Relation Rel>
+template <Relation R>
 struct search_binary_upper_predicate
 {
-    Domain<Rel> const& value;
-    Rel rel;
+    Domain<R> const& value;
+    R rel;
 
     constexpr
-    search_binary_upper_predicate(Domain<Rel> const& value_, Rel rel_)
+    search_binary_upper_predicate(Domain<R> const& value_, R rel_)
         : value{value_}
         , rel{rel_}
     {}
 
     constexpr auto
-    operator()(Domain<Rel> const& x)
+    operator()(Domain<R> const& x)
     {
         return invoke(rel, value, x);
     }
 };
 
-template <Forward_position P, Limit<P> L, Relation Rel = less<Value_type<P>>>
+template <Forward_cursor C, Limit<C> L, Relation R = less<Value_type<C>>>
 requires
-    Loadable<P> and
-    Same_as<Value_type<P>, Domain<Rel>>
+    Loadable<C> and
+    Same_as<Value_type<C>, Domain<R>>
 constexpr auto
-search_binary_lower(P pos, L lim, Value_type<P> const& value, Rel rel = less<Value_type<P>>{}) -> P
-//[[expects axiom: loadable_range(pos, lim)]]
+search_binary_lower(C cur, L lim, Value_type<C> const& value, R rel = {}) -> C
+//[[expects axiom: loadable_range(cur, lim)]]
 //[[expects axiom: weak_ordering(rel)]]
 {
-    return partition_point(mv(pos), mv(lim), search_binary_lower_predicate<Rel>{value, rel});
+    return partition_point(mv(cur), mv(lim), search_binary_lower_predicate<R>{value, rel});
 }
 
-template <Forward_position P, Limit<P> L, Relation Rel = less<Value_type<P>>>
+template <Forward_cursor C, Limit<C> L, Relation R = less<Value_type<C>>>
 requires
-    Loadable<P> and
-    Same_as<Value_type<P>, Domain<Rel>>
+    Loadable<C> and
+    Same_as<Value_type<C>, Domain<R>>
 constexpr auto
-search_binary_upper(P pos, L lim, Value_type<P> const& value, Rel rel = less<Value_type<P>>{}) -> P
-//[[expects axiom: loadable_range(pos, lim)]]
+search_binary_upper(C cur, L lim, Value_type<C> const& value, R rel = {}) -> C
+//[[expects axiom: loadable_range(cur, lim)]]
 //[[expects axiom: weak_ordering(rel)]]
 {
-    return partition_point(mv(pos), mv(lim), search_binary_upper_predicate<Rel>{value, rel});
+    return partition_point(mv(cur), mv(lim), search_binary_upper_predicate<R>{value, rel});
 }
 
-template <Forward_position P, Limit<P> L, Relation Rel = less<Value_type<P>>>
+template <Forward_cursor C, Limit<C> L, Relation R = less<Value_type<C>>>
 requires
-    Loadable<P> and
-    Same_as<Value_type<P>, Domain<Rel>>
+    Loadable<C> and
+    Same_as<Value_type<C>, Domain<R>>
 constexpr auto
-search_binary(P pos, L lim, Value_type<P> const& value, Rel rel = less<Value_type<P>>{}) -> bounded_range<P>
-//[[expects axiom: loadable_range(pos, lim)]]
+search_binary(C cur, L lim, Value_type<C> const& value, R rel = {}) -> bounded_range<C>
+//[[expects axiom: loadable_range(cur, lim)]]
 //[[expects axiom: weak_ordering(rel)]]
 {
-    search_binary_lower_predicate<Rel> first_pred{value, rel};
-    search_binary_upper_predicate<Rel> limit_pred{value, rel};
+    search_binary_lower_predicate<R> first_pred{value, rel};
+    search_binary_upper_predicate<R> limit_pred{value, rel};
 
-    auto dist = lim - pos;
+    auto dist = lim - cur;
     while (!is_zero(dist)) {
         auto const half_dist = half(dist);
-        auto mid = pos + half_dist;
+        auto mid = cur + half_dist;
         if (limit_pred(load(mid))) {
             dist = half_dist;
         } else if (!first_pred(load(mid))) {
             dist = dist - successor(half_dist);
-            pos = successor(mid);
+            cur = successor(mid);
         } else {
-            auto first = search_binary_lower(pos, mid, value, rel);
+            auto first = search_binary_lower(cur, mid, value, rel);
             increment(mid);
-            auto limit = search_binary_upper(mid, pos + dist, value, rel);
+            auto limit = search_binary_upper(mid, cur + dist, value, rel);
             return {first, limit};
         }
     }
 
-    return {pos, pos};
+    return {cur, cur};
 }
 
 }

@@ -47,35 +47,35 @@ struct array_k
         return data[i];
     }
 
-    template <Unary_function Fun>
+    template <Unary_function F>
     requires
-        Same_as<Decay<T>, Domain<Fun>> and
-        Same_as<Decay<T>, Codomain<Fun>>
+        Same_as<Decay<T>, Domain<F>> and
+        Same_as<Decay<T>, Codomain<F>>
     constexpr auto
-    fmap(Fun fun) -> array_k<T, k>&
+    fmap(F fun) -> array_k<T, k>&
     {
         using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
         return at(this);
     }
 
-    template <Unary_function Fun>
-    requires Same_as<Decay<T>, Domain<Fun>>
+    template <Unary_function F>
+    requires Same_as<Decay<T>, Domain<F>>
     constexpr auto
-    fmap(Fun fun) const -> array_k<Codomain<Fun>, k>
+    fmap(F fun) const -> array_k<Codomain<F>, k>
     {
         using elements::map;
-        array_k<Codomain<Fun>, k> x;
+        array_k<Codomain<F>, k> x;
         map(first(at(this)), limit(at(this)), first(x), fun);
         return x;
     }
 
-    template <Unary_function Fun>
-    requires Same_as<Decay<T>, Domain<Fun>>
+    template <Unary_function F>
+    requires Same_as<Decay<T>, Domain<F>>
     constexpr auto
-    flat_map(Fun fun) -> array_k<Value_type<Codomain<Fun>>, k * Size<Codomain<Fun>>>
+    flat_map(F fun) -> array_k<Value_type<Codomain<F>>, k * Size<Codomain<F>>>
     {
-        array_k<Value_type<Codomain<Fun>>, k * Size<Codomain<Fun>>> x;
+        array_k<Value_type<Codomain<F>>, k * Size<Codomain<F>>> x;
         auto src = first(at(this));
         auto lim = limit(at(this));
         auto dst = first(x);
@@ -95,13 +95,13 @@ struct value_type_t<array_k<T, k>>
 };
 
 template <Semiregular T, pointer_diff k>
-struct position_type_t<array_k<T, k>>
+struct cursor_type_t<array_k<T, k>>
 {
     using type = Pointer_type<T>;
 };
 
 template <Semiregular T, pointer_diff k>
-struct position_type_t<array_k<T, k> const>
+struct cursor_type_t<array_k<T, k> const>
 {
     using type = Pointer_type<T const>;
 };

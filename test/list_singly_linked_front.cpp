@@ -9,7 +9,7 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
 {
     e::list_singly_linked_front<int> x{0, 1, 2, 3, 4};
     static_assert(e::Dynamic_sequence<decltype(x), e::front<decltype(x)>>);
-    static_assert(e::Linked_forward_position<e::Position_type<decltype(x)>>);
+    static_assert(e::Linked_forward_cursor<e::Cursor_type<decltype(x)>>);
 
     REQUIRE (e::axiom_Regular(x));
 
@@ -158,7 +158,7 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
             CHECK (x0[2] == 0);
         }
 
-        SECTION ("Inserting after position")
+        SECTION ("Inserting after cursor")
         {
             auto after = e::after{x0, e::first(x0)};
 
@@ -176,7 +176,7 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
             CHECK (x0[0] == 0);
             CHECK (x0[1] == 1);
 
-            e::increment(after.pos);
+            e::increment(after.cur);
             after = e::insert(after, 2);
 
             REQUIRE (!e::is_empty(x0));
@@ -222,7 +222,7 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
             REQUIRE (e::size(x0) == 0);
         }
 
-        SECTION ("Erasing after position")
+        SECTION ("Erasing after cursor")
         {
             auto after = e::after{x0, e::first(x0)};
 

@@ -10,9 +10,9 @@ SCENARIO ("Fill", "[fill]")
     {
         int x[]{0, 1, 2, 3, 4};
 
-        auto pos = e::fill(x, x + 5, 0);
+        auto cur = e::fill(x, x + 5, 0);
 
-        REQUIRE (pos == x + 5);
+        REQUIRE (cur == x + 5);
 
         CHECK(x[0] == 0);
         CHECK(x[1] == 0);

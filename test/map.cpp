@@ -11,9 +11,9 @@ SCENARIO ("Mapping", "[map]")
 
     SECTION ("Unary mapping")
     {
-        auto pos = e::map(x, x + 5, y, e::negative<int>{});
+        auto cur = e::map(x, x + 5, y, e::negative<int>{});
 
-        REQUIRE(pos == y + 5);
+        REQUIRE (!e::precedes(cur, y + 5));
 
         CHECK (y[0] == 0);
         CHECK (y[1] == -1);
@@ -24,9 +24,9 @@ SCENARIO ("Mapping", "[map]")
 
     SECTION ("Binary mapping")
     {
-        auto pos = e::map(x, x + 5, y, y + 0, e::sum<int>{});
+        auto cur = e::map(x, x + 5, y, y + 0, e::sum<int>{});
 
-        REQUIRE(pos == y + 5);
+        REQUIRE (!e::precedes(cur, y + 5));
 
         CHECK (y[0] == 5);
         CHECK (y[1] == 7);

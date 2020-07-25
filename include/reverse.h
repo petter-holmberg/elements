@@ -4,18 +4,18 @@
 
 namespace elements {
 
-template <Bidirectional_position P, Limit<P> L>
-requires Mutable<P>
+template <Bidirectional_cursor C, Limit<C> L>
+requires Mutable<C>
 constexpr void
-reverse(P pos, L lim)
-//[[expects: mutable_bounded_range(pos, lim)]]
+reverse(C cur, L lim)
+//[[expects: mutable_bounded_range(cur, lim)]]
 {
     while (true) {
-        if (pos == lim) return;
+        if (cur == lim) return;
         decrement(lim);
-        if (pos == lim) return;
-        swap(at(pos), at(lim));
-        increment(pos);
+        if (cur == lim) return;
+        swap(at(cur), at(lim));
+        increment(cur);
     }
 }
 

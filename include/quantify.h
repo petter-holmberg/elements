@@ -4,48 +4,48 @@
 
 namespace elements {
 
-template <Position P, Limit<P> L, Unary_predicate U>
+template <Cursor C, Limit<C> L, Unary_predicate P>
 requires
-    Loadable<P> and
-    Same_as<Value_type<P>, Domain<U>>
+    Loadable<C> and
+    Same_as<Value_type<C>, Domain<P>>
 constexpr auto
-each_of(P pos, L lim, U pred) -> bool
-//[[expects axiom: loadable_range(pos, lim)]]
+each_of(C cur, L lim, P pred) -> bool
+//[[expects axiom: loadable_range(cur, lim)]]
 {
-    return !precedes(search_if_not(mv(pos), lim, pred), lim);
+    return !precedes(search_if_not(mv(cur), lim, pred), lim);
 }
 
-template <Position P, Limit<P> L, Unary_predicate U>
+template <Cursor C, Limit<C> L, Unary_predicate P>
 requires
-    Loadable<P> and
-    Same_as<Value_type<P>, Domain<U>>
+    Loadable<C> and
+    Same_as<Value_type<C>, Domain<P>>
 constexpr auto
-any_not_of(P pos, L lim, U pred) -> bool
-//[[expects axiom: loadable_range(pos, lim)]]
+any_not_of(C cur, L lim, P pred) -> bool
+//[[expects axiom: loadable_range(cur, lim)]]
 {
-    return precedes(search_if_not(mv(pos), lim, pred), lim);
+    return precedes(search_if_not(mv(cur), lim, pred), lim);
 }
 
-template <Position P, Limit<P> L, Unary_predicate U>
+template <Cursor C, Limit<C> L, Unary_predicate P>
 requires
-    Loadable<P> and
-    Same_as<Value_type<P>, Domain<U>>
+    Loadable<C> and
+    Same_as<Value_type<C>, Domain<P>>
 constexpr auto
-none_of(P pos, L lim, U pred) -> bool
-//[[expects axiom: loadable_range(pos, lim)]]
+none_of(C cur, L lim, P pred) -> bool
+//[[expects axiom: loadable_range(cur, lim)]]
 {
-    return !precedes(search_if(mv(pos), lim, pred), lim);
+    return !precedes(search_if(mv(cur), lim, pred), lim);
 }
 
-template <Position P, Limit<P> L, Unary_predicate U>
+template <Cursor C, Limit<C> L, Unary_predicate P>
 requires
-    Loadable<P> and
-    Same_as<Value_type<P>, Domain<U>>
+    Loadable<C> and
+    Same_as<Value_type<C>, Domain<P>>
 constexpr auto
-any_of(P pos, L lim, U pred) -> bool
-//[[expects axiom: loadable_range(pos, lim)]]
+any_of(C cur, L lim, P pred) -> bool
+//[[expects axiom: loadable_range(cur, lim)]]
 {
-    return precedes(search_if(mv(pos), lim, pred), lim);
+    return precedes(search_if(mv(cur), lim, pred), lim);
 }
 
 }

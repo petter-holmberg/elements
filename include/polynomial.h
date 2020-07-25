@@ -224,9 +224,9 @@ constexpr auto
 degree(polynomial<R, C> const& x) -> Size_type<polynomial<R, C>>
 {
     return search_if(
-        reverse_position(limit(x.coefficients)),
-        reverse_position(first(x.coefficients)),
-        [](R const& y){ return y != Zero<R>; }).pos - successor(first(x.coefficients));
+        reverse_cursor(limit(x.coefficients)),
+        reverse_cursor(first(x.coefficients)),
+        [](R const& y){ return y != Zero<R>; }).cur - successor(first(x.coefficients));
 }
 
 template <typename R, typename C>
@@ -255,13 +255,13 @@ subderivative(polynomial<I, C> const& x, I const& k) -> polynomial<I, C>
 {
     if (k == Zero<I>) return x;
     polynomial<I, C> y(successor(degree(x)) - k, Zero<I>);
-    auto pos0 = first(x.coefficients) + k;
-    auto pos1 = first(y.coefficients);
+    auto cur0 = first(x.coefficients) + k;
+    auto cur1 = first(y.coefficients);
     auto i = Zero<I>;
-    while (pos1 != limit(y.coefficients)) {
-        store(pos1, load(pos0) * choose(i + k, k));
-        increment(pos0);
-        increment(pos1);
+    while (cur1 != limit(y.coefficients)) {
+        store(cur1, load(cur0) * choose(i + k, k));
+        increment(cur0);
+        increment(cur1);
         increment(i);
     }
     return y;

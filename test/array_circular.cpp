@@ -10,7 +10,7 @@ SCENARIO ("Using circular array", "[array_circular]")
     e::array_circular<int> x{0, 1, 2, 3, 4};
     static_assert(e::Dynamic_sequence<decltype(x), e::back<decltype(x)>>);
     static_assert(e::Dynamic_sequence<decltype(x), e::front<decltype(x)>>);
-    static_assert(e::Affine_space<e::Position_type<decltype(x)>>);
+    static_assert(e::Affine_space<e::Cursor_type<decltype(x)>>);
 
     REQUIRE (e::axiom_Regular(x));
 

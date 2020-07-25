@@ -55,21 +55,21 @@ SCENARIO ("Partitioning", "[partition]")
         int buf[]{0};
 
         {
-            auto pos = e::partition_semistable(x, x, is_odd);
+            auto cur = e::partition_semistable(x, x, is_odd);
             REQUIRE (e::is_partitioned(x, x, is_odd));
-            REQUIRE (pos == x);
+            REQUIRE (cur == x);
         }
 
         {
-            auto pos = e::partition_with_buffer(x, x, buf, is_odd);
+            auto cur = e::partition_with_buffer(x, x, buf, is_odd);
             REQUIRE (e::is_partitioned(x, x, is_odd));
-            REQUIRE (pos == x);
+            REQUIRE (cur == x);
         }
 
         {
-            auto pos = e::partition(x, x, is_odd);
+            auto cur = e::partition(x, x, is_odd);
             REQUIRE (e::is_partitioned(x, x, is_odd));
-            REQUIRE (pos == x);
+            REQUIRE (cur == x);
         }
     }
 
@@ -81,21 +81,21 @@ SCENARIO ("Partitioning", "[partition]")
             int x[]{0};
 
             {
-                auto pos = e::partition_semistable(x, x + 1, is_odd);
+                auto cur = e::partition_semistable(x, x + 1, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 1, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
             }
 
             {
-                auto pos = e::partition_with_buffer(x, x + 1, buf, is_odd);
+                auto cur = e::partition_with_buffer(x, x + 1, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 1, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
             }
 
             {
-                auto pos = e::partition(x, x + 1, is_odd);
+                auto cur = e::partition(x, x + 1, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 1, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
             }
         }
 
@@ -103,21 +103,21 @@ SCENARIO ("Partitioning", "[partition]")
             int x[]{1};
 
             {
-                auto pos = e::partition_semistable(x, x + 1, is_odd);
+                auto cur = e::partition_semistable(x, x + 1, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 1, is_odd));
-                REQUIRE (pos == x);
+                REQUIRE (cur == x);
             }
 
             {
-                auto pos = e::partition_with_buffer(x, x + 1, buf, is_odd);
+                auto cur = e::partition_with_buffer(x, x + 1, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 1, is_odd));
-                REQUIRE (pos == x);
+                REQUIRE (cur == x);
             }
 
             {
-                auto pos = e::partition(x, x + 1, is_odd);
+                auto cur = e::partition(x, x + 1, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 1, is_odd));
-                REQUIRE (pos == x);
+                REQUIRE (cur == x);
             }
         }
     }
@@ -130,25 +130,25 @@ SCENARIO ("Partitioning", "[partition]")
             int x[]{0, 0};
 
             {
-                auto pos = e::partition_semistable(x, x + 2, is_odd);
+                auto cur = e::partition_semistable(x, x + 2, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
-                REQUIRE (pos == x + 2);
+                REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 0);
             }
 
             {
-                auto pos = e::partition_with_buffer(x, x + 2, buf, is_odd);
+                auto cur = e::partition_with_buffer(x, x + 2, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
-                REQUIRE (pos == x + 2);
+                REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 0);
             }
 
             {
-                auto pos = e::partition(x, x + 2, is_odd);
+                auto cur = e::partition(x, x + 2, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
-                REQUIRE (pos == x + 2);
+                REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 0);
             }
@@ -158,25 +158,25 @@ SCENARIO ("Partitioning", "[partition]")
             int x[]{0, 1};
 
             {
-                auto pos = e::partition_semistable(x, x + 2, is_odd);
+                auto cur = e::partition_semistable(x, x + 2, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 1);
             }
 
             {
-                auto pos = e::partition_with_buffer(x, x + 2, buf, is_odd);
+                auto cur = e::partition_with_buffer(x, x + 2, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 1);
             }
 
             {
-                auto pos = e::partition(x, x + 2, is_odd);
+                auto cur = e::partition(x, x + 2, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 1);
             }
@@ -186,25 +186,25 @@ SCENARIO ("Partitioning", "[partition]")
             int x[]{1, 0};
 
             {
-                auto pos = e::partition_semistable(x, x + 2, is_odd);
+                auto cur = e::partition_semistable(x, x + 2, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 1);
             }
 
             {
-                auto pos = e::partition_with_buffer(x, x + 2, buf, is_odd);
+                auto cur = e::partition_with_buffer(x, x + 2, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 1);
             }
 
             {
-                auto pos = e::partition(x, x + 2, is_odd);
+                auto cur = e::partition(x, x + 2, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 1);
             }
@@ -214,25 +214,25 @@ SCENARIO ("Partitioning", "[partition]")
             int x[]{1, 1};
 
             {
-                auto pos = e::partition_semistable(x, x + 2, is_odd);
+                auto cur = e::partition_semistable(x, x + 2, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
-                REQUIRE (pos == x);
+                REQUIRE (cur == x);
                 REQUIRE (x[0] == 1);
                 REQUIRE (x[1] == 1);
             }
 
             {
-                auto pos = e::partition_with_buffer(x, x + 2, buf, is_odd);
+                auto cur = e::partition_with_buffer(x, x + 2, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
-                REQUIRE (pos == x);
+                REQUIRE (cur == x);
                 REQUIRE (x[0] == 1);
                 REQUIRE (x[1] == 1);
             }
 
             {
-                auto pos = e::partition(x, x + 2, is_odd);
+                auto cur = e::partition(x, x + 2, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
-                REQUIRE (pos == x);
+                REQUIRE (cur == x);
                 REQUIRE (x[0] == 1);
                 REQUIRE (x[1] == 1);
             }
@@ -247,27 +247,27 @@ SCENARIO ("Partitioning", "[partition]")
             int x[]{0, 0, 0};
 
             {
-                auto pos = e::partition_semistable(x, x + 3, is_odd);
+                auto cur = e::partition_semistable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 3);
+                REQUIRE (cur == x + 3);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 0);
                 REQUIRE (x[2] == 0);
             }
 
             {
-                auto pos = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 3);
+                REQUIRE (cur == x + 3);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 0);
                 REQUIRE (x[2] == 0);
             }
 
             {
-                auto pos = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 3);
+                REQUIRE (cur == x + 3);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 0);
                 REQUIRE (x[2] == 0);
@@ -278,27 +278,27 @@ SCENARIO ("Partitioning", "[partition]")
             int x[]{0, 0, 1};
 
             {
-                auto pos = e::partition_semistable(x, x + 3, is_odd);
+                auto cur = e::partition_semistable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 2);
+                REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 0);
                 REQUIRE (x[2] == 1);
             }
 
             {
-                auto pos = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 2);
+                REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 0);
                 REQUIRE (x[2] == 1);
             }
 
             {
-                auto pos = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 2);
+                REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 0);
                 REQUIRE (x[2] == 1);
@@ -309,27 +309,27 @@ SCENARIO ("Partitioning", "[partition]")
             int x[]{0, 1, 0};
 
             {
-                auto pos = e::partition_semistable(x, x + 3, is_odd);
+                auto cur = e::partition_semistable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 2);
+                REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 0);
                 REQUIRE (x[2] == 1);
             }
 
             {
-                auto pos = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 2);
+                REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 0);
                 REQUIRE (x[2] == 1);
             }
 
             {
-                auto pos = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 2);
+                REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 0);
                 REQUIRE (x[2] == 1);
@@ -340,27 +340,27 @@ SCENARIO ("Partitioning", "[partition]")
             int x[]{0, 1, 1};
 
             {
-                auto pos = e::partition_semistable(x, x + 3, is_odd);
+                auto cur = e::partition_semistable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 1);
                 REQUIRE (x[2] == 1);
             }
 
             {
-                auto pos = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 1);
                 REQUIRE (x[2] == 1);
             }
 
             {
-                auto pos = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 1);
                 REQUIRE (x[2] == 1);
@@ -371,27 +371,27 @@ SCENARIO ("Partitioning", "[partition]")
             int x[]{1, 0, 0};
 
             {
-                auto pos = e::partition_semistable(x, x + 3, is_odd);
+                auto cur = e::partition_semistable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 2);
+                REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 0);
                 REQUIRE (x[2] == 1);
             }
 
             {
-                auto pos = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 2);
+                REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 0);
                 REQUIRE (x[2] == 1);
             }
 
             {
-                auto pos = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 2);
+                REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 0);
                 REQUIRE (x[2] == 1);
@@ -402,27 +402,27 @@ SCENARIO ("Partitioning", "[partition]")
             int x[]{1, 0, 1};
 
             {
-                auto pos = e::partition_semistable(x, x + 3, is_odd);
+                auto cur = e::partition_semistable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 1);
                 REQUIRE (x[2] == 1);
             }
 
             {
-                auto pos = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 1);
                 REQUIRE (x[2] == 1);
             }
 
             {
-                auto pos = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 1);
                 REQUIRE (x[2] == 1);
@@ -433,27 +433,27 @@ SCENARIO ("Partitioning", "[partition]")
             int x[]{1, 1, 0};
 
             {
-                auto pos = e::partition_semistable(x, x + 3, is_odd);
+                auto cur = e::partition_semistable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 1);
                 REQUIRE (x[2] == 1);
             }
 
             {
-                auto pos = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 1);
                 REQUIRE (x[2] == 1);
             }
 
             {
-                auto pos = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x + 1);
+                REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
                 REQUIRE (x[1] == 1);
                 REQUIRE (x[2] == 1);
@@ -464,27 +464,27 @@ SCENARIO ("Partitioning", "[partition]")
             int x[]{1, 1, 1};
 
             {
-                auto pos = e::partition_semistable(x, x + 3, is_odd);
+                auto cur = e::partition_semistable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x);
+                REQUIRE (cur == x);
                 REQUIRE (x[0] == 1);
                 REQUIRE (x[1] == 1);
                 REQUIRE (x[2] == 1);
             }
 
             {
-                auto pos = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x);
+                REQUIRE (cur == x);
                 REQUIRE (x[0] == 1);
                 REQUIRE (x[1] == 1);
                 REQUIRE (x[2] == 1);
             }
 
             {
-                auto pos = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
-                REQUIRE (pos == x);
+                REQUIRE (cur == x);
                 REQUIRE (x[0] == 1);
                 REQUIRE (x[1] == 1);
                 REQUIRE (x[2] == 1);

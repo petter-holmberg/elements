@@ -13,6 +13,7 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/copy.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/combinatorics.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/count.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/cursor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/fill.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/for_each.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/functional.cpp
@@ -30,7 +31,6 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/pair.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/partition.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/polynomial.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/position.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/quantify.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/rational.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/reduce.cpp

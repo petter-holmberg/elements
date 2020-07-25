@@ -140,25 +140,25 @@ struct array_double_ended
         return load(first(at(this)) + i);
     }
 
-    template <Unary_function Fun>
+    template <Unary_function F>
     requires
-        Same_as<Decay<T>, Domain<Fun>> and
-        Same_as<Decay<T>, Codomain<Fun>>
+        Same_as<Decay<T>, Domain<F>> and
+        Same_as<Decay<T>, Codomain<F>>
     constexpr auto
-    fmap(Fun fun) -> array_double_ended<T>&
+    fmap(F fun) -> array_double_ended<T>&
     {
         using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
         return at(this);
     }
 
-    template <Unary_function Fun>
-    requires Same_as<Decay<T>, Domain<Fun>>
+    template <Unary_function F>
+    requires Same_as<Decay<T>, Domain<F>>
     constexpr auto
-    fmap(Fun fun) const -> array_double_ended<Codomain<Fun>>
+    fmap(F fun) const -> array_double_ended<Codomain<F>>
     {
         using elements::map;
-        array_double_ended<Codomain<Fun>> x;
+        array_double_ended<Codomain<F>> x;
         reserve(x, size(at(this)));
         map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
         at(x.header).limit = at(x.header).limit_of_storage;
@@ -173,13 +173,13 @@ struct value_type_t<array_double_ended<T>>
 };
 
 template <Movable T>
-struct position_type_t<array_double_ended<T>>
+struct cursor_type_t<array_double_ended<T>>
 {
     using type = Pointer_type<T>;
 };
 
 template <Movable T>
-struct position_type_t<array_double_ended<T> const>
+struct cursor_type_t<array_double_ended<T> const>
 {
     using type = Pointer_type<T const>;
 };
@@ -220,12 +220,12 @@ reserve(
 {
     if (n < size(x) or n == capacity(x)) return;
     array_double_ended<T> temp(n);
-    auto pos = first(x);
+    auto cur = first(x);
     auto dst = first(temp) + offset;
     at(temp.header).first = dst;
-    while (precedes(pos, limit(x))) {
-        construct(at(dst), mv(at(pos)));
-        increment(pos);
+    while (precedes(cur, limit(x))) {
+        construct(at(dst), mv(at(cur)));
+        increment(cur);
         increment(dst);
     }
     at(temp.header).limit = dst;
@@ -241,9 +241,9 @@ insert(back<array_double_ended<T>> arr, U&& x) -> back<array_double_ended<T>>
         if (!precedes(first(seq), first_of_storage(seq))) {
             reserve(seq, max(One<Size_type<array_double_ended<T>>>, twice(size(seq))));
         } else {
-            auto pos = first_of_storage(seq) + half(first(seq) - first_of_storage(seq));
-            at(seq.header).limit = swap(first(seq), limit(seq), pos);
-            at(seq.header).first = pos;
+            auto cur = first_of_storage(seq) + half(first(seq) - first_of_storage(seq));
+            at(seq.header).limit = swap(first(seq), limit(seq), cur);
+            at(seq.header).first = cur;
         }
     }
     auto& header = at(seq.header);
@@ -262,12 +262,12 @@ insert(front<array_double_ended<T>> arr, U&& x) -> front<array_double_ended<T>>
             auto n = size(seq);
             reserve(seq, max(One<Size_type<array_double_ended<T>>>, twice(n)), n);
         } else {
-            auto pos = limit(seq) + successor(half(limit_of_storage(seq) - limit(seq)));
+            auto cur = limit(seq) + successor(half(limit_of_storage(seq) - limit(seq)));
             at(seq.header).first = swap(
-                reverse_position(limit(seq)),
-                reverse_position(first(seq)),
-                reverse_position(pos)).pos;
-            at(seq.header).limit = pos;
+                reverse_cursor(limit(seq)),
+                reverse_cursor(first(seq)),
+                reverse_cursor(cur)).cur;
+            at(seq.header).limit = cur;
         }
     }
     auto& header = at(seq.header);
@@ -357,7 +357,7 @@ pop_first(array_double_ended<T>& arr)
 
 template <Movable T>
 constexpr auto
-first(array_double_ended<T> const& x) -> Position_type<array_double_ended<T>>
+first(array_double_ended<T> const& x) -> Cursor_type<array_double_ended<T>>
 {
     if (x.header == nullptr) return nullptr;
     return at(x.header).first;
@@ -365,7 +365,7 @@ first(array_double_ended<T> const& x) -> Position_type<array_double_ended<T>>
 
 template <Movable T>
 constexpr auto
-limit(array_double_ended<T> const& x) -> Position_type<array_double_ended<T>>
+limit(array_double_ended<T> const& x) -> Cursor_type<array_double_ended<T>>
 {
     if (x.header == nullptr) return nullptr;
     return at(x.header).limit;
@@ -373,7 +373,7 @@ limit(array_double_ended<T> const& x) -> Position_type<array_double_ended<T>>
 
 template <Movable T>
 constexpr auto
-first_of_storage(array_double_ended<T> const& x) -> Position_type<array_double_ended<T>>
+first_of_storage(array_double_ended<T> const& x) -> Cursor_type<array_double_ended<T>>
 {
     if (x.header == nullptr) return nullptr;
     return pointer_to(at(x.header).x);
@@ -381,7 +381,7 @@ first_of_storage(array_double_ended<T> const& x) -> Position_type<array_double_e
 
 template <Movable T>
 constexpr auto
-limit_of_storage(array_double_ended<T> const& x) -> Position_type<array_double_ended<T>>
+limit_of_storage(array_double_ended<T> const& x) -> Cursor_type<array_double_ended<T>>
 {
     if (x.header == nullptr) return nullptr;
     return at(x.header).limit_of_storage;

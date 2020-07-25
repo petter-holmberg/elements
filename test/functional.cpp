@@ -5,7 +5,7 @@
 
 namespace e = elements;
 
-SCENARIO ("Using filter position", "[filter_position]")
+SCENARIO ("Using filter_sink", "[filter_sink]")
 {
     int x[]{0, 1, 2, 3, 4};
     int y[]{5, 6, 7, 8, 9};
@@ -14,8 +14,8 @@ SCENARIO ("Using filter position", "[filter_position]")
 
     SECTION ("Filtering with sink")
     {
-        auto pos = e::copy(x, x + 5, e::filter_sink{is_even}(y + 0));
-        REQUIRE(!precedes(pos, y + 3));
+        auto cur = e::copy(x, x + 5, e::filter_sink{is_even}(y + 0));
+        REQUIRE(!precedes(cur, y + 3));
         CHECK (y[0] == 0);
         CHECK (y[1] == 2);
         CHECK (y[2] == 4);
@@ -24,15 +24,15 @@ SCENARIO ("Using filter position", "[filter_position]")
     }
 }
 
-SCENARIO ("Using map position", "[map_position]")
+SCENARIO ("Using map_sink", "[map_sink]")
 {
     int x[]{0, 1, 2, 3, 4};
     int y[]{5, 6, 7, 8, 9};
 
     SECTION ("Mapping with sink")
     {
-        auto pos = e::copy(x, x + 5, e::map_sink{e::negative<int>{}}(y + 0));
-        REQUIRE(!precedes(pos, y + 5));
+        auto cur = e::copy(x, x + 5, e::map_sink{e::negative<int>{}}(y + 0));
+        REQUIRE(!precedes(cur, y + 5));
         CHECK (y[0] == 0);
         CHECK (y[1] == -1);
         CHECK (y[2] == -2);

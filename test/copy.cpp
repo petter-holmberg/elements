@@ -11,9 +11,9 @@ SCENARIO ("Copying", "[copy]")
 
     SECTION ("Copying one array to another")
     {
-        auto pos = e::copy(x, x + 5, y);
+        auto cur = e::copy(x, x + 5, y);
 
-        REQUIRE(pos == y + 5);
+        REQUIRE(cur == y + 5);
 
         CHECK (y[0] == 0);
         CHECK (y[1] == 1);
@@ -24,9 +24,9 @@ SCENARIO ("Copying", "[copy]")
 
     SECTION ("Copying an array into itelf")
     {
-        auto pos = e::copy(x, x + 5, x);
+        auto cur = e::copy(x, x + 5, x);
 
-        REQUIRE(pos == x + 5);
+        REQUIRE(cur == x + 5);
 
         CHECK (x[0] == 0);
         CHECK (x[1] == 1);
@@ -37,9 +37,9 @@ SCENARIO ("Copying", "[copy]")
 
     SECTION ("Copying a backward-overlapping sub-range of an array")
     {
-        auto pos = e::copy(x + 1, x + 5, x);
+        auto cur = e::copy(x + 1, x + 5, x);
 
-        REQUIRE(pos == x + 4);
+        REQUIRE(cur == x + 4);
 
         CHECK (x[0] == 1);
         CHECK (x[1] == 2);
@@ -54,9 +54,9 @@ SCENARIO ("Copying", "[copy]")
 
         SECTION ("Matching predicate")
         {
-            auto pos = e::copy_if(x, x + 5, y, is_even);
+            auto cur = e::copy_if(x, x + 5, y, is_even);
 
-            REQUIRE(pos == y + 3);
+            REQUIRE(cur == y + 3);
             CHECK (y[0] == 0);
             CHECK (y[1] == 2);
             CHECK (y[2] == 4);
@@ -66,9 +66,9 @@ SCENARIO ("Copying", "[copy]")
 
         SECTION ("Mismatching predicate")
         {
-            auto pos = e::copy_if_not(x, x + 5, y, is_even);
+            auto cur = e::copy_if_not(x, x + 5, y, is_even);
 
-            REQUIRE(pos == y + 2);
+            REQUIRE(cur == y + 2);
             CHECK (y[0] == 1);
             CHECK (y[1] == 3);
             CHECK (y[2] == 7);

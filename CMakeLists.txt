@@ -8,11 +8,6 @@ configure_file (
     "${PROJECT_BINARY_DIR}/include/config.h")
 
 include_directories ("${PROJECT_SOURCE_DIR}/include")
-include_directories ("${PROJECT_SOURCE_DIR}/include/adapters")
-include_directories ("${PROJECT_SOURCE_DIR}/include/algorithms")
-include_directories ("${PROJECT_SOURCE_DIR}/include/data_structures")
-include_directories ("${PROJECT_SOURCE_DIR}/include/concepts")
-include_directories ("${PROJECT_SOURCE_DIR}/include/type_functions")
 set (CMAKE_BUILD_TYPE Release)
 set (CMAKE_CXX_COMPILER clang++-11)
 
@@ -26,11 +21,7 @@ add_custom_target (
     --verbose
     --check-config
     --suppress=missingInclude missingIncludeSystem
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/concepts/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/type_functions/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/algorithms/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/data_structures/*.h)
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
 
 enable_testing ()
 add_subdirectory (test)

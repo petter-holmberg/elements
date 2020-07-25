@@ -11,17 +11,17 @@ SCENARIO ("Using swap", "[swap]")
 
     SECTION ("Reverse swapping")
     {
-        auto first_x = e::bidirectional_position{x};
-        auto limit_x = e::bidirectional_position{x + 5};
-        auto first_y = e::bidirectional_position{y};
-        auto limit_y = e::bidirectional_position{y + 5};
+        auto first_x = e::bidirectional_cursor{x};
+        auto limit_x = e::bidirectional_cursor{x + 5};
+        auto first_y = e::bidirectional_cursor{y};
+        auto limit_y = e::bidirectional_cursor{y + 5};
 
         SECTION ("Swapping one range with itself")
         {
-            auto [pos0, pos1] = e::reverse_swap(first_x, limit_x, first_x, limit_x);
+            auto [cur0, cur1] = e::reverse_swap(first_x, limit_x, first_x, limit_x);
 
-            REQUIRE(pos0 == first_x);
-            REQUIRE(pos1 == limit_x);
+            REQUIRE(cur0 == first_x);
+            REQUIRE(cur1 == limit_x);
 
             CHECK (x[0] == 0);
             CHECK (x[1] == 1);
@@ -32,10 +32,10 @@ SCENARIO ("Using swap", "[swap]")
 
         SECTION ("Swapping two ranges")
         {
-            auto [pos0, pos1] = e::reverse_swap(first_x, limit_x, first_y, limit_y);
+            auto [cur0, cur1] = e::reverse_swap(first_x, limit_x, first_y, limit_y);
 
-            REQUIRE(pos0 == first_x);
-            REQUIRE(pos1 == limit_y);
+            REQUIRE(cur0 == first_x);
+            REQUIRE(cur1 == limit_y);
 
             CHECK (x[0] == 9);
             CHECK (x[1] == 8);

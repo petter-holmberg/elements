@@ -11,11 +11,11 @@ SCENARIO ("Binary search", "[search_binary]")
     {
         e::array_single_ended<int> x{};
 
-        auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::limit(x));
+        auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::limit(x));
 
-        pos = e::search_binary_upper(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::limit(x));
+        cur = e::search_binary_upper(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::limit(x));
 
         auto range = e::search_binary(e::first(x), e::limit(x), 3);
         REQUIRE (e::first(range) == e::limit(x));
@@ -26,11 +26,11 @@ SCENARIO ("Binary search", "[search_binary]")
     {
         e::array_single_ended<int> x{3};
 
-        auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::first(x));
+        auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::first(x));
 
-        pos = e::search_binary_upper(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::limit(x));
+        cur = e::search_binary_upper(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::limit(x));
 
         auto range = e::search_binary(e::first(x), e::limit(x), 3);
         REQUIRE (e::first(range) == e::first(x));
@@ -41,11 +41,11 @@ SCENARIO ("Binary search", "[search_binary]")
     {
         e::array_single_ended<int> x{3, 3};
 
-        auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::first(x));
+        auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::first(x));
 
-        pos = e::search_binary_upper(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::limit(x));
+        cur = e::search_binary_upper(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::limit(x));
 
         auto range = e::search_binary(e::first(x), e::limit(x), 3);
         REQUIRE (e::first(range) == e::first(x));
@@ -56,11 +56,11 @@ SCENARIO ("Binary search", "[search_binary]")
     {
         e::array_single_ended<int> x{3, 3, 4, 5};
 
-        auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::first(x));
+        auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::first(x));
 
-        pos = e::search_binary_upper(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::first(x) + 2);
+        cur = e::search_binary_upper(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::first(x) + 2);
 
         auto range = e::search_binary(e::first(x), e::limit(x), 3);
         REQUIRE (e::first(range) == e::first(x));
@@ -71,11 +71,11 @@ SCENARIO ("Binary search", "[search_binary]")
     {
         e::array_single_ended<int> x{0, 1, 2, 3, 3};
 
-        auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::first(x) + 3);
+        auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::first(x) + 3);
 
-        pos = e::search_binary_upper(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::limit(x));
+        cur = e::search_binary_upper(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::limit(x));
 
         auto range = e::search_binary(e::first(x), e::limit(x), 3);
         REQUIRE (e::first(range) == e::first(x) + 3);
@@ -86,11 +86,11 @@ SCENARIO ("Binary search", "[search_binary]")
     {
         e::array_single_ended<int> x{0, 3, 3, 3, 4, 5, 6, 7, 8};
 
-        auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::first(x) + 1);
+        auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::first(x) + 1);
 
-        pos = e::search_binary_upper(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::first(x) + 4);
+        cur = e::search_binary_upper(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::first(x) + 4);
 
         auto range = e::search_binary(e::first(x), e::limit(x), 3);
         REQUIRE (e::first(range) == e::first(x) + 1);
@@ -101,11 +101,11 @@ SCENARIO ("Binary search", "[search_binary]")
     {
         e::array_single_ended<int> x{0, 3, 3, 3, 4};
 
-        auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::first(x) + 1);
+        auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::first(x) + 1);
 
-        pos = e::search_binary_upper(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::first(x) + 4);
+        cur = e::search_binary_upper(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::first(x) + 4);
 
         auto range = e::search_binary(e::first(x), e::limit(x), 3);
         REQUIRE (e::first(range) == e::first(x) + 1);
@@ -116,11 +116,11 @@ SCENARIO ("Binary search", "[search_binary]")
     {
         e::array_single_ended<int> x{0, 1, 1, 2, 2, 3, 3, 3, 4};
 
-        auto pos = e::search_binary_lower(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::first(x) + 5);
+        auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::first(x) + 5);
 
-        pos = e::search_binary_upper(e::first(x), e::limit(x), 3);
-        REQUIRE (pos == e::first(x) + 8);
+        cur = e::search_binary_upper(e::first(x), e::limit(x), 3);
+        REQUIRE (cur == e::first(x) + 8);
 
         auto range = e::search_binary(e::first(x), e::limit(x), 3);
         REQUIRE (e::first(range) == e::first(x) + 5);

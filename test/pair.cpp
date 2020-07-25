@@ -11,10 +11,10 @@ SCENARIO ("Using pairs", "[pair]")
 
     SECTION ("Creating pairs of move-only objects")
     {
-        e::pair x(e::loadable_position(0), 1);
+        e::pair x(e::loadable_cursor(0), 1);
 
-        e::loadable_position pos(1);
-        e::pair y(0, e::mv(pos));
+        e::loadable_cursor cur(1);
+        e::pair y(0, e::mv(cur));
     }
 
     SECTION ("Getting pair elements")

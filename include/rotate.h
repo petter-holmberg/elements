@@ -1,64 +1,63 @@
 #pragma once
 
 #include "integer.h"
-#include "pair.h"
 #include "reverse.h"
 #include "swap.h"
 
 namespace elements {
 
-template <Forward_position P, Limit<P> L>
-requires Mutable<P>
+template <Forward_cursor C, Limit<C> L>
+requires Mutable<C>
 constexpr void
-rotate_step(P& pos0, P& pos1, L lim)
+rotate_step(C& cur0, C& cur1, L lim)
 {
-    auto pos = pos1;
+    auto cur = cur1;
     do {
-        swap_step(pos0, pos);
-        if (pos0 == pos1) pos1 = pos;
-    } while (precedes(pos, lim));
+        swap_step(cur0, cur);
+        if (cur0 == cur1) cur1 = cur;
+    } while (precedes(cur, lim));
 }
 
-template <Forward_position P, Limit<P> L>
-requires Mutable<P>
+template <Forward_cursor C, Limit<C> L>
+requires Mutable<C>
 constexpr auto
-rotate_nontrivial(P pos0, L lim, P pos1) -> P
-//[[expects: mutable_bounded_range(pos, lim)]]
-//[[expects: precedes(pos0, pos1) and precedes(pos1, lim)]]
+rotate_nontrivial(C cur0, L lim, C cur1) -> C
+//[[expects: mutable_bounded_range(cur, lim)]]
+//[[expects: precedes(cur0, cur1) and precedes(cur1, lim)]]
 {
-    rotate_step(pos0, pos1, lim);
-    auto pos = pos0;
-    while (precedes(pos1, lim)) rotate_step(pos0, pos1, lim);
-    return pos;
+    rotate_step(cur0, cur1, lim);
+    auto cur = cur0;
+    while (precedes(cur1, lim)) rotate_step(cur0, cur1, lim);
+    return cur;
 }
 
-template <Bidirectional_position P, Limit<P> L>
-requires Mutable<P>
+template <Bidirectional_cursor C, Limit<C> L>
+requires Mutable<C>
 constexpr auto
-rotate_nontrivial(P pos0, L lim, P pos1) -> P
-//[[expects: mutable_bounded_range(pos, lim)]]
-//[[expects: precedes(pos0, pos1) and precedes(pos1, lim)]]
+rotate_nontrivial(C cur0, L lim, C cur1) -> C
+//[[expects: mutable_bounded_range(cur, lim)]]
+//[[expects: precedes(cur0, cur1) and precedes(cur1, lim)]]
 {
-    reverse(pos0, pos1);
-    reverse(pos1, lim);
-    auto [pos2, pos3] = reverse_swap(pos1, lim, pos0, pos1);
-    reverse(pos3, pos2);
-    if (pos1 == pos2) {
-        return pos3;
+    reverse(cur0, cur1);
+    reverse(cur1, lim);
+    auto [cur2, cur3] = reverse_swap(cur1, lim, cur0, cur1);
+    reverse(cur3, cur2);
+    if (cur1 == cur2) {
+        return cur3;
     } else {
-        return pos2;
+        return cur2;
     }
 }
 
-template <Forward_position P>
-requires Mutable<P>
+template <Forward_cursor C>
+requires Mutable<C>
 constexpr auto
-rotate(P pos0, P lim, P pos1) -> P
-//[[expects: mutable_bounded_range(pos, lim)]]
+rotate(C cur0, C lim, C cur1) -> C
+//[[expects: mutable_bounded_range(cur, lim)]]
 {
-    if (pos1 == pos0) return lim;
-    if (pos1 == lim) return pos0;
-    return rotate_nontrivial(pos0, lim, pos1);
+    if (cur1 == cur0) return lim;
+    if (cur1 == lim) return cur0;
+    return rotate_nontrivial(cur0, lim, cur1);
 }
 
 }

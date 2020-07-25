@@ -11,8 +11,8 @@ namespace elements {
 template <Movable T>
 struct list_singly_linked_front_back
 {
-    list_singly_linked_position<T> head;
-    list_singly_linked_position<T> tail;
+    list_singly_linked_cursor<T> head;
+    list_singly_linked_cursor<T> tail;
 
     constexpr
     list_singly_linked_front_back() = default;
@@ -71,38 +71,38 @@ struct list_singly_linked_front_back
     }
 
     constexpr auto
-    operator[](Difference_type<list_singly_linked_position<T>> i) -> T&
+    operator[](Difference_type<list_singly_linked_cursor<T>> i) -> T&
     {
-        auto pos = head + i;
-        return at(pos);
+        auto cur = head + i;
+        return at(cur);
     }
 
     constexpr auto
-    operator[](Difference_type<list_singly_linked_position<T>> i) const -> T const&
+    operator[](Difference_type<list_singly_linked_cursor<T>> i) const -> T const&
     {
-        auto pos = head + i;
-        return load(pos);
+        auto cur = head + i;
+        return load(cur);
     }
 
-    template <Unary_function Fun>
+    template <Unary_function F>
     requires
-        Same_as<Decay<T>, Domain<Fun>> and
-        Same_as<Decay<T>, Codomain<Fun>>
+        Same_as<Decay<T>, Domain<F>> and
+        Same_as<Decay<T>, Codomain<F>>
     constexpr auto
-    fmap(Fun fun) -> list_singly_linked_front_back<T>&
+    fmap(F fun) -> list_singly_linked_front_back<T>&
     {
         using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
         return at(this);
     }
 
-    template <Unary_function Fun>
-    requires Same_as<Decay<T>, Domain<Fun>>
+    template <Unary_function F>
+    requires Same_as<Decay<T>, Domain<F>>
     constexpr auto
-    fmap(Fun fun) const -> list_singly_linked_front_back<Codomain<Fun>>
+    fmap(F fun) const -> list_singly_linked_front_back<Codomain<F>>
     {
         using elements::map;
-        list_singly_linked_front_back<Codomain<Fun>> x;
+        list_singly_linked_front_back<Codomain<F>> x;
         map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
         return x;
     }
@@ -115,15 +115,15 @@ struct value_type_t<list_singly_linked_front_back<T>>
 };
 
 template <Movable T>
-struct position_type_t<list_singly_linked_front_back<T>>
+struct cursor_type_t<list_singly_linked_front_back<T>>
 {
-    using type = list_singly_linked_position<T>;
+    using type = list_singly_linked_cursor<T>;
 };
 
 template <Movable T>
-struct position_type_t<list_singly_linked_front_back<T const>>
+struct cursor_type_t<list_singly_linked_front_back<T const>>
 {
-    using type = list_singly_linked_position<T const>;
+    using type = list_singly_linked_cursor<T const>;
 };
 
 template <Movable T>
@@ -159,7 +159,7 @@ constexpr auto
 insert(front<list_singly_linked_front_back<T>> list, U&& x) -> front<list_singly_linked_front_back<T>>
 {
     auto& seq = base(list);
-    auto node = list_singly_linked_position{new list_node_singly_linked{fw<U>(x), first(seq).pos}};
+    auto node = list_singly_linked_cursor{new list_node_singly_linked{fw<U>(x), first(seq).cur}};
     if (is_empty(seq)) {
         seq.tail = node;
     }
@@ -172,7 +172,7 @@ constexpr auto
 insert(back<list_singly_linked_front_back<T>> list, U&& x) -> back<list_singly_linked_front_back<T>>
 {
     auto& seq = base(list);
-    auto node = list_singly_linked_position{new list_node_singly_linked{fw<U>(x)}};
+    auto node = list_singly_linked_cursor{new list_node_singly_linked{fw<U>(x)}};
     if (is_empty(seq)) {
         seq.head = node;
     } else {
@@ -187,7 +187,7 @@ constexpr auto
 insert(after<list_singly_linked_front_back<T>> list, U&& x) -> after<list_singly_linked_front_back<T>>
 {
     auto& seq = base(list);
-    auto node = list_singly_linked_position{new list_node_singly_linked{fw<U>(x)}};
+    auto node = list_singly_linked_cursor{new list_node_singly_linked{fw<U>(x)}};
     if (precedes(current(list), limit(list))) {
         if (!precedes(current(list), last(list))) {
             seq.tail = node;
@@ -235,12 +235,12 @@ constexpr auto
 erase(front<list_singly_linked_front_back<T>> list) -> front<list_singly_linked_front_back<T>>
 {
     auto& seq = base(list);
-    auto pos = successor(first(seq));
-    delete first(seq).pos;
+    auto cur = successor(first(seq));
+    delete first(seq).cur;
     if (!precedes(first(seq), last(seq))) {
-        seq.tail = pos;
+        seq.tail = cur;
     }
-    seq.head = pos;
+    seq.head = cur;
     return list;
 }
 
@@ -249,12 +249,12 @@ constexpr auto
 erase(after<list_singly_linked_front_back<T>> list) -> after<list_singly_linked_front_back<T>>
 {
     auto& seq = base(list);
-    auto rem_pos = successor(current(list));
+    auto rem_cur = successor(current(list));
     set_link_forward(current(list), successor(successor(current(list))));
     if (!precedes(current(list), limit(list))) {
         seq.tail = current(list);
     }
-    delete rem_pos.pos;
+    delete rem_cur.cur;
     return list;
 }
 
@@ -274,21 +274,21 @@ pop_first(list_singly_linked_front_back<T>& list)
 
 template <Movable T>
 constexpr auto
-first(list_singly_linked_front_back<T> const& x) -> Position_type<list_singly_linked_front_back<T>>
+first(list_singly_linked_front_back<T> const& x) -> Cursor_type<list_singly_linked_front_back<T>>
 {
     return x.head;
 }
 
 template <Movable T>
 constexpr auto
-last(list_singly_linked_front_back<T> const& x) -> Position_type<list_singly_linked_front_back<T>>
+last(list_singly_linked_front_back<T> const& x) -> Cursor_type<list_singly_linked_front_back<T>>
 {
     return x.tail;
 }
 
 template <Movable T>
 constexpr auto
-limit(list_singly_linked_front_back<T> const&) -> Position_type<list_singly_linked_front_back<T>>
+limit(list_singly_linked_front_back<T> const&) -> Cursor_type<list_singly_linked_front_back<T>>
 {
     return {};
 }

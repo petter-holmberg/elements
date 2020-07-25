@@ -4,63 +4,63 @@
 
 namespace elements {
 
-template <Unary_predicate U, Position P>
+template <Unary_predicate P, Cursor N>
 struct counter
 {
-    U& pred;
-    P& count;
+    P& pred;
+    N& count;
 
     constexpr
-    counter(U& pred_, P& count_)
+    counter(P& pred_, N& count_)
         : pred{pred_}
         , count{count_}
     {}
 
     constexpr void
-    operator()(Domain<U> const& x)
+    operator()(Domain<P> const& x)
     {
         if (invoke(pred, x)) increment(count);
     }
 };
 
-template <Position P, Limit<P> L, Unary_predicate U, Position C = Difference_type<P>>
+template <Cursor C, Limit<C> L, Unary_predicate P, Cursor N = Difference_type<C>>
 requires
-    Loadable<P> and
-    Same_as<Value_type<P>, Domain<U>>
+    Loadable<C> and
+    Same_as<Value_type<C>, Domain<P>>
 constexpr auto
-count_if(P pos, L lim, U pred, C count = Zero<C>) -> C
-//[[expects axiom: loadable_range(pos, lim)]]
+count_if(C cur, L lim, P pred, N count = Zero<N>) -> N
+//[[expects axiom: loadable_range(cur, lim)]]
 {
-    return for_each(mv(pos), lim, counter{pred, count}).count;
+    return for_each(mv(cur), lim, counter{pred, count}).procedure.count;
 }
 
-template <Position P, Limit<P> L, Unary_predicate U, Position C = Difference_type<P>>
+template <Cursor C, Limit<C> L, Unary_predicate P, Cursor N = Difference_type<C>>
 requires
-    Loadable<P> and
-    Same_as<Value_type<P>, Domain<U>>
+    Loadable<C> and
+    Same_as<Value_type<C>, Domain<P>>
 constexpr auto
-count_if_not(P pos, L lim, U pred, C count = Zero<C>) -> C
-//[[expects axiom: loadable_range(pos, lim)]]
+count_if_not(C cur, L lim, P pred, N count = Zero<N>) -> N
+//[[expects axiom: loadable_range(cur, lim)]]
 {
-    return count_if(mv(pos), lim, negation{pred}, count);
+    return count_if(mv(cur), lim, negation{pred}, count);
 }
 
-template <Position P, Limit<P> L, Position C = Value_type<P>>
-requires Loadable<P>
+template <Cursor C, Limit<C> L, Cursor N = Value_type<C>>
+requires Loadable<C>
 constexpr auto
-count(P pos, L lim, Value_type<P> const& value, C count = Zero<C>) -> C
-//[[expects axiom: loadable_range(pos, lim)]]
+count(C cur, L lim, Value_type<C> const& value, N count = Zero<N>) -> N
+//[[expects axiom: loadable_range(cur, lim)]]
 {
-    return count_if(mv(pos), lim, equal_unary{value}, count);
+    return count_if(mv(cur), lim, equal_unary{value}, count);
 }
 
-template <Position P, Limit<P> L, Position C = Value_type<P>>
-requires Loadable<P>
+template <Cursor C, Limit<C> L, Cursor N = Value_type<C>>
+requires Loadable<C>
 constexpr auto
-count_not(P pos, L lim, Value_type<P> const& value, C count = Zero<C>) -> C
-//[[expects axiom: loadable_range(pos, lim)]]
+count_not(C cur, L lim, Value_type<C> const& value, N count = Zero<N>) -> N
+//[[expects axiom: loadable_range(cur, lim)]]
 {
-    return count_if_not(mv(pos), lim, equal_unary{value}, count);
+    return count_if_not(mv(cur), lim, equal_unary{value}, count);
 }
 
 }

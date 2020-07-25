@@ -9,7 +9,7 @@ SCENARIO ("Using doubly linked list with front and back links", "[list_doubly_li
 {
     e::list_doubly_linked_front_back<int> x{0, 1, 2, 3, 4};
     static_assert(e::Dynamic_sequence<decltype(x), e::front<decltype(x)>>);
-    static_assert(e::Linked_bidirectional_position<e::Position_type<decltype(x)>>);
+    static_assert(e::Linked_bidirectional_cursor<e::Cursor_type<decltype(x)>>);
 
     REQUIRE (e::axiom_Regular(x));
 
@@ -158,7 +158,7 @@ SCENARIO ("Using doubly linked list with front and back links", "[list_doubly_li
             CHECK (x0[2] == 0);
         }
 
-        SECTION ("Inserting before position")
+        SECTION ("Inserting before cursor")
         {
             auto before = e::before{x0, e::first(x0)};
 
@@ -175,7 +175,7 @@ SCENARIO ("Using doubly linked list with front and back links", "[list_doubly_li
             CHECK (x0[0] == 1);
             CHECK (x0[1] == 0);
 
-            e::increment(before.pos);
+            e::increment(before.cur);
             e::insert(before, 2);
 
             REQUIRE (!e::is_empty(x0));
@@ -185,7 +185,7 @@ SCENARIO ("Using doubly linked list with front and back links", "[list_doubly_li
             CHECK (x0[2] == 0);
         }
 
-        SECTION ("Inserting after position")
+        SECTION ("Inserting after cursor")
         {
             auto after = e::after{x0, e::first(x0)};
 
@@ -268,26 +268,26 @@ SCENARIO ("Using doubly linked list with front and back links", "[list_doubly_li
             REQUIRE (e::size(x0) == 0);
         }
 
-        SECTION ("Erasing at position")
+        SECTION ("Erasing at cursor")
         {
-            auto pos = e::successor(e::first(x0));
+            auto cur = e::successor(e::first(x0));
 
-            e::erase(pos);
+            e::erase(cur);
 
             REQUIRE (!e::is_empty(x0));
             REQUIRE (e::size(x0) == 2);
             CHECK (x0[0] == 0);
             CHECK (x0[1] == 2);
 
-            pos = e::first(x0);
-            e::erase(pos);
+            cur = e::first(x0);
+            e::erase(cur);
 
             REQUIRE (!e::is_empty(x0));
             REQUIRE (e::size(x0) == 1);
             CHECK (x0[0] == 2);
 
-            pos = e::first(x0);
-            e::erase(pos);
+            cur = e::first(x0);
+            e::erase(cur);
 
             REQUIRE (e::is_empty(x0));
             REQUIRE (e::size(x0) == 0);

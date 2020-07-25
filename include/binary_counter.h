@@ -4,24 +4,24 @@
 
 namespace elements {
 
-template <Forward_position P, Limit<P> L, Binary_operation Op>
+template <Forward_cursor C, Limit<C> L, Binary_operation Op>
 requires
-    Mutable<P> and
-    Same_as<Decay<Value_type<P>>, Domain<Op>>
+    Mutable<C> and
+    Same_as<Decay<Value_type<C>>, Domain<Op>>
 constexpr auto
-add_to_counter(P pos, L lim, Op op, Domain<Op> x, Domain<Op> const& zero) -> Domain<Op>
-//[[expects axiom: loadable_range(pos, lim)]]
+add_to_counter(C cur, L lim, Op op, Domain<Op> x, Domain<Op> const& zero) -> Domain<Op>
+//[[expects axiom: loadable_range(cur, lim)]]
 //[[expects axiom: partially_associative(op)]]
 {
     if (x == zero) return zero;
-    while (precedes(pos, lim)) {
-        if (load(pos) == zero) {
-            store(pos, x);
+    while (precedes(cur, lim)) {
+        if (load(cur) == zero) {
+            store(cur, x);
             return zero;
         }
-        store(x, op(load(pos), x));
-        store(pos, zero);
-        increment(pos);
+        store(x, op(load(cur), x));
+        store(cur, zero);
+        increment(cur);
     }
     return x;
 }
@@ -70,28 +70,28 @@ struct size_type_t<binary_counter<Op, k>>
 
 template <Binary_operation Op, pointer_diff k>
 constexpr auto
-first(binary_counter<Op, k>& x) -> Position_type<Value_type<binary_counter<Op, k>>>
+first(binary_counter<Op, k>& x) -> Cursor_type<Value_type<binary_counter<Op, k>>>
 {
     return first(x.data);
 }
 
 template <Binary_operation Op, pointer_diff k>
 constexpr auto
-first(binary_counter<Op, k> const& x) -> Position_type<Value_type<binary_counter<Op, k>> const>
+first(binary_counter<Op, k> const& x) -> Cursor_type<Value_type<binary_counter<Op, k>> const>
 {
     return first(x.data);
 }
 
 template <Binary_operation Op, pointer_diff k>
 constexpr auto
-limit(binary_counter<Op, k>& x) -> Position_type<Value_type<binary_counter<Op, k>>>
+limit(binary_counter<Op, k>& x) -> Cursor_type<Value_type<binary_counter<Op, k>>>
 {
     return first(x) + size(x);
 }
 
 template <Binary_operation Op, pointer_diff k>
 constexpr auto
-limit(binary_counter<Op, k> const& x) -> Position_type<Value_type<binary_counter<Op, k>> const>
+limit(binary_counter<Op, k> const& x) -> Cursor_type<Value_type<binary_counter<Op, k>> const>
 {
     return first(x) + size(x);
 }

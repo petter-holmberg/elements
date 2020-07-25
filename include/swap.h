@@ -13,55 +13,55 @@ swap(T& x, T& y)
     y = mv(z);
 }
 
-template <Forward_position P0, Forward_position P1>
+template <Forward_cursor C0, Forward_cursor C1>
 requires
-    Mutable<P0> and
-    Mutable<P1> and
-    Same_as<Value_type<P0>, Value_type<P1>>
+    Mutable<C0> and
+    Mutable<C1> and
+    Same_as<Value_type<C0>, Value_type<C1>>
 constexpr void
-swap_step(P0& pos0, P1& pos1)
+swap_step(C0& cur0, C1& cur1)
 {
-    swap(at(pos0), at(pos1));
-    increment(pos0);
-    increment(pos1);
+    swap(at(cur0), at(cur1));
+    increment(cur0);
+    increment(cur1);
 }
 
-template <Forward_position P0, Limit<P0> L, Forward_position P1>
+template <Forward_cursor C0, Limit<C0> L, Forward_cursor C1>
 requires
-    Mutable<P0> and
-    Mutable<P1> and
-    Same_as<Value_type<P0>, Value_type<P1>>
+    Mutable<C0> and
+    Mutable<C1> and
+    Same_as<Value_type<C0>, Value_type<C1>>
 constexpr auto
-swap(P0 pos0, L lim, P1 pos1) -> P1
+swap(C0 cur0, L lim, C1 cur1) -> C1
 {
-    while (precedes(pos0, lim)) swap_step(pos0, pos1);
-    return pos1;
+    while (precedes(cur0, lim)) swap_step(cur0, cur1);
+    return cur1;
 }
 
-template <Bidirectional_position P0, Forward_position P1>
+template <Bidirectional_cursor C0, Forward_cursor C1>
 requires
-    Mutable<P0> and
-    Mutable<P1> and
-    Same_as<Value_type<P0>, Value_type<P1>>
+    Mutable<C0> and
+    Mutable<C1> and
+    Same_as<Value_type<C0>, Value_type<C1>>
 constexpr void
-reverse_swap_step(P0& pos0, P1& pos1)
+reverse_swap_step(C0& cur0, C1& cur1)
 {
-    decrement(pos0);
-    swap(at(pos0), at(pos1));
-    increment(pos1);
+    decrement(cur0);
+    swap(at(cur0), at(cur1));
+    increment(cur1);
 }
 
-template <Bidirectional_position P0, Limit<P0> L0, Bidirectional_position P1, Limit<P1> L1>
+template <Bidirectional_cursor C0, Limit<C0> L0, Bidirectional_cursor C1, Limit<C1> L1>
 requires
-    Mutable<P0> and
-    Mutable<P1>
+    Mutable<C0> and
+    Mutable<C1>
 constexpr auto
-reverse_swap(P0 pos0, L0 lim0, P1 pos1, L1 lim1) -> pair<P0, P1>
-//[[expects: mutable_bounded_range(pos0, lim0)]]
-//[[expects: mutable_bounded_range(pos1, lim1)]]
+reverse_swap(C0 cur0, L0 lim0, C1 cur1, L1 lim1) -> pair<C0, C1>
+//[[expects: mutable_bounded_range(cur0, lim0)]]
+//[[expects: mutable_bounded_range(cur1, lim1)]]
 {
-    while (precedes(pos0, lim0) and precedes(pos1, lim1)) reverse_swap_step(lim0, pos1);
-    return {lim0, pos1};
+    while (precedes(cur0, lim0) and precedes(cur1, lim1)) reverse_swap_step(lim0, cur1);
+    return {lim0, cur1};
 }
 
 }

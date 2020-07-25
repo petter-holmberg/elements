@@ -4,7 +4,7 @@
 #include <cstddef>
 
 #include "algebra.h"
-#include "position.h"
+#include "cursor.h"
 
 namespace e = elements;
 

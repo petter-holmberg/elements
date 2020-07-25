@@ -10,36 +10,36 @@ namespace elements {
 template <Movable T>
 struct list_node_doubly_linked_sentinel_links
 {
-    Pointer_type<list_node_doubly_linked<T>> pos_next{};
-    Pointer_type<list_node_doubly_linked<T>> pos_prev{};
+    Pointer_type<list_node_doubly_linked<T>> next{};
+    Pointer_type<list_node_doubly_linked<T>> prev{};
 
     constexpr
     list_node_doubly_linked_sentinel_links()
-        : pos_next{reinterpret_cast<Pointer_type<list_node_doubly_linked<T>>>(this)}
-        , pos_prev{reinterpret_cast<Pointer_type<list_node_doubly_linked<T>>>(this)}
+        : next{reinterpret_cast<Pointer_type<list_node_doubly_linked<T>>>(this)}
+        , prev{reinterpret_cast<Pointer_type<list_node_doubly_linked<T>>>(this)}
     {}
 };
 
 template <Movable T>
 constexpr auto
-allocate_list_doubly_linked_sentinel_node() -> list_doubly_linked_position<T>
+allocate_list_doubly_linked_sentinel_node() -> list_doubly_linked_cursor<T>
 {
-    return list_doubly_linked_position<T>{
+    return list_doubly_linked_cursor<T>{
         reinterpret_cast<Pointer_type<list_node_doubly_linked<T>>>(
             new list_node_doubly_linked_sentinel_links<T>)};
 }
 
 template <Movable T>
 constexpr void
-deallocate_list_doubly_linked_sentinel_node(list_doubly_linked_position<T> pos)
+deallocate_list_doubly_linked_sentinel_node(list_doubly_linked_cursor<T> cur)
 {
-    delete reinterpret_cast<Pointer_type<list_node_doubly_linked_sentinel_links<T>>>(pos.pos);
+    delete reinterpret_cast<Pointer_type<list_node_doubly_linked_sentinel_links<T>>>(cur.cur);
 }
 
 template <Movable T>
 struct list_doubly_linked_sentinel
 {
-    list_doubly_linked_position<T> sentinel{};
+    list_doubly_linked_cursor<T> sentinel{};
 
     constexpr
     list_doubly_linked_sentinel()
@@ -104,38 +104,38 @@ struct list_doubly_linked_sentinel
     }
 
     constexpr auto
-    operator[](Difference_type<list_doubly_linked_position<T>> i) -> T&
+    operator[](Difference_type<list_doubly_linked_cursor<T>> i) -> T&
     {
-        auto pos = first(at(this)) + i;
-        return at(pos);
+        auto cur = first(at(this)) + i;
+        return at(cur);
     }
 
     constexpr auto
-    operator[](Difference_type<list_doubly_linked_position<T>> i) const -> T const&
+    operator[](Difference_type<list_doubly_linked_cursor<T>> i) const -> T const&
     {
-        auto pos = first(at(this)) + i;
-        return load(pos);
+        auto cur = first(at(this)) + i;
+        return load(cur);
     }
 
-    template <Unary_function Fun>
+    template <Unary_function F>
     requires
-        Same_as<Decay<T>, Domain<Fun>> and
-        Same_as<Decay<T>, Codomain<Fun>>
+        Same_as<Decay<T>, Domain<F>> and
+        Same_as<Decay<T>, Codomain<F>>
     constexpr auto
-    fmap(Fun fun) -> list_doubly_linked_sentinel<T>&
+    fmap(F fun) -> list_doubly_linked_sentinel<T>&
     {
         using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
         return at(this);
     }
 
-    template <Unary_function Fun>
-    requires Same_as<Decay<T>, Domain<Fun>>
+    template <Unary_function F>
+    requires Same_as<Decay<T>, Domain<F>>
     constexpr auto
-    fmap(Fun fun) const -> list_doubly_linked_sentinel<Codomain<Fun>>
+    fmap(F fun) const -> list_doubly_linked_sentinel<Codomain<F>>
     {
         using elements::map;
-        list_doubly_linked_sentinel<Codomain<Fun>> x;
+        list_doubly_linked_sentinel<Codomain<F>> x;
         map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
         return x;
     }
@@ -148,15 +148,15 @@ struct value_type_t<list_doubly_linked_sentinel<T>>
 };
 
 template <Movable T>
-struct position_type_t<list_doubly_linked_sentinel<T>>
+struct cursor_type_t<list_doubly_linked_sentinel<T>>
 {
-    using type = list_doubly_linked_position<T>;
+    using type = list_doubly_linked_cursor<T>;
 };
 
 template <Movable T>
-struct position_type_t<list_doubly_linked_sentinel<T const>>
+struct cursor_type_t<list_doubly_linked_sentinel<T const>>
 {
-    using type = list_doubly_linked_position<T const>;
+    using type = list_doubly_linked_cursor<T const>;
 };
 
 template <Movable T>
@@ -191,9 +191,9 @@ constexpr auto
 insert(front<list_doubly_linked_sentinel<T>> list, U&& x) -> front<list_doubly_linked_sentinel<T>>
 {
     auto& seq = base(list);
-    auto node = new list_node_doubly_linked{fw<U>(x), first(seq).pos, limit(seq).pos};
+    auto node = new list_node_doubly_linked{fw<U>(x), first(seq).cur, limit(seq).cur};
     next_link(seq.sentinel) = node;
-    at(at(node).pos_next).pos_prev = node;
+    at(at(node).next).prev = node;
     return list;
 }
 
@@ -202,8 +202,8 @@ constexpr auto
 insert(back<list_doubly_linked_sentinel<T>> list, U&& x) -> back<list_doubly_linked_sentinel<T>>
 {
     auto& seq = base(list);
-    auto node = new list_node_doubly_linked{fw<U>(x), limit(seq).pos, last(seq).pos};
-    at(predecessor(seq.sentinel).pos).pos_next = node;
+    auto node = new list_node_doubly_linked{fw<U>(x), limit(seq).cur, last(seq).cur};
+    at(predecessor(seq.sentinel).cur).next = node;
     prev_link(seq.sentinel) = node;
     return list;
 }
@@ -213,11 +213,11 @@ constexpr auto
 insert(before<list_doubly_linked_sentinel<T>> list, U&& x) -> before<list_doubly_linked_sentinel<T>>
 {
     auto& seq = base(list);
-    auto pos = current(list);
-    auto node = new list_node_doubly_linked{fw<U>(x), pos.pos, at(pos.pos).pos_prev};
-    prev_link(pos) = node;
-    at(at(node).pos_prev).pos_next = node;
-    return before{seq, list_doubly_linked_position{node}};
+    auto cur = current(list);
+    auto node = new list_node_doubly_linked{fw<U>(x), cur.cur, at(cur.cur).prev};
+    prev_link(cur) = node;
+    at(at(node).prev).next = node;
+    return before{seq, list_doubly_linked_cursor{node}};
 }
 
 template <Movable T, Constructible_from<T> U>
@@ -225,11 +225,11 @@ constexpr auto
 insert(after<list_doubly_linked_sentinel<T>> list, U&& x) -> after<list_doubly_linked_sentinel<T>>
 {
     auto& seq = base(list);
-    auto pos = current(list);
-    auto node = new list_node_doubly_linked{fw<U>(x), at(pos.pos).pos_next, pos.pos};
-    at(at(pos.pos).pos_next).pos_prev = node;
-    next_link(pos) = node;
-    return after{seq, list_doubly_linked_position{node}};
+    auto cur = current(list);
+    auto node = new list_node_doubly_linked{fw<U>(x), at(cur.cur).next, cur.cur};
+    at(at(cur.cur).next).prev = node;
+    next_link(cur) = node;
+    return after{seq, list_doubly_linked_cursor{node}};
 }
 
 template <Movable T, Constructible_from<T> U>
@@ -265,9 +265,9 @@ constexpr auto
 erase(front<list_doubly_linked_sentinel<T>> list) -> front<list_doubly_linked_sentinel<T>>
 {
     auto& seq = base(list);
-    auto pos = first(seq);
-    set_link_bidirectional(predecessor(pos), successor(pos));
-    delete pos.pos;
+    auto cur = first(seq);
+    set_link_bidirectional(predecessor(cur), successor(cur));
+    delete cur.cur;
     return list;
 }
 
@@ -276,18 +276,18 @@ constexpr auto
 erase(back<list_doubly_linked_sentinel<T>> list) -> back<list_doubly_linked_sentinel<T>>
 {
     auto& seq = base(list);
-    auto pos = last(seq);
-    set_link_bidirectional(predecessor(pos), successor(pos));
-    delete pos.pos;
+    auto cur = last(seq);
+    set_link_bidirectional(predecessor(cur), successor(cur));
+    delete cur.cur;
     return list;
 }
 
 template <Movable T>
 constexpr void
-erase(list_doubly_linked_position<T> pos)
+erase(list_doubly_linked_cursor<T> cur)
 {
-    set_link_bidirectional(predecessor(pos), successor(pos));
-    delete pos.pos;
+    set_link_bidirectional(predecessor(cur), successor(cur));
+    delete cur.cur;
 }
 
 template <Movable T>
@@ -313,21 +313,21 @@ pop_last(list_doubly_linked_sentinel<T>& list)
 
 template <Movable T>
 constexpr auto
-first(list_doubly_linked_sentinel<T> const& x) -> Position_type<list_doubly_linked_sentinel<T>>
+first(list_doubly_linked_sentinel<T> const& x) -> Cursor_type<list_doubly_linked_sentinel<T>>
 {
     return successor(x.sentinel);
 }
 
 template <Movable T>
 constexpr auto
-last(list_doubly_linked_sentinel<T> const& x) -> Position_type<list_doubly_linked_sentinel<T>>
+last(list_doubly_linked_sentinel<T> const& x) -> Cursor_type<list_doubly_linked_sentinel<T>>
 {
     return predecessor(x.sentinel);
 }
 
 template <Movable T>
 constexpr auto
-limit(list_doubly_linked_sentinel<T> const& x) -> Position_type<list_doubly_linked_sentinel<T>>
+limit(list_doubly_linked_sentinel<T> const& x) -> Cursor_type<list_doubly_linked_sentinel<T>>
 {
     return x.sentinel;
 }

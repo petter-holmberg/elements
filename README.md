@@ -5,23 +5,23 @@ Library contents
 
 Adapters are type constructors that provide a different behavior and/or different interface than the given type.
 
-## Position adapters
+## Cursor adapters
 
-`position` takes a `Position` and provides the minimal interface required.
+`cursor` takes a `Cursor` and provides the minimal interface required.
 
-`forward_position` takes a `Forward_position` and provides the minimal interface required.
+`forward_cursor` takes a `Forward_cursor` and provides the minimal interface required.
 
-`counted_position` takes a `Position` and optionally a count of the `Difference_type` of the position, constructing a position type that can be compared against a limit that is `Equality_comparable_with` the count. `increment` increments both the position and the count, `decrement` decrements both the position and the count.
+`counted_cursor` takes a `Cursor` and optionally a count of the `Difference_type` of the cursor, constructing a cursor type that can be compared against a limit that is `Equality_comparable_with` the count. `increment` increments both the cursor and the count, `decrement` decrements both the cursor and the count.
 
-`loadable_position` takes a `Loadable` `Position` and provides the minimal interface required.
+`loadable_cursor` takes a `Loadable` `Cursor` and provides the minimal interface required.
 
-`reverse_position` takes a `Bidirectional_position` and implements a `Bidirectional_position` where `increment` decrements and `decrement` increments. Loading and storing is done from the predecessor of the original position. It is used for traversing ranges in reverse.
+`reverse_cursor` takes a `Bidirectional_cursor` and implements a `Bidirectional_cursor` where `increment` decrements and `decrement` increments. Loading and storing is done from the predecessor of the original cursor. It is used for traversing ranges in reverse.
 
-`filter_position` takes a `Storable` `Position` and a `Unary_predicate`, constructing a position type that stores and increments when `store` is called, if the predicate is true for the current element. `filter_sink` takes a `Unary_predicate`, constructing an `Invocable` type that returns a `filter_position` when invoked with a `Storable` `Position`.
+`filter_cursor` takes a `Storable` `Cursor` and a `Unary_predicate`, constructing a cursor type that stores and increments when `store` is called, if the predicate is true for the current element. `filter_sink` takes a `Unary_predicate`, constructing an `Invocable` type that returns a `filter_cursor` when invoked with a `Storable` `Cursor`.
 
-`insert_position` takes a `Storable` `Position`, constructing a position type that applies the function `insert` on the current element when `store` is called. `insert_sink` in an `Invocable` type that returns an `insert_position` when invoked with a `Storable` `Position`.
+`insert_cursor` takes a `Storable` `Cursor`, constructing a cursor type that applies the function `insert` on the current element when `store` is called. `insert_sink` in an `Invocable` type that returns an `insert_cursor` when invoked with a `Storable` `Cursor`.
 
-`map_position` takes a `Storable` `Position` and a `Unary_function`, constructing a position type that applies the function on the current element when `store` is called. `map_sink` takes a `Unary_function`, constructing an `Invocable` type that returns a `map_position` when invoked with a `Storable` `Position`.
+`map_cursor` takes a `Storable` `Cursor` and a `Unary_function`, constructing a cursor type that applies the function on the current element when `store` is called. `map_sink` takes a `Unary_function`, constructing an `Invocable` type that returns a `map_cursor` when invoked with a `Storable` `Cursor`.
 
 # Algorithms
 
@@ -58,19 +58,19 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 ## Copying
 
-`copy` takes a loadable range as source and a storable position as destination. It performs copying from the first to the last element of the source, which implies that the range starting at the destination position can overlap with the source position, as long as no source position is read after an aliased destination position.
+`copy` takes a loadable range as source and a storable cursor as destination. It performs copying from the first to the last element of the source, which implies that the range starting at the destination cursor can overlap with the source cursor, as long as no source cursor is read after an aliased destination cursor.
 
-`copy_select` takes a loadable range as source, a storable position as destination, and a `Unary_predicate` to determine which of the elements from the source that should be copied to the destination.
+`copy_select` takes a loadable range as source, a storable cursor as destination, and a `Unary_predicate` to determine which of the elements from the source that should be copied to the destination.
 
-`copy_if` takes a loadable range as source, a storable position as destination, and a `Unary_predicate` to determine which of the elements from the source that should be copied to the destination. The predicate is tested on the elements at the source positions.
+`copy_if` takes a loadable range as source, a storable cursor as destination, and a `Unary_predicate` to determine which of the elements from the source that should be copied to the destination. The predicate is tested on the elements at the source cursors.
 
-`copy_if_not` takes a loadable range as source, a storable position as destination, and a `Unary_predicate` to determine which of the elements from the source that should not be copied to the destination. The predicate is tested on the elements at the source positions.
+`copy_if_not` takes a loadable range as source, a storable cursor as destination, and a `Unary_predicate` to determine which of the elements from the source that should not be copied to the destination. The predicate is tested on the elements at the source cursors.
 
 ## Map
 
-The first version of `map` takes a loadable range as source, a storable position as destination, and a unary function to apply to every element in the source range, storing the result in the range starting at the destination position. It applies the function from the first to the last element of the source, which implies that the range starting at the destination position can overlap with the source position, as long as no source position is read after an aliased destination position.
+The first version of `map` takes a loadable range as source, a storable cursor as destination, and a unary function to apply to every element in the source range, storing the result in the range starting at the destination cursor. It applies the function from the first to the last element of the source, which implies that the range starting at the destination cursor can overlap with the source cursor, as long as no source cursor is read after an aliased destination cursor.
 
-The second version of `map` takes a loadable range and a loadable position as sources, a storable position as destination, and a binary function to apply to every corresponding pair of elements in the source ranges, storing the result in the range starting at the destination position. It applies the function from the first to the last element of the sources, which implies that the range starting at the destination position can overlap with any of the source positions, as long as no source position is read after an aliased destination position.
+The second version of `map` takes a loadable range and a loadable cursor as sources, a storable cursor as destination, and a binary function to apply to every corresponding pair of elements in the source ranges, storing the result in the range starting at the destination cursor. It applies the function from the first to the last element of the sources, which implies that the range starting at the destination cursor can overlap with any of the source cursors, as long as no source cursor is read after an aliased destination cursor.
 
 ## Reduce
 
@@ -92,13 +92,13 @@ This algorithm minimizes the cost of applying the operation if the size of a red
 
 `is_partitioned` takes a loadable range and a unary predicate. It checks if the range is partitioned according to the predicate, with all elements not satisfying the predicate preceding the elements satisfying the predicate.
 
-`partition_point_counted` takes a forward position, a distance, and a unary predicate, assuming that the range from the position to the position + distance is partitioned according to the predicate. Using bisection, it returns the position of the first element satisfying the predicate.
+`partition_point_counted` takes a forward cursor, a distance, and a unary predicate, assuming that the range from the cursor to the cursor + distance is partitioned according to the predicate. Using bisection, it returns a cursor pointing to the first element satisfying the predicate.
 
-`partition_point` takes a loadable forward range and a unary predicate, assuming that the range is partitioned according to the predicate. Using bisection, it returns the position of the first element satisfying the predicate.
+`partition_point` takes a loadable forward range and a unary predicate, assuming that the range is partitioned according to the predicate. Using bisection, it returns a cursor pointing to the first element satisfying the predicate.
 
-`partition_semistable` takes a mutable forward range and a unary prediate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It preserves the relative ordering of the elements not satisfying the predicate, but not the relative ordering of the elements satisfying the predicate. It returns the partition point, i.e. the position of the first element satisfying the predicate.
+`partition_semistable` takes a mutable forward range and a unary prediate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It preserves the relative ordering of the elements not satisfying the predicate, but not the relative ordering of the elements satisfying the predicate. It returns the partition point, i.e. a cursor pointing to the first element satisfying the predicate.
 
-`partition_with_buffer` takes a mutable forward range, the position of the first element of a mutable buffer with a size not less than the size of the forward range, and a unary prediate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It preserves the relative ordering of the elements on both sides of the partition point. It returns the partition point.
+`partition_with_buffer` takes a mutable forward range, a cursor pointing to the first element of a mutable buffer with a size not less than the size of the forward range, and a unary prediate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It preserves the relative ordering of the elements on both sides of the partition point. It returns the partition point.
 
 `partition` takes a mutable bidirectional range and a unary prediate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It preserves the relative ordering of the elements on both sides of the partition point. It returns the partition point.
 
@@ -108,9 +108,9 @@ This algorithm minimizes the cost of applying the operation if the size of a red
 
 The functions in `search.h` implement algorithms based on binary search, as described in [Knuth3](#Knuth3), Chapter 6.2.
 
-`search_binary_lower` takes a loadable forward range and a relation defaulting to `less`, assuming that the range is ordered in accordance with the relation. It returns the position of the first element satisfying the relation.
+`search_binary_lower` takes a loadable forward range and a relation defaulting to `less`, assuming that the range is ordered in accordance with the relation. It returns a cursor pointing to the first element satisfying the relation.
 
-`search_binary_upper` takes a loadable forward range and a relation defaulting to `less`, assuming that the range is ordered in accordance with the relation. It returns the successor to the position of the last element satisfying the relation.
+`search_binary_upper` takes a loadable forward range and a relation defaulting to `less`, assuming that the range is ordered in accordance with the relation. It returns the successor of a cursor pointing to the last element satisfying the relation.
 
 `search_binary` takes a loadable forward range and a relation defaulting to `less`, assuming that the range is ordered in accordance with the relation. It finds the `bounded_range` of elements satisfying the relation.
 
@@ -128,11 +128,11 @@ For `search_not`, a match is defined as the first element `y` for which the give
 
 `search_backward`, `search_backward_not`, `search_backward_if`, and `search_backward_if_not` are variations of the functions above that search backward through the loadable range.
 
-`search_unguarded`, `search_not_unguarded`, `search_if_unguarded`, and `search_if_not_unguarded` are variations of the functions above that assume an element satisfying the applied predicate is known to exist in the given range (which necessarily is nonempty). They take a position to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration. Iteration is faster because the end of the range doesn't need to be checked.
+`search_unguarded`, `search_not_unguarded`, `search_if_unguarded`, and `search_if_not_unguarded` are variations of the functions above that assume an element satisfying the applied predicate is known to exist in the given range (which necessarily is nonempty). They take a cursor pointing to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration. Iteration is faster because the end of the range doesn't need to be checked.
 
-`search_guarded`, `search_not_guarded`, `search_if_guarded`, and `search_if_not_guarded` are variations of the functions above that temporarily put a `sentinel` value at the last position of the range, to enable search nearly as fast as for the unguarded variations. They require the range to be `Mutable` and take the last position of the range instead of its limit. `search_not_guarded`, `search_if_guarded`, and `search_if_not_guarded` also take a sentinel value to be used to ensure termination.
+`search_guarded`, `search_not_guarded`, `search_if_guarded`, and `search_if_not_guarded` are variations of the functions above that temporarily put a `sentinel` value at the last position of the range, to enable search nearly as fast as for the unguarded variations. They require the range to be `Mutable` and take a cursor pointing to the last element of the range instead of its limit. `search_not_guarded`, `search_if_guarded`, and `search_if_not_guarded` also take a sentinel value to be used to ensure termination.
 
-assume an element satisfying the applied predicate is known to exist in the given range. They take a position to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration.
+assume an element satisfying the applied predicate is known to exist in the given range. They take a cursor pointing to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration.
 
 `search_match` and `search_mismatch` take two loadable ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `equal`.
 
@@ -141,8 +141,8 @@ stopping at the first position where an element and its successor satisfy the re
 
 ### Subsequence search
 
-`search_subsequence` takes two loadable ranges, the position of the first element of a mutable buffer of the `Difference_type` of the range position, with a size not less than the size of the second range, and an optional relation. The default relation is `equal`
-It will return the position of the first subsequence in the first range that matches the second range, or the limit of the first range if no subsequence matching the second range is found.
+`search_subsequence` takes two loadable ranges, a cursor pointing to the first element of a mutable buffer of the `Difference_type` of the range cursor, with a size not less than the size of the second range, and an optional relation. The default relation is `equal`
+It will return a cursor pointing to the first subsequence in the first range that matches the second range, or the limit of the first range if no subsequence matching the second range is found.
 
 ## Permutations
 
@@ -152,11 +152,11 @@ It will return the position of the first subsequence in the first range that mat
 
 ### Rotate
 
-`rotate` takes a mutable range and a position in the range, swapping elements such that the element at the given position becomes the first element in the range, and the element preceding it becomes the last element.
+`rotate` takes a mutable range and a cursor in the range, swapping elements such that the element at the given cursor's position becomes the first element in the range, and the element preceding it becomes the last element.
 
 ## Side effects
 
-`for_each` takes a loadable range and a procedure of `Arity` 1. It applies the procedure on each value in the range, returning the procedure as it could have accumulated information during the traversal.
+`for_each` takes a loadable range and a procedure of `Arity` 1. It applies the procedure on each value in the range, returning a `for_each_result` containing a cursor and the procedure. The cursor points at the position where the iteration has stopped (which may not be reachable a second time), and the procedure is returned as it could have accumulated information during the traversal.
 
 ## Quantifiers
 
@@ -167,9 +167,9 @@ It will return the position of the first subsequence in the first range that mat
 
 ## Zipping/Unzipping
 
-`zip` takes two loadable ranges as sources and a storable position as destination. It performs copying from the first to the last element of the sources, starting with the first source and alternating between the sources for every element. If one of the source ranges is longer than the other, its remaining elements are appended at the end.
+`zip` takes two loadable ranges as sources and a storable cursor as destination. It performs copying from the first to the last element of the sources, starting with the first source and alternating between the sources for every element. If one of the source ranges is longer than the other, its remaining elements are appended at the end.
 
-`unzip` takes one loadable range as source and two storable positions as destinations. It performs copying from the first to the last element of the source, alternating between the destinations for each element.
+`unzip` takes one loadable range as source and two storable cursors as destinations. It performs copying from the first to the last element of the source, alternating between the destinations for each element.
 
 # Data structures
 
@@ -191,11 +191,11 @@ It will return the position of the first subsequence in the first range that mat
 
 ### Ranges
 
-`bounded_range` implements a `Range` consisting of two `Loadable` positions.
+`bounded_range` implements a `Range` consisting of two `Loadable` cursors.
 
 ### Static sequences
 
-`pair` implements a structure of two elements (that may differ in type) allocated on the stack. They can be accessed through the function `get`, either by position or by type. If the two elements
+`pair` implements a structure of two elements (that may differ in type) allocated on the stack. They can be accessed through the function `get`, either by cursor or by type. If the two elements
 are of the same type, `pair` also provides a functor interface through the member function `.map`.
 
 `array_k` implements an array of *k* elements contiguously allocated on the stack, like built-in C++ arrays, but with regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
@@ -213,24 +213,24 @@ Lists have regular semantics, lexicographic comparison operators, and supporting
 
 ###### Singly-linked lists
 
-Singly-linked lists provide a `Forward_position`.
+Singly-linked lists provide a `Forward_cursor`.
 
-`list_singly_linked_front` implements a singly-linked list that supports constant-time `insert` and `erase` at the front or after a given position. The header and position type are the size of a single pointer.
+`list_singly_linked_front` implements a singly-linked list that supports constant-time `insert` and `erase` at the front or after a given cursor. The header and cursor type are the size of a single pointer.
 
-`list_singly_linked_front_back` implements a singly-linked list that supports constant-time `insert` and `erase` at the front or after a given position, and constant-time `insert` at the back. The header is the size of two pointers and the position type is the size of a single pointer.
+`list_singly_linked_front_back` implements a singly-linked list that supports constant-time `insert` and `erase` at the front or after a given cursor, and constant-time `insert` at the back. The header is the size of two pointers and the cursor type is the size of a single pointer.
 
 `list_singly_linked_circular` implements a circular singly-linked list that supports constant-time
-`insert` and `erase` at the front or after a given position, and constant-time `insert` at the back. The header is the size of a single pointer and the position type is the size of two pointers. Iteration is slower than for `list_singly_linked_front` and `list_singly_linked_front_back` because of special cases at the front and back of the list.
+`insert` and `erase` at the front or after a given cursor, and constant-time `insert` at the back. The header is the size of a single pointer and the cursor type is the size of two pointers. Iteration is slower than for `list_singly_linked_front` and `list_singly_linked_front_back` because of special cases at the front and back of the list.
 
 ###### Doubly-linked lists
 
-Doubly-linked lists support constant-time `insert` and `erase` at the front and back and constant-time `insert` before and after a given position.
+Doubly-linked lists support constant-time `insert` and `erase` at the front and back and constant-time `insert` before and after a given cursor.
 
-`list_doubly_linked_circular` implements a circular doubly-linked list. It supports constant-time `erase` before and after a given position. The header is the size of a single pointer and the position type is the size of three pointers. Iteration is slower than for `list_doubly_linked_front_back`and `list_doubly_linked_sentinel` because of special cases at the front and back of the list. Construction of an empty list is cheaper than for `list_doubly_linked_sentinel`.
+`list_doubly_linked_circular` implements a circular doubly-linked list. It supports constant-time `erase` before and after a given cursor. The header is the size of a single pointer and the cursor type is the size of three pointers. Iteration is slower than for `list_doubly_linked_front_back`and `list_doubly_linked_sentinel` because of special cases at the front and back of the list. Construction of an empty list is cheaper than for `list_doubly_linked_sentinel`.
 
-`list_doubly_linked_front_back` implements a doubly-linked list with both ends linked to its header. It supports constant-time `erase` at a given position. The header is the size of two pointers and the position type is the size of a single pointer. Construction of an empty list is cheaper than for `list_doubly_linked_sentinel`, but move construction, move assignment and `swap` is more expensive because of remote links to the header at the front and back of the list.
+`list_doubly_linked_front_back` implements a doubly-linked list with both ends linked to its header. It supports constant-time `erase` at a given cursor. The header is the size of two pointers and the cursor type is the size of a single pointer. Construction of an empty list is cheaper than for `list_doubly_linked_sentinel`, but move construction, move assignment and `swap` is more expensive because of remote links to the header at the front and back of the list.
 
-`list_doubly_linked_sentinel` implements a doubly-linked list with a sentinel node linked at both ends. It supports constant-time `erase` at a given position. The header and position type are the size of a single pointer. Iteration is faster than for `list_doubly_linked_circular` but construction of an empty list is more expensive as it requires allocation of the sentinel node.
+`list_doubly_linked_sentinel` implements a doubly-linked list with a sentinel node linked at both ends. It supports constant-time `erase` at a given cursor. The header and cursor type are the size of a single pointer. Iteration is faster than for `list_doubly_linked_circular` but construction of an empty list is more expensive as it requires allocation of the sentinel node.
 
 #### Extent-based data structures
 
@@ -251,7 +251,7 @@ to the array elements.
 
 `array_circular` implements an array of elements that are not necessarily contiguously allocated, as the elements are treated as if they may wrap around at the end of the reserved area.
 It stores a single pointer on the stack, keeping the array size and capacity in a header to the array elements.
-Positions of `array_circular` elements are larger and element access is slower than for `array_single_ended` and `array_double_ended`.
+Cursors of `array_circular` elements are larger and element access is slower than for `array_single_ended` and `array_double_ended`.
 `array_circular` supports insertion at the back and the front in amortized constant time using `emplace`, `push`, `emplace_first`, and `push_first`. If the capacity is exceeded it reallocates and moves its elements.
 
 `array_segmented_single_ended` implements a segmented array of elements, where elements are stored on the free store in multiple contiguously allocated blocks of a fixed size *k*, managed by an index of pointers, also contiguously allocated on the free store. All blocks in the array are full, except possibly the last one.
@@ -347,7 +347,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 `Vector_space` describes a `Module` where the "scalar" type is a `Field` and is defaulted to the `Value_type` of the "vector" type.
 
-`Affine_space` describes a triple of types, representing a "position", a "vector", and a "scalar", where the vector and scalar form an `Affine_space` and the point is a `Regular` type where `operator+` and `operator-` are defined such that addition and subtraction of point and vector yields a point, and subtraction of point and point yields a vector.
+`Affine_space` describes a triple of types, representing a "point", a "vector", and a "scalar", where the vector and scalar form an `Affine_space` and the point is a `Regular` type where `operator+` and `operator-` are defined such that addition and subtraction of point and vector yields a point, and subtraction of point and point yields a vector.
 
 ## Functional concepts
 
@@ -386,48 +386,48 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 `Ordered_ring` describes a `Ring` that is also `Totally_ordered`.
 `Ordered_integral_domain` describes an `Integral_domain` that is also `Totally_ordered`.
 
-## Positions
+## Cursors
 
-Positions are types representing a point in a space, such as a number in a numeric type or a memory address to an element in a data structure.
-When defined, positions have successors and predecessors that can be accessed with the functions `increment` and `decrement`. The point value the position refers to can often be accessed via the position with the functions `load` and `store`.
+Cursors are types representing a point in a space, such as a number in a numeric type or a memory address to an element in a data structure.
+When defined, cursors have successors and predecessors that can be accessed with the functions `increment` and `decrement`. The point value the cursor refers to can often be accessed via the cursor with the functions `load` and `store`.
 
 ### Linear traversal
 
-`Position` describes a `Movable` object representing a point in a space, with a function `increment` that moves it to the next point. Points are not necessarily visitable more than once.
+`Cursor` describes a `Movable` object representing a point in a space, with a function `increment` that moves it to the next point. Points are not necessarily visitable more than once.
 
-`Forward_position` describes a `Regular` `Position` type where points may be visited multiple times.
+`Forward_cursor` describes a `Regular` `Cursor` type where points may be visited multiple times.
 
-`Bidirectional_position` describes a `Forward_position` type with a function `decrement` that moves it to the previous point. It is an `Affine_space` over its `Difference_type`.
+`Bidirectional_cursor` describes a `Forward_cursor` type with a function `decrement` that moves it to the previous point. It is an `Affine_space` over its `Difference_type`.
 
 #### Linear traversal with mutable successors
 
-`Linked_forward_position` describes a `Forward_position` type with a function `next_link` that returns a reference to the next linked element.
+`Linked_forward_cursor` describes a `Forward_cursor` type with a function `next_link` that returns a reference to the next linked element.
 
-`Forward_linker` describes a function object type that can be called with two `Linked_forward_position` objects and will link the first one to the second one.
+`Forward_linker` describes a function object type that can be called with two `Linked_forward_cursor` objects and will link the first one to the second one.
 
-`Linked_bidirectional_position` describes a `Bidirectional_position` type with functions `next_link` and `prev_link` that return a reference to the adjacent linked
+`Linked_bidirectional_cursor` describes a `Bidirectional_cursor` type with functions `next_link` and `prev_link` that return a reference to the adjacent linked
 
-`Bidirectional_linker` describes a function object type that can be called with two `Linked_bidirectional_position` objects and will link the first one to the second one.
+`Bidirectional_linker` describes a function object type that can be called with two `Linked_bidirectional_cursor` objects and will link the first one to the second one.
 
 #### Segmented traversal
 
-`Segmented_position` describes a position in a segmented range, consisting of an index position and a segment position at the current index, both of which are `Position` types.
+`Segmented_cursor` describes a cursor in a segmented range, consisting of an index cursor and a segment cursor at the current index, both of which are `Cursor` types.
 
 ### Access
 
 `Loadable` describes a type with a function `load` that returns a constant reference to its held object. For an object that represents the position of another object, `load` returns a reference to the other object. For other objects, load returns a reference to the object itself.
 
-`Storable` describes a type with a function `store` that stores a given value at at a given position. If the object given as a position does not represent a position, it stores the value at the position of the object itself.
+`Storable` describes a type with a function `store` that stores a given value at at a given position. If the given object does not represent a position, it stores the value at the position of the object itself.
 
 `Mutable` describes a type that is both `Loadable` and `Storable`, and defines a function `at` that
 returns either a reference or a constant reference to its held object.
 
 ### Ranges
 
-`Limit` describes a `Position` type together with a type that can be used to check if the limit of the range into which the position points has been reached. The check is done with the `Binary_predicate` `precedes`.
+`Limit` describes a `Cursor` type together with a type that can be used to check if the limit of the range into which the cursor points has been reached. The check is done with the `Binary_predicate` `precedes`.
 
-`Range` describes a type with two functions `first` and `limit`, returning the half-open range of positions describing it.
-`Mutable_range` describes a `Range` with a `Mutable` `Position_type`.
+`Range` describes a type with two functions `first` and `limit`, returning the half-open range of cursors describing it.
+`Mutable_range` describes a `Range` with a `Mutable` `Cursor_type`.
 
 `Sequence` describes a `Range` that is `Totally_ordered`, and represents a composite object whose range of elements are its parts. It has functions `is_empty`. `size` and `operator[]` for element access.
 `Dynamic_sequence` describes a `Sequence` that can change size at runtime. It has functions `insert` and `erase` to change elements at the back or the front of the range.
@@ -456,21 +456,21 @@ returns either a reference or a constant reference to its held object.
 
 `Domain` is the type of a homogeneous invocable's parameters.
 
-## Positions
+## Cursors
 
 `Pointer_type` is the type of a pointer to an object of a given type.
 
-`Value_type` is either a type directly, or, in the case of a `Position` type or a `Range` type, the type it is parameterized on.
+`Value_type` is either a type directly, or, in the case of a `Cursor` type or a `Range` type, the type it is parameterized on.
 
-`Difference_type` is a type capable of storing the (signed) difference between two positions of the given type.
+`Difference_type` is a type capable of storing the (signed) difference between two cursors of the given type.
 
-`Position_type` is the type of an object describing a position to the given type.
+`Cursor_type` is the type of an object describing a cursor to the given type.
 
 `Size_type` is the type used to describe the size of an object of a given type.
 
 `Size` is the size of a given type (when known at compile time).
 
-`Index_position_type` and `Segment_position_type` describe the two `Position` types of a `Segment_position`.
+`Index_cursor_type` and `Segment_cursor_type` describe the two `Cursor` types of a `Segment_cursor`.
 
 ## Algebra
 
@@ -494,17 +494,17 @@ Index
 
 # Adapters
 
-`position`
-`forward_position`
-`counted_position`
-`loadable_position`
-`reverse_position`
+`cursor`
+`forward_cursor`
+`counted_cursor`
+`loadable_cursor`
+`reverse_cursor`
 
-`filter_position`
+`filter_cursor`
 `filter_sink`
-`insert_position`
+`insert_cursor`
 `insert_sink`
-`map_position`
+`map_cursor`
 `map_sink`
 
 # Algorithms
@@ -590,6 +590,7 @@ Index
 `rotate`
 
 `for_each`
+`for_each_result`
 
 `each_of`
 `any_not_of`
@@ -694,12 +695,12 @@ Index
 `Ordered_ring`
 `Ordered_integral_domain`
 
-`Position`
-`Forward_position`
-`Bidirectional_position`
-`Linked_forward_position`
+`Cursor`
+`Forward_cursor`
+`Bidirectional_cursor`
+`Linked_forward_cursor`
 `Forward_linker`
-`Linked_bidirectional_position`
+`Linked_bidirectional_cursor`
 `Bidirectional_linker`
 `Loadable`
 `Storable`
@@ -743,11 +744,11 @@ Index
 `Pointer_type`
 `Value_type`
 `Difference_type`
-`Position_type`
+`Cursor_type`
 `Size_type`
 `Size`
-`Index_position_type`
-`Segment_position_type`
+`Index_cursor_type`
+`Segment_cursor_type`
 
 `Zero`
 `One`

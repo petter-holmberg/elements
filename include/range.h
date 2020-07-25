@@ -4,105 +4,105 @@
 
 namespace elements {
 
-template <Position P, Limit<P> L = P>
-requires Loadable<P>
+template <Cursor C, Limit<C> L = C>
+requires Loadable<C>
 struct bounded_range
 {
-    P first;
+    C first;
     L limit;
 
     constexpr
     bounded_range() = default;
 
-    constexpr bounded_range(P const& first_, L const& limit_)
+    constexpr bounded_range(C const& first_, L const& limit_)
         : first{first_}, limit{limit_}
     {}
 
     constexpr auto
-    operator[](Difference_type<P> x) -> Value_type<P>&
-    requires Mutable<P>
+    operator[](Difference_type<C> x) -> Value_type<C>&
+    requires Mutable<C>
     {
         return at(first + x);
     }
 
     constexpr auto
-    operator[](Difference_type<P> x) const -> const Value_type<P>&
+    operator[](Difference_type<C> x) const -> const Value_type<C>&
     {
         return load(first + x);
     }
 };
 
-template <Position P, Limit<P> L>
-requires Loadable<P>
+template <Cursor C, Limit<C> L>
+requires Loadable<C>
 constexpr auto
-first(bounded_range<P, L> const& x) -> P
+first(bounded_range<C, L> const& x) -> C
 {
     return x.first;
 }
 
-template <Position P, Limit<P> L>
-requires Loadable<P>
+template <Cursor C, Limit<C> L>
+requires Loadable<C>
 constexpr auto
-limit(bounded_range<P, L> const& x) -> L
+limit(bounded_range<C, L> const& x) -> C
 {
     return x.limit;
 }
 
-template <Position P, Limit<P> L>
-requires Loadable<P>
+template <Cursor C, Limit<C> L>
+requires Loadable<C>
 constexpr auto
-operator==(bounded_range<P, L> const& x, bounded_range<P, L> const& y) -> bool
+operator==(bounded_range<C, L> const& x, bounded_range<C, L> const& y) -> bool
 {
     return first(x) == first(y) and limit(x) == limit(y);
 }
 
-template <Position P, Limit<P> L>
-requires Loadable<P>
-struct less<bounded_range<P, L>>
+template <Cursor C, Limit<C> L>
+requires Loadable<C>
+struct less<bounded_range<C, L>>
 {
     constexpr auto
-    operator()(bounded_range<P, L> const& x, bounded_range<P, L> const& y) -> bool
+    operator()(bounded_range<C, L> const& x, bounded_range<C, L> const& y) -> bool
     {
-        less<P> less_pos;
+        less<C> less_cur;
         return
-            less_pos(first(x), first(y)) or
-            (!less_pos(first(y), first(x)) and less_pos(limit(x), limit(y)));
+            less_cur(first(x), first(y)) or
+            (!less_cur(first(y), first(x)) and less_cur(limit(x), limit(y)));
     }
 };
 
-template <Position P, Limit<P> L>
-requires Loadable<P>
-struct position_type_t<bounded_range<P, L>>
+template <Cursor C, Limit<C> L>
+requires Loadable<C>
+struct cursor_type_t<bounded_range<C, L>>
 {
-    using type = P;
+    using type = C;
 };
 
-template <Position P, Limit<P> L>
-requires Loadable<P>
-struct value_type_t<bounded_range<P, L>>
+template <Cursor C, Limit<C> L>
+requires Loadable<C>
+struct value_type_t<bounded_range<C, L>>
 {
-    using type = Value_type<P>;
+    using type = Value_type<C>;
 };
 
-template <Position P, Limit<P> L>
-requires Loadable<P>
-struct size_type_t<bounded_range<P, L>>
+template <Cursor C, Limit<C> L>
+requires Loadable<C>
+struct size_type_t<bounded_range<C, L>>
 {
-    using type = Difference_type<P>;
+    using type = Difference_type<C>;
 };
 
-template <Position P, Limit<P> L>
-requires Loadable<P>
+template <Cursor C, Limit<C> L>
+requires Loadable<C>
 constexpr auto
-size(bounded_range<P, L> const& x) -> Difference_type<P>
+size(bounded_range<C, L> const& x) -> Difference_type<C>
 {
     return limit(x) - first(x);
 }
 
-template <Position P, Limit<P> L>
-requires Loadable<P>
+template <Cursor C, Limit<C> L>
+requires Loadable<C>
 constexpr auto
-is_empty(bounded_range<P, L> const& x) -> bool
+is_empty(bounded_range<C, L> const& x) -> bool
 {
     return first(x) == limit(x);
 }
@@ -128,7 +128,7 @@ concept Range =
 template <typename R>
 concept Mutable_range =
     Range<R> and
-    Mutable<Position_type<R>>;
+    Mutable<Cursor_type<R>>;
 
 template <typename S>
 concept Sequence =
@@ -162,14 +162,14 @@ base(back<S>& seq) -> S&
 
 template <Sequence S>
 constexpr auto
-first(back<S>& seq) -> Position_type<S>
+first(back<S>& seq) -> Cursor_type<S>
 {
     return first(base(seq));
 }
 
 template <Sequence S>
 constexpr auto
-limit(back<S>& seq) -> Position_type<S>
+limit(back<S>& seq) -> Cursor_type<S>
 {
     return limit(base(seq));
 }
@@ -201,14 +201,14 @@ base(front<S>& seq) -> S&
 
 template <Sequence S>
 constexpr auto
-first(front<S>& seq) -> Position_type<S>
+first(front<S>& seq) -> Cursor_type<S>
 {
     return first(base(seq));
 }
 
 template <Sequence S>
 constexpr auto
-limit(front<S>& seq) -> Position_type<S>
+limit(front<S>& seq) -> Cursor_type<S>
 {
     return limit(base(seq));
 }
@@ -226,11 +226,11 @@ template <typename S>
 struct before
 {
     Pointer_type<S> seq;
-    Position_type<S> pos;
+    Cursor_type<S> cur;
 
-    before(S& seq_, Position_type<S> pos_)
+    before(S& seq_, Cursor_type<S> cur_)
         : seq(&seq_)
-        , pos(pos_)
+        , cur(cur_)
     {}
 };
 
@@ -243,56 +243,56 @@ struct value_type_t<before<S>>
 
 template <typename S>
     requires Dynamic_sequence<S, front<S>>
-struct position_type_t<before<S>>
+struct cursor_type_t<before<S>>
 {
-    using type = Position_type<S>;
+    using type = Cursor_type<S>;
 };
 
 template <typename S>
     requires Dynamic_sequence<S, front<S>>
 struct size_type_t<before<S>>
 {
-    using type = Difference_type<Position_type<S>>;
+    using type = Difference_type<Cursor_type<S>>;
 };
 
 template <typename S>
     requires Dynamic_sequence<S, front<S>>
 constexpr auto
-base(before<S>& pos) -> S&
+base(before<S>& cur) -> S&
 {
-    return at(pos.seq);
+    return at(cur.seq);
 }
 
 template <typename S>
     requires Dynamic_sequence<S, front<S>>
 constexpr auto
-current(before<S>& pos) -> Position_type<S>
+current(before<S>& cur) -> Cursor_type<S>
 {
-    return {pos.pos};
+    return {cur.cur};
 }
 
 template <typename S>
     requires Dynamic_sequence<S, front<S>>
 constexpr auto
-first(before<S>& pos) -> Position_type<S>
+first(before<S>& cur) -> Cursor_type<S>
 {
-    return first(base(pos));
+    return first(base(cur));
 }
 
 template <typename S>
     requires Dynamic_sequence<S, front<S>>
 constexpr auto
-last(before<S>& pos) -> Position_type<S>
+last(before<S>& cur) -> Cursor_type<S>
 {
-    return last(base(pos));
+    return last(base(cur));
 }
 
 template <typename S>
     requires Dynamic_sequence<S, front<S>>
 constexpr auto
-limit(before<S>& pos) -> Position_type<S>
+limit(before<S>& cur) -> Cursor_type<S>
 {
-    return limit(base(pos));
+    return limit(base(cur));
 }
 
 template <typename S>
@@ -300,11 +300,11 @@ template <typename S>
 struct after
 {
     Pointer_type<S> seq;
-    Position_type<S> pos;
+    Cursor_type<S> cur;
 
-    after(S& seq_, Position_type<S> pos_)
+    after(S& seq_, Cursor_type<S> cur_)
         : seq(&seq_)
-        , pos(pos_)
+        , cur(cur_)
     {}
 };
 
@@ -317,136 +317,136 @@ struct value_type_t<after<S>>
 
 template <typename S>
     requires Dynamic_sequence<S, front<S>>
-struct position_type_t<after<S>>
+struct cursor_type_t<after<S>>
 {
-    using type = Position_type<S>;
+    using type = Cursor_type<S>;
 };
 
 template <typename S>
     requires Dynamic_sequence<S, front<S>>
 struct size_type_t<after<S>>
 {
-    using type = Difference_type<Position_type<S>>;
+    using type = Difference_type<Cursor_type<S>>;
 };
 
 template <typename S>
     requires Dynamic_sequence<S, front<S>>
 constexpr auto
-base(after<S>& pos) -> S&
+base(after<S>& cur) -> S&
 {
-    return at(pos.seq);
+    return at(cur.seq);
 }
 
 template <typename S>
     requires Dynamic_sequence<S, front<S>>
 constexpr auto
-current(after<S>& pos) -> Position_type<S>
+current(after<S>& cur) -> Cursor_type<S>
 {
-    return {pos.pos};
+    return {cur.cur};
 }
 
 template <typename S>
     requires Dynamic_sequence<S, front<S>>
 constexpr auto
-first(after<S>& pos) -> Position_type<S>
+first(after<S>& cur) -> Cursor_type<S>
 {
-    return first(base(pos));
+    return first(base(cur));
 }
 
 template <typename S>
     requires Dynamic_sequence<S, front<S>>
 constexpr auto
-last(after<S>& pos) -> Position_type<S>
+last(after<S>& cur) -> Cursor_type<S>
 {
-    return last(base(pos));
+    return last(base(cur));
 }
 
 template <typename S>
     requires Dynamic_sequence<S, front<S>>
 constexpr auto
-limit(after<S>& pos) -> Position_type<S>
+limit(after<S>& cur) -> Cursor_type<S>
 {
-    return limit(base(pos));
+    return limit(base(cur));
 }
 
-template <typename P>
-struct insert_position
+template <typename C>
+struct insert_cursor
 {
-    P pos{};
+    C cur{};
 
     explicit constexpr
-    insert_position(P& pos_)
-        : pos{pos_}
+    insert_cursor(C& cur_)
+        : cur{cur_}
     {}
 };
 
-template <typename P>
-struct value_type_t<insert_position<P>>
+template <typename C>
+struct value_type_t<insert_cursor<C>>
 {
-    using type = Value_type<P>;
+    using type = Value_type<C>;
 };
 
-template <typename P>
-struct position_type_t<insert_position<P>>
+template <typename C>
+struct cursor_type_t<insert_cursor<C>>
 {
-    using type = Position_type<P>;
+    using type = Cursor_type<C>;
 };
 
-template <typename P>
+template <typename C>
 constexpr auto
-precedes(insert_position<P> const& pos0, P const& pos1) -> bool
+precedes(insert_cursor<C> const& cur0, C const& cur1) -> bool
 {
-    return pos0.pos != pos1;
+    return cur0.cur != cur1;
 }
 
-template <typename P>
+template <typename C>
 constexpr auto
-precedes(P const& pos0, insert_position<P> const& pos1) -> bool
+precedes(C const& cur0, insert_cursor<C> const& cur1) -> bool
 {
-    return !(precedes(pos1, pos0));
+    return !(precedes(cur1, cur0));
 }
 
-template <typename P>
+template <typename C>
 constexpr void
-increment(insert_position<P>&)
+increment(insert_cursor<C>&)
 {}
 
-template <typename P>
+template <typename C>
 constexpr void
-store(insert_position<P>& pos, Value_type<P> const& x)
+store(insert_cursor<C>& cur, Value_type<C> const& x)
 {
-    pos.pos = insert(pos.pos, x);
+    cur.cur = insert(cur.cur, x);
 }
 
-template <typename P>
+template <typename C>
 constexpr void
-store(insert_position<P>& pos, Value_type<P>&& x)
+store(insert_cursor<C>& cur, Value_type<C>&& x)
 {
-    pos.pos = insert(pos.pos, fw<Value_type<P>>(x));
+    cur.cur = insert(cur.cur, fw<Value_type<C>>(x));
 }
 
 struct insert_sink
 {
-    template <typename P>
+    template <typename C>
     auto
-    operator()(P pos)
+    operator()(C cur)
     {
-        return insert_position{pos};
+        return insert_cursor{cur};
     }
 };
 
-template <Sequence S, typename P>
+template <Sequence S, typename C>
 constexpr auto
-insert_range(S const& seq, P pos) -> P
+insert_range(S const& seq, C cur) -> C
 {
-    return copy(first(seq), limit(seq), insert_sink{}(pos)).pos;
+    return copy(first(seq), limit(seq), insert_sink{}(cur)).cur;
 }
 
-template <typename T, typename P>
+template <typename T, typename C>
 constexpr auto
-insert_range(std::initializer_list<T> seq, P pos) -> P
+insert_range(std::initializer_list<T> seq, C cur) -> C
 {
-    return copy(first(seq), limit(seq), insert_sink{}(pos)).pos;
+    return copy(first(seq), limit(seq), insert_sink{}(cur)).cur;
 }
 
 }

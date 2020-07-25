@@ -15,9 +15,9 @@ SCENARIO ("Zipping and unzipping", "[zip]")
             int x[]{0, 1, 2, 3, 4};
             int y[]{5, 6, 7, 8, 9};
 
-            auto pos = e::zip(x, x + 5, y, y + 5, z);
+            auto cur = e::zip(x, x + 5, y, y + 5, z);
 
-            REQUIRE(pos == z + 10);
+            REQUIRE(cur == z + 10);
 
             CHECK (z[0] == 0);
             CHECK (z[1] == 5);
@@ -36,9 +36,9 @@ SCENARIO ("Zipping and unzipping", "[zip]")
             int x[]{0, 1, 2, 3, 4};
             int y[]{5, 6, 7};
 
-            auto pos = e::zip(x, x + 5, y, y + 3, z);
+            auto cur = e::zip(x, x + 5, y, y + 3, z);
 
-            REQUIRE(pos == z + 8);
+            REQUIRE(cur == z + 8);
 
             CHECK (z[0] == 0);
             CHECK (z[1] == 5);
@@ -57,9 +57,9 @@ SCENARIO ("Zipping and unzipping", "[zip]")
             int x[]{0, 1, 2};
             int y[]{5, 6, 7, 8, 9};
 
-            auto pos = e::zip(x, x + 3, y, y + 5, z);
+            auto cur = e::zip(x, x + 3, y, y + 5, z);
 
-            REQUIRE(pos == z + 8);
+            REQUIRE(cur == z + 8);
 
             CHECK (z[0] == 0);
             CHECK (z[1] == 5);
@@ -82,10 +82,10 @@ SCENARIO ("Zipping and unzipping", "[zip]")
             int y[]{-1, -1, -1, -1, -1};
             int z[]{-1, -1, -1, -1, -1};
 
-            auto pos = e::unzip(x, x + 10, y, z);
+            auto cur = e::unzip(x, x + 10, y, z);
 
-            REQUIRE(pos.m0 == y + 5);
-            REQUIRE(pos.m1 == z + 5);
+            REQUIRE(cur.m0 == y + 5);
+            REQUIRE(cur.m1 == z + 5);
 
             CHECK (y[0] == 0);
             CHECK (y[1] == 2);
@@ -105,10 +105,10 @@ SCENARIO ("Zipping and unzipping", "[zip]")
             int y[]{-1, -1, -1, -1, -1};
             int z[]{-1, -1, -1, -1, -1};
 
-            auto pos = e::unzip(x, x + 9, y, z);
+            auto cur = e::unzip(x, x + 9, y, z);
 
-            REQUIRE(pos.m0 == y + 5);
-            REQUIRE(pos.m1 == z + 4);
+            REQUIRE(cur.m0 == y + 5);
+            REQUIRE(cur.m1 == z + 4);
 
             CHECK (y[0] == 0);
             CHECK (y[1] == 2);

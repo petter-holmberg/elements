@@ -66,7 +66,7 @@ struct result
     }
 
     constexpr
-    result (result&& x) noexcept
+    result(result&& x) noexcept
         : has_value(x.has_value)
     {
         if (has_value) {

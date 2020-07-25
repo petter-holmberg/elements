@@ -1,38 +1,38 @@
 #pragma once
 
-#include "position.h"
+#include "cursor.h"
 
 namespace elements {
 
-template <Position P, Limit<P> L, Movable T>
-requires Storable<P>
+template <Cursor C, Limit<C> L, Movable T>
+requires Storable<C>
 constexpr auto
-fill(P pos, L lim, T const& value) -> P
-//[[expects axiom: storable_range(pos, lim)]]
+fill(C cur, L lim, T const& value) -> C
+//[[expects axiom: storable_range(cur, lim)]]
 {
-    while (precedes(pos, lim)) {
-        store(pos, value);
-        increment(pos);
+    while (precedes(cur, lim)) {
+        store(cur, value);
+        increment(cur);
     }
-    return pos;
+    return cur;
 }
 
-template <Segmented_position P, Movable T>
-requires Storable<P>
+template <Segmented_cursor C, Limit<C> L, Movable T>
+requires Storable<C>
 constexpr auto
-fill(P pos, P lim, T const& value) -> P
+fill(C cur, L lim, T const& value) -> C
 {
-    auto index_pos_ = index_pos(pos);
-    auto index_lim_ = index_pos(lim);
-    if (!precedes(index_pos_, index_lim_)) {
-        return {index_pos_, fill(segment_pos(pos), segment_pos(lim), value)};
+    auto index_cur = index_cursor(cur);
+    auto index_lim = index_cursor(lim);
+    if (!precedes(index_cur, index_lim)) {
+        return {index_cur, fill(segment_cursor(cur), segment_cursor(lim), value)};
     } else {
-        auto segment_pos_ = fill(segment_pos(pos), limit(load(index_pos_)), value);
+        auto segment_cur = fill(segment_cursor(cur), limit(load(index_cur)), value);
         do {
-            increment(index_pos_);
-            segment_pos_ = fill(first(load(index_pos_)), limit(load(index_pos_)), value);
-        } while (precedes(index_pos_, index_lim_));
-        return {index_pos_, segment_pos_};
+            increment(index_cur);
+            segment_cur = fill(first(load(index_cur)), limit(load(index_cur)), value);
+        } while (precedes(index_cur, index_lim));
+        return {index_cur, segment_cur};
     }
 }
 

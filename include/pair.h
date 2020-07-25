@@ -1,7 +1,7 @@
 #pragma once
 
 #include "invocable.h"
-#include "position.h"
+#include "cursor.h"
 
 namespace elements {
 
@@ -23,25 +23,25 @@ struct pair
         , m1(mv(member1))
     {}
 
-    template <Unary_function Fun>
+    template <Unary_function F>
     requires
         Same_as<T0, T1> and
-        Same_as<Decay<T0>, Domain<Fun>> and
-        Same_as<Decay<T0>, Codomain<Fun>>
+        Same_as<Decay<T0>, Domain<F>> and
+        Same_as<Decay<T0>, Codomain<F>>
     constexpr auto
-    fmap(Fun fun) -> pair<T0>&
+    fmap(F fun) -> pair<T0>&
     {
         m0 = invoke(fun, mv(m0));
         m1 = invoke(fun, mv(m1));
         return *this;
     }
 
-    template <Unary_function Fun>
+    template <Unary_function F>
     requires
         Same_as<T0, T1> and
-        Same_as<Decay<T0>, Domain<Fun>>
+        Same_as<Decay<T0>, Domain<F>>
     constexpr auto
-    fmap(Fun fun) const -> pair<Codomain<Fun>>
+    fmap(F fun) const -> pair<Codomain<F>>
     {
         return {invoke(fun, m0), invoke(fun, m1)};
     }
