@@ -72,11 +72,11 @@ mv(T&& x) noexcept -> Remove_ref<T>&&
 }
 
 template <typename F, typename... Args>
-using Invoke_result = std::invoke_result_t<F, Args...>;
+using Return_type = std::invoke_result_t<F, Args...>;
 
 template <typename F, typename... Args>
 constexpr auto
-invoke(F&& f, Args&&... args) noexcept(exposition_only::Is_nothrow_invocable<F, Args...>) -> Invoke_result<F, Args...>
+invoke(F&& f, Args&&... args) noexcept(exposition_only::Is_nothrow_invocable<F, Args...>) -> Return_type<F, Args...>
 {
     return std::invoke(fw<F>(f), fw<Args>(args)...);
 }

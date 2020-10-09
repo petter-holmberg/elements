@@ -6,24 +6,18 @@ namespace elements {
 
 // 2 values
 
-template <Relation R>
+template <typename T, Relation<T, T> R>
 constexpr auto
-select_0_2(
-    Domain<R>& a,
-    Domain<R>& b,
-    R rel) -> Domain<R>&
+select_0_2(T& a, T& b, R rel) -> T&
 //[[expects axiom: weak_ordering(rel)]]
 {
     if (invoke(rel, b, a)) return b;
     return a;
 }
 
-template <Relation R>
+template <typename T, Relation<T, T> R>
 constexpr auto
-select_0_2(
-    Domain<R> const& a,
-    Domain<R> const& b,
-    R rel) -> Domain<R> const&
+select_0_2(T const& a, T const& b, R rel) -> T const&
 //[[expects axiom: weak_ordering(rel)]]
 {
     if (invoke(rel, b, a)) return b;
@@ -32,40 +26,30 @@ select_0_2(
 
 template <Default_totally_ordered T>
 constexpr auto
-min(
-    T const& a,
-    T const& b) -> T const&
+min(T const& a, T const& b) -> T const&
 {
     return select_0_2(a, b, less<T>{});
 }
 
 template <Default_totally_ordered T>
 constexpr auto
-min(
-    T& a,
-    T& b) -> T&
+min(T& a, T& b) -> T&
 {
     return select_0_2(a, b, less<T>{});
 }
 
-template <Relation R>
+template <typename T, Relation<T, T> R>
 constexpr auto
-select_1_2(
-    Domain<R> const& a,
-    Domain<R> const& b,
-    R rel) -> Domain<R> const&
+select_1_2(T const& a, T const& b, R rel) -> T const&
 //[[expects axiom: weak_ordering(rel)]]
 {
     if (invoke(rel, b, a)) return a;
     return b;
 }
 
-template <Relation R>
+template <typename T, Relation<T, T> R>
 constexpr auto
-select_1_2(
-    Domain<R>& a,
-    Domain<R>& b,
-    R rel) -> Domain<R>&
+select_1_2(T& a, T& b, R rel) -> T&
 //[[expects axiom: weak_ordering(rel)]]
 {
     if (invoke(rel, b, a)) return a;
@@ -74,43 +58,31 @@ select_1_2(
 
 template <Default_totally_ordered T>
 constexpr auto
-max(
-    T const& a,
-    T const& b) -> T const&
+max(T const& a, T const& b) -> T const&
 {
     return select_1_2(a, b, less<T>{});
 }
 
 template <Default_totally_ordered T>
 constexpr auto
-max(
-    T& a,
-    T& b) -> T const&
+max(T& a, T& b) -> T const&
 {
     return select_1_2(a, b, less<T>{});
 }
 
 // 3 values
 
-template <Relation R>
+template <typename T, Relation<T, T> R>
 constexpr auto
-select_0_3(
-    Domain<R> const& a,
-    Domain<R> const& b,
-    Domain<R> const& c,
-    R rel) -> Domain<R> const&
+select_0_3(T const& a, T const& b, T const& c, R rel) -> T const&
 //[[expects axiom: weak_ordering(rel)]]
 {
     return select_0_2(select_0_2(a, b, rel), c, rel);
 }
 
-template <Relation R>
+template <typename T, Relation<T, T> R>
 constexpr auto
-select_0_3(
-    Domain<R>& a,
-    Domain<R>& b,
-    Domain<R>& c,
-    R rel) -> Domain<R>&
+select_0_3(T& a, T& b, T& c, R rel) -> T&
 //[[expects axiom: weak_ordering(rel)]]
 {
     return select_0_2(select_0_2(a, b, rel), c, rel);
@@ -118,31 +90,21 @@ select_0_3(
 
 template <Default_totally_ordered T>
 constexpr auto
-min(
-    T const& a,
-    T const& b,
-    T const& c) -> T const&
+min(T const& a, T const& b, T const& c) -> T const&
 {
     return select_0_3(a, b, c, less<T>{});
 }
 
 template <Default_totally_ordered T>
 constexpr auto
-min(
-    T& a,
-    T& b,
-    T& c) -> T&
+min(T& a, T& b, T& c) -> T&
 {
     return select_0_3(a, b, c, less<T>{});
 }
 
-template <Relation R>
+template <typename T, Relation<T, T> R>
 constexpr auto
-select_1_3_ab(
-    Domain<R> const& a,
-    Domain<R> const& b,
-    Domain<R> const& c,
-    R rel) -> Domain<R> const&
+select_1_3_ab(T const& a, T const& b, T const& c, R rel) -> T const&
 //[[expects axiom: weak_ordering(rel)]]
 //[[expects: select_0_1(a, b, rel) == a]]
 {
@@ -150,13 +112,9 @@ select_1_3_ab(
     return select_1_2(a, c, rel);
 }
 
-template <Relation R>
+template <typename T, Relation<T, T> R>
 constexpr auto
-select_1_3_ab(
-    Domain<R>& a,
-    Domain<R>& b,
-    Domain<R>& c,
-    R rel) -> Domain<R>&
+select_1_3_ab(T& a, T& b, T& c, R rel) -> T&
 //[[expects axiom: weak_ordering(rel)]]
 //[[expects: select_0_1(a, b, rel) == a]]
 {
@@ -164,13 +122,9 @@ select_1_3_ab(
     return select_1_2(a, c, rel);
 }
 
-template <Relation R>
+template <typename T, Relation<T, T> R>
 constexpr auto
-select_1_3(
-    Domain<R> const& a,
-    Domain<R> const& b,
-    Domain<R> const& c,
-    R rel) -> Domain<R> const&
+select_1_3(T const& a, T const& b, T const& c, R rel) -> T const&
 //[[expects axiom: weak_ordering(rel)]]
 {
     if (invoke(rel, b, a))
@@ -179,13 +133,9 @@ select_1_3(
         return select_1_3_ab(a, b, c, rel);
 }
 
-template <Relation R>
+template <typename T, Relation<T, T> R>
 constexpr auto
-select_1_3(
-    Domain<R>& a,
-    Domain<R>& b,
-    Domain<R>& c,
-    R rel) -> Domain<R>&
+select_1_3(T& a, T& b, T& c, R rel) -> T&
 //[[expects axiom: weak_ordering(rel)]]
 {
     if (invoke(rel, b, a))
@@ -196,43 +146,29 @@ select_1_3(
 
 template <Default_totally_ordered T>
 constexpr auto
-median(
-    T const& a,
-    T const& b,
-    T const& c) -> T const&
+median(T const& a, T const& b, T const& c) -> T const&
 {
     return select_1_3(a, b, c, less<T>{});
 }
 
 template <Default_totally_ordered T>
 constexpr auto
-median(
-    T& a,
-    T& b,
-    T& c) -> T&
+median(T& a, T& b, T& c) -> T&
 {
     return select_1_3(a, b, c, less<T>{});
 }
 
-template <Relation R>
+template <typename T, Relation<T, T> R>
 constexpr auto
-select_2_3(
-    Domain<R> const& a,
-    Domain<R> const& b,
-    Domain<R> const& c,
-    R rel) -> Domain<R> const&
+select_2_3(T const& a, T const& b, T const& c, R rel) -> T const&
 //[[expects axiom: weak_ordering(rel)]]
 {
     return select_1_2(select_1_2(a, b, rel), c, rel);
 }
 
-template <Relation R>
+template <typename T, Relation<T, T> R>
 constexpr auto
-select_2_3(
-    Domain<R>& a,
-    Domain<R>& b,
-    Domain<R>& c,
-    R rel) -> Domain<R>&
+select_2_3(T& a, T& b, T& c, R rel) -> T&
 //[[expects axiom: weak_ordering(rel)]]
 {
     return select_1_2(select_1_2(a, b, rel), c, rel);
@@ -240,20 +176,14 @@ select_2_3(
 
 template <Default_totally_ordered T>
 constexpr auto
-max(
-    T const& a,
-    T const& b,
-    T const& c) -> T const&
+max(T const& a, T const& b, T const& c) -> T const&
 {
     return select_2_3(a, b, c, less<T>{});
 }
 
 template <Default_totally_ordered T>
 constexpr auto
-max(
-    T& a,
-    T& b,
-    T& c) -> T&
+max(T& a, T& b, T& c) -> T&
 {
     return select_2_3(a, b, c, less<T>{});
 }

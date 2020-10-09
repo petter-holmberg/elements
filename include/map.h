@@ -4,12 +4,11 @@
 
 namespace elements {
 
-template <Cursor S, Limit<S> L, Cursor D, Unary_function F>
+template <Cursor S, Limit<S> L, Cursor D, Regular_invocable<Value_type<S>> F>
 requires
     Loadable<S> and
     Storable<D> and
-    Same_as<Decay<Value_type<S>>, Domain<F>> and
-    Same_as<Decay<Value_type<D>>, Codomain<F>>
+    Same_as<Decay<Value_type<D>>, Return_type<F, Value_type<S>>>
 constexpr auto
 map(S src, L lim, D dst, F fun) -> D
 //[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (lim - src))]]
@@ -22,12 +21,11 @@ map(S src, L lim, D dst, F fun) -> D
     return dst;
 }
 
-template <Segmented_cursor S, Cursor D, Unary_function F>
+template <Segmented_cursor S, Cursor D, Regular_invocable<Value_type<S>> F>
 requires
     Loadable<S> and
     Storable<D> and
-    Same_as<Decay<Value_type<S>>, Domain<F>> and
-    Same_as<Decay<Value_type<D>>, Codomain<F>>
+    Same_as<Decay<Value_type<D>>, Return_type<F, Value_type<S>>>
 constexpr auto
 map(S src, S lim, D dst, F fun) -> D
 {
@@ -45,14 +43,12 @@ map(S src, S lim, D dst, F fun) -> D
     }
 }
 
-template <Cursor S0, Limit<S0> L0, Cursor S1, Cursor D, Binary_function F>
+template <Cursor S0, Limit<S0> L0, Cursor S1, Cursor D, Regular_invocable<Value_type<S0>, Value_type<S1>> F>
 requires
     Loadable<S0> and
     Loadable<S1> and
     Storable<D> and
-    Same_as<Decay<Value_type<S0>>, Decay<Input_type<F, 0>>> and
-    Same_as<Decay<Value_type<S1>>, Decay<Input_type<F, 1>>> and
-    Same_as<Decay<Value_type<D>>, Codomain<F>>
+    Same_as<Decay<Value_type<D>>, Return_type<F, Value_type<S0>, Value_type<S1>>>
 constexpr auto
 map(S0 src0, L0 lim0, S1 src1, D dst, F fun) -> D
 //[[expects axiom: not_overlapped_forward(src0, lim0, dst, dst + (lim0 - src0))]]

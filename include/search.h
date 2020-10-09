@@ -5,12 +5,10 @@
 
 namespace elements {
 
-template <Cursor C, Limit<C> L, Unary_predicate U>
-requires
-    Loadable<C> and
-    Same_as<Value_type<C>, Domain<U>>
+template <Cursor C, Limit<C> L, Predicate<Value_type<C>> P>
+requires Loadable<C>
 constexpr auto
-search_if(C cur, L lim, U pred) -> C
+search_if(C cur, L lim, P pred) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
 {
     while (precedes(cur, lim)) {
@@ -20,12 +18,10 @@ search_if(C cur, L lim, U pred) -> C
     return cur;
 }
 
-template <Segmented_cursor C, Unary_predicate U>
-requires
-    Loadable<C> and
-    Same_as<Value_type<C>, Domain<U>>
+template <Segmented_cursor C, Predicate<Value_type<C>> P>
+requires Loadable<C>
 constexpr auto
-search_if(C cur, C lim, U pred) -> C
+search_if(C cur, C lim, P pred) -> C
 {
     auto index_cur_ = index_cur(cur);
     auto index_lim_ = index_cur(lim);
@@ -43,12 +39,10 @@ search_if(C cur, C lim, U pred) -> C
     }
 }
 
-template <Bidirectional_cursor C, Limit<C> L, Unary_predicate U>
-requires
-    Loadable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<U>>
+template <Bidirectional_cursor C, Limit<C> L, Predicate<Value_type<C>> P>
+requires Loadable<C>
 constexpr auto
-search_backward_if(C cur, L lim, U pred) -> C
+search_backward_if(C cur, L lim, P pred) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
 {
     auto backward_lim = cur;
@@ -60,36 +54,30 @@ search_backward_if(C cur, L lim, U pred) -> C
     return cur;
 }
 
-template <Cursor C, Limit<C> L, Unary_predicate U>
-requires
-    Loadable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<U>>
+template <Cursor C, Limit<C> L, Predicate<Value_type<C>> P>
+requires Loadable<C>
 constexpr auto
-search_if_not(C cur, L lim, U pred) -> C
+search_if_not(C cur, L lim, P pred) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
 {
-    return search_if(mv(cur), mv(lim), negation{pred});
+    return search_if(mv(cur), mv(lim), negation<Value_type<C>, P>{pred});
 }
 
-template <Segmented_cursor C, Unary_predicate U>
-requires
-    Loadable<C> and
-    Same_as<Value_type<C>, Domain<U>>
+template <Segmented_cursor C, Predicate<Value_type<C>> P>
+requires Loadable<C>
 constexpr auto
-search_if_not(C cur, C lim, U pred) -> C
+search_if_not(C cur, C lim, P pred) -> C
 {
-    return search_if(mv(cur), mv(lim), negation{pred});
+    return search_if(mv(cur), mv(lim), negation<Value_type<C>, P>{pred});
 }
 
-template <Bidirectional_cursor C, Limit<C> L, Unary_predicate U>
-requires
-    Loadable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<U>>
+template <Bidirectional_cursor C, Limit<C> L, Predicate<Value_type<C>> P>
+requires Loadable<C>
 constexpr auto
-search_backward_if_not(C cur, L lim, U pred) -> C
+search_backward_if_not(C cur, L lim, P pred) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
 {
-    return search_backward_if(mv(cur), mv(lim), negation{pred});
+    return search_backward_if(mv(cur), mv(lim), negation<Value_type<C>, P>{pred});
 }
 
 template <Cursor C, Limit<C> L, Equality_comparable_with<Value_type<C>> T>
@@ -144,12 +132,10 @@ search_backward_not(C cur, L lim, T const& value) -> C
     return search_backward_if_not(mv(cur), mv(lim), equal_unary{value});
 }
 
-template <Cursor C, Unary_predicate U>
-requires
-    Loadable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<U>>
+template <Cursor C, Predicate<Value_type<C>> P>
+requires Loadable<C>
 constexpr auto
-search_if_unguarded(C cur, U pred) -> C
+search_if_unguarded(C cur, P pred) -> C
 //[[expects axiom: loadable_range(cur, _)]]
 //[[expects axiom: any_of(cur, _, pred)]]
 {
@@ -157,16 +143,14 @@ search_if_unguarded(C cur, U pred) -> C
     return cur;
 }
 
-template <Cursor C, Unary_predicate U>
-requires
-    Loadable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<U>>
+template <Cursor C, Predicate<Value_type<C>> P>
+requires Loadable<C>
 constexpr auto
-search_if_not_unguarded(C cur, U pred) -> C
+search_if_not_unguarded(C cur, P pred) -> C
 //[[expects axiom: loadable_range(cur, _)]]
 //[[expects axiom: any_not_of(cur, _, pred)]]
 {
-    return search_if_unguarded(mv(cur), negation{pred});
+    return search_if_unguarded(mv(cur), negation<Value_type<C>, P>{pred});
 }
 
 template <Cursor C, Equality_comparable_with<Value_type<C>> T>
@@ -189,12 +173,10 @@ search_not_unguarded(C cur, T const& value) -> C
     return search_if_not_unguarded(mv(cur), equal_unary{value});
 }
 
-template <Forward_cursor C, Unary_predicate U>
-requires
-    Mutable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<U>>
+template <Forward_cursor C, Predicate<Value_type<C>> P>
+requires Mutable<C>
 constexpr auto
-search_if_guarded(C first, C last, U pred, Value_type<C> const& sentinel) -> C
+search_if_guarded(C first, C last, P pred, Value_type<C> const& sentinel) -> C
 //[[expects axiom: mutable_range(cur, successor(last))]]
 {
     if (!precedes(first, successor(last))) return first;
@@ -207,15 +189,13 @@ search_if_guarded(C first, C last, U pred, Value_type<C> const& sentinel) -> C
     return successor(last);
 }
 
-template <Forward_cursor C, Unary_predicate U>
-requires
-    Mutable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<U>>
+template <Forward_cursor C, Predicate<Value_type<C>> P>
+requires Mutable<C>
 constexpr auto
-search_if_not_guarded(C first, C last, U pred, Value_type<C> const& sentinel) -> C
+search_if_not_guarded(C first, C last, P pred, Value_type<C> const& sentinel) -> C
 //[[expects axiom: mutable_range(cur, successor(last))]]
 {
-    return search_if_guarded(first, last, negation{pred}, sentinel);
+    return search_if_guarded(first, last, negation<Value_type<C>, P>{pred}, sentinel);
 }
 
 template <Forward_cursor C, Equality_comparable_with<Value_type<C>> T>
@@ -237,12 +217,10 @@ search_not_guarded(C first, C last, T const& value, T const& sentinel) -> C
     return search_if_not_guarded(first, last, equal_unary{value}, sentinel);
 }
 
-template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation R = equal<Value_type<C0>>>
+template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation<Value_type<C0>, Value_type<C1>> R = equal<Value_type<C0>>>
 requires
     Loadable<C0> and
-    Loadable<C1> and
-    Same_as<Decay<Value_type<C0>>, Decay<Value_type<C1>>> and
-    Same_as<Decay<Value_type<C0>>, Domain<R>>
+    Loadable<C1>
 constexpr auto
 search_match(C0 cur0, L0 lim0, C1 cur1, L1 lim1, R rel = {}) -> pair<C0, C1>
 //[[expects axiom: loadable_range(cur0, lim0)]]
@@ -256,24 +234,20 @@ search_match(C0 cur0, L0 lim0, C1 cur1, L1 lim1, R rel = {}) -> pair<C0, C1>
     return {mv(cur0), mv(cur1)};
 }
 
-template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation R = equal<Value_type<C0>>>
+template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation<Value_type<C0>, Value_type<C1>> R = equal<Value_type<C0>>>
 requires
     Loadable<C0> and
-    Loadable<C1> and
-    Same_as<Decay<Value_type<C0>>, Decay<Value_type<C1>>> and
-    Same_as<Decay<Value_type<C0>>, Domain<R>>
+    Loadable<C1>
 constexpr auto
 search_mismatch(C0 cur0, L0 lim0, C1 cur1, L1 lim1, R rel = {}) -> pair<C0, C1>
 //[[expects axiom: loadable_range(cur0, lim0)]]
 //[[expects axiom: loadable_range(cur0, lim1)]]
 {
-    return search_match(mv(cur0), mv(lim0), mv(cur1), mv(lim1), complement{rel});
+    return search_match(mv(cur0), mv(lim0), mv(cur1), mv(lim1), complement<Value_type<C0>, Value_type<C1>, R>{rel});
 }
 
-template <Cursor C, Limit<C> L, Relation R = equal<Value_type<C>>>
-requires
-    Loadable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<R>>
+template <Cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = equal<Value_type<C>>>
+requires Loadable<C>
 constexpr auto
 search_adjacent_match(C cur, L lim, R rel = {}) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
@@ -289,21 +263,17 @@ search_adjacent_match(C cur, L lim, R rel = {}) -> C
     return cur;
 }
 
-template <Cursor C, Limit<C> L, Relation R = equal<Value_type<C>>>
-requires
-    Loadable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<R>>
+template <Cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = equal<Value_type<C>>>
+requires Loadable<C>
 constexpr auto
 search_adjacent_mismatch(C cur, L lim, R rel = {}) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
 {
-    return search_adjacent_match(mv(cur), mv(lim), complement{rel});
+    return search_adjacent_match(mv(cur), mv(lim), complement<Value_type<C>, Value_type<C>, R>{rel});
 }
 
-template <Forward_cursor C, Limit<C> L, Relation R = equal<Value_type<C>>>
-requires
-    Loadable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<R>>
+template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = equal<Value_type<C>>>
+requires Loadable<C>
 constexpr auto
 search_adjacent_match(C cur, L lim, R rel = {}) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
@@ -319,23 +289,20 @@ search_adjacent_match(C cur, L lim, R rel = {}) -> C
     return cur;
 }
 
-template <Forward_cursor C, Limit<C> L, Relation R = equal<Value_type<C>>>
-requires
-    Loadable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<R>>
+template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = equal<Value_type<C>>>
+requires Loadable<C>
 constexpr auto
 search_adjacent_mismatch(C cur, L lim, R rel = {}) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
 {
-    return search_adjacent_match(cur, lim, complement{rel});
+    return search_adjacent_match(cur, lim, complement<Value_type<C>, Value_type<C>, R>{rel});
 }
 
-template <Indexed_cursor C, Indexed_cursor B, Relation R = equal<Value_type<C>>>
+template <Indexed_cursor C, Indexed_cursor B, Relation<Value_type<C>, Value_type<C>> R = equal<Value_type<C>>>
 requires
     Loadable<C> and
     Loadable<B> and
-    Same_as<Difference_type<C>, Value_type<B>> and
-    Same_as<Decay<Value_type<C>>, Domain<R>>
+    Same_as<Difference_type<C>, Value_type<B>>
 constexpr auto
 kmp_next(Value_type<B> k, C cur0, C cur1, B buf, R rel = {}) -> Value_type<B>
 {
@@ -344,12 +311,11 @@ kmp_next(Value_type<B> k, C cur0, C cur1, B buf, R rel = {}) -> Value_type<B>
     return k;
 }
 
-template <Indexed_cursor C, Limit<C> L, Indexed_cursor B, Relation R = equal<Value_type<C>>>
+template <Indexed_cursor C, Limit<C> L, Indexed_cursor B, Relation<Value_type<C>, Value_type<C>> R = equal<Value_type<C>>>
 requires
     Loadable<C> and
     Mutable<B> and
-    Same_as<Difference_type<C>, Value_type<B>> and
-    Same_as<Decay<Value_type<C>>, Domain<R>>
+    Same_as<Difference_type<C>, Value_type<B>>
 constexpr void
 compute_kmp_next(C cur, L lim, B buf, R rel = {})
 {
@@ -367,14 +333,13 @@ compute_kmp_next(C cur, L lim, B buf, R rel = {})
     }
 }
 
-template <Indexed_cursor P, Limit<P> L, Indexed_cursor B, Relation R = equal<Value_type<P>>>
+template <Indexed_cursor C, Limit<C> L, Indexed_cursor B, Relation<Value_type<C>, Value_type<C>> R = equal<Value_type<C>>>
 requires
-    Loadable<P> and
+    Loadable<C> and
     Mutable<B> and
-    Same_as<Difference_type<P>, Value_type<B>> and
-    Same_as<Decay<Value_type<P>>, Domain<R>>
+    Same_as<Difference_type<C>, Value_type<B>>
 constexpr auto
-search_subsequence(P cur0, L lim0, P cur1, L lim1, B buf, R rel = {}) -> P
+search_subsequence(C cur0, L lim0, C cur1, L lim1, B buf, R rel = {}) -> C
 {
     if (!precedes(cur1, lim1)) return cur0;
 

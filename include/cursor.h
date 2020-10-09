@@ -267,8 +267,8 @@ template <
     Limit<S0> L0,
     Cursor S1,
     Forward_cursor D,
-    Binary_operation S_add_op,
-    Binary_operation S_mul_op>
+    Operation<Value_type<S0>, Value_type<S1>> S_add_op,
+    Operation<Value_type<S0>, Value_type<S1>> S_mul_op>
 requires
     Loadable<S0> and
     Loadable<S1> and

@@ -229,7 +229,7 @@ struct future
     template <Invocable Fun>
     auto fmap(Fun&& fun)
     {
-        auto pack = package<Result_type<Fun(Res)>()>([header_ = header, fun_ = fw<Fun>(fun)](){
+        auto pack = package<Return_type<Fun(Res)>()>([header_ = header, fun_ = fw<Fun>(fun)](){
             return fun_(header_->_r.back());
         });
         header->fmap(mv(pack.first));
@@ -271,7 +271,7 @@ auto package(Fun&& fun) -> pair<packaged_task<Task>, future<Codomain<Task>>>
 template <typename Fun, typename... Args>
 auto async(Fun&& fun, Args&&... args)
 {
-    auto pack = package<Result_type<Fun, Args...>()>(std::bind(fw<Fun>(fun), fw<Args>(args)...));
+    auto pack = package<Return_type<Fun, Args...>()>(std::bind(fw<Fun>(fun), fw<Args>(args)...));
     global_task_system.async(mv(get<0>(pack)));
     return get<1>(pack);
 }

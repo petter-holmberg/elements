@@ -5,12 +5,10 @@
 
 namespace elements {
 
-template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation R>
+template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation<Value_type<C0>, Value_type<C1>> R>
 requires
     Loadable<C0> and
-    Loadable<C1> and
-    Same_as<Decay<Value_type<C0>>, Decay<Value_type<C1>>> and
-    Same_as<Decay<Value_type<C0>>, Domain<R>>
+    Loadable<C1>
 constexpr auto
 equivalent_lexicographical(C0 cur0, L0 lim0, C1 cur1, L1 lim1, R rel) -> bool
 //[[expects axiom: loadable_range(cur0, lim0)]]
@@ -24,20 +22,17 @@ equivalent_lexicographical(C0 cur0, L0 lim0, C1 cur1, L1 lim1, R rel) -> bool
 template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1>
 requires
     Loadable<C0> and
-    Loadable<C1> and
-    Same_as<Decay<Value_type<C0>>, Decay<Value_type<C1>>>
+    Loadable<C1>
 constexpr auto
 equal_lexicographical(C0 cur0, L0 lim0, C1 cur1, L1 lim1) -> bool
 {
     return equivalent_lexicographical(mv(cur0), lim0, mv(cur1), lim1, equal<Value_type<C0>>{});
 }
 
-template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation R>
+template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation<Value_type<C0>, Value_type<C1>> R>
 requires
     Loadable<C0> and
-    Loadable<C1> and
-    Same_as<Decay<Value_type<C0>>, Decay<Value_type<C1>>> and
-    Same_as<Decay<Value_type<C0>>, Domain<R>>
+    Loadable<C1>
 constexpr auto
 compare_lexicographical(C0 cur0, L0 lim0, C1 cur1, L1 lim1, R rel) -> bool
 //[[expects axiom: loadable_range(cur0, lim0)]]
@@ -57,8 +52,7 @@ compare_lexicographical(C0 cur0, L0 lim0, C1 cur1, L1 lim1, R rel) -> bool
 template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1>
 requires
     Loadable<C0> and
-    Loadable<C1> and
-    Same_as<Decay<Value_type<C0>>, Decay<Value_type<C1>>>
+    Loadable<C1>
 constexpr auto
 less_lexicographical(C0 cur0, L0 lim0, C1 cur1, L1 lim1) -> bool
 {

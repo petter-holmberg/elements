@@ -4,19 +4,12 @@
 
 namespace elements {
 
-template <Regular T>
-constexpr auto
-axiom_Commutative(T const& a, T const& b) noexcept -> bool
-{
-    return a + b == b + a;
-}
-
 // Group-like
 
 template <typename S, typename Op>
 concept Semigroup =
     Regular<S> and
-    Binary_operation<Op>;
+    Operation<Op, S, S>;
     // axiom associative(Op) {
     //     Op(Op(a, b), c) == Op(a, Op(b, c));
     // }
@@ -282,7 +275,7 @@ struct inverse_operation<M, product<M>>
 template <typename G, typename Op>
 concept Group =
     Monoid<G, Op> and
-    Unary_operation<inverse_operation<G, Op>>;
+    Operation<inverse_operation<G, Op>, G>;
     // axiom inverse(inverse_operation<G, Op>, Op, identity_element<G, Op>) {
     //     Op(a, inverse_operation<G, Op>{}(a)) == identity_element<G, Op>;
     //     Op(inverse_operation<G, Op>{}(a), a) == identity_element<G, Op>;

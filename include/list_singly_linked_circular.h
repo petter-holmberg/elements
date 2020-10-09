@@ -175,25 +175,21 @@ struct list_singly_linked_circular
         return load(cur);
     }
 
-    template <Unary_function F>
-    requires
-        Same_as<Decay<T>, Domain<F>> and
-        Same_as<Decay<T>, Codomain<F>>
+    template <Operation<T> Op>
     constexpr auto
-    fmap(F fun) -> list_singly_linked_circular<T>&
+    fmap(Op op) -> list_singly_linked_circular<T>&
     {
         using elements::copy;
-        copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
+        copy(first(at(this)), limit(at(this)), map_sink{op}(first(at(this))));
         return at(this);
     }
 
-    template <Unary_function F>
-    requires Same_as<Decay<T>, Domain<F>>
+    template <Regular_invocable<T> F>
     constexpr auto
-    fmap(F fun) const -> list_singly_linked_circular<Codomain<F>>
+    fmap(F fun) const -> list_singly_linked_circular<Return_type<F, T>>
     {
         using elements::map;
-        list_singly_linked_circular<Codomain<F>> x;
+        list_singly_linked_circular<Return_type<F, T>> x;
         map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
         return x;
     }

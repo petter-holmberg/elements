@@ -4,15 +4,14 @@
 
 namespace elements {
 
-template <Cursor C, Limit<C> L, Unary_function F, typename I = back<Codomain<F>>>
+template <Cursor C, Limit<C> L, Regular_invocable<Value_type<C>> F, typename I = back<Return_type<F, Value_type<C>>>>
 requires
     Loadable<C> and
-    Same_as<Value_type<C>, Domain<F>> and
-    Sequence<Codomain<F>>
+    Sequence<Return_type<F, Value_type<C>>>
 constexpr auto
-flat_map(C src, L lim, F fun) -> Codomain<F>
+flat_map(C src, L lim, F fun) -> Return_type<F, Value_type<C>>
 {
-    Codomain<F> x;
+    Return_type<F, Value_type<C>> x;
     while (precedes(src, lim)) {
         auto y = invoke(fun, load(src));
         insert_range(y, I{x});
@@ -21,18 +20,17 @@ flat_map(C src, L lim, F fun) -> Codomain<F>
     return x;
 }
 
-template <Cursor C, Limit<C> L, Unary_function F, typename I = back<Codomain<F>>>
+template <Cursor C, Limit<C> L, Regular_invocable<Value_type<C>> F, typename I = back<Return_type<F, Value_type<C>>>>
 requires
     Loadable<C> and
-    Same_as<Value_type<C>, Domain<F>> and
-    Sequence<Codomain<F>> and
-    requires (Codomain<F> x, Size_type<Codomain<F>> s) {
+    Sequence<Return_type<F, Value_type<C>>> and
+    requires (Return_type<F, Value_type<C>> x, Size_type<Return_type<F, Value_type<C>>> s) {
         reserve(x, s);
     }
 constexpr auto
-flat_map(C src, L lim, F fun) -> Codomain<F>
+flat_map(C src, L lim, F fun) -> Return_type<F, Value_type<C>>
 {
-    Codomain<F> x;
+    Return_type<F, Value_type<C>> x;
     while (precedes(src, lim)) {
         auto y = invoke(fun, load(src));
         reserve(x, size(x) + size(y));
@@ -42,13 +40,12 @@ flat_map(C src, L lim, F fun) -> Codomain<F>
     return x;
 }
 
-template <Segmented_cursor C, Unary_function F, typename I = back<Codomain<F>>>
+template <Segmented_cursor C, Regular_invocable<Value_type<C>> F, typename I = back<Return_type<F, Value_type<C>>>>
 requires
     Loadable<C> and
-    Same_as<Value_type<C>, Domain<F>> and
-    Sequence<Codomain<F>>
+    Sequence<Return_type<F, Value_type<C>>>
 constexpr auto
-flat_map(C src, C lim, F fun) -> Codomain<F>
+flat_map(C src, C lim, F fun) -> Return_type<F, Value_type<C>>
 {
     auto index_src = index_cursor(src);
     auto index_lim = index_cursor(lim);

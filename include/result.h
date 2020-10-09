@@ -145,8 +145,7 @@ struct result
         return has_value;
     }
 
-    template <Unary_operation Op>
-    requires Same_as<Decay<T>, Domain<Op>>
+    template <Operation<T> Op>
     constexpr auto
     fmap(Op op) -> result<T, E>&
     {
@@ -154,15 +153,14 @@ struct result
         return at(this);
     }
 
-    template <Unary_function Fun>
-    requires Same_as<Decay<T>, Domain<Fun>>
+    template <Regular_invocable<T> F>
     constexpr auto
-    fmap(Fun fun) const -> result<Codomain<Fun>, E>
+    fmap(F fun) const -> result<Return_type<F, T>, E>
     {
         if (has_value) {
-            return result<Codomain<Fun>, E>(fun(data.value));
+            return result<Return_type<F, T>, E>(fun(data.value));
         } else {
-            return result<Codomain<Fun>, E>(failure<E>(data.error));
+            return result<Return_type<F, T>, E>(failure<E>(data.error));
         }
     }
 };
@@ -344,31 +342,27 @@ at(result<T, E>& x) -> T&
     return x.data.value;
 }
 
-template <Movable T, Movable E, Unary_function Fun>
-requires
-    Same_as<Decay<T>, Domain<Fun>> and
-    Same_as<Decay<E>, Error_type<Codomain<Fun>>>
+template <Movable T, Movable E, Regular_invocable<T> F>
+requires Same_as<Decay<E>, Error_type<Return_type<F, T>>>
 constexpr auto
-operator&(result<T, E> const& x, Fun fun) -> Codomain<Fun>
+operator&(result<T, E> const& x, F fun) -> Return_type<F, T>
 {
     if (x.has_value) {
         return fun(x.data.value);
     } else {
-        return Codomain<Fun>(failure<E>(x.data.error));
+        return Return_type<F, T>(failure<E>(x.data.error));
     }
 }
 
-template <Movable T, Movable E, Unary_function Fun>
-requires
-    Same_as<Decay<T>, Domain<Fun>> and
-    Same_as<Decay<E>, Error_type<Codomain<Fun>>>
+template <Movable T, Movable E, Regular_invocable<T> F>
+requires Same_as<Decay<E>, Error_type<Return_type<F, T>>>
 constexpr auto
-operator&(result<T, E>& x, Fun fun) -> Codomain<Fun>
+operator&(result<T, E>& x, F fun) -> Return_type<F, T>
 {
     if (x.has_value) {
         return fun(x.data.value);
     } else {
-        return Codomain<Fun>(failure<E>(x.data.error));
+        return Return_type<F, T>(failure<E>(x.data.error));
     }
 }
 

@@ -47,35 +47,30 @@ struct array_k
         return data[i];
     }
 
-    template <Unary_function F>
-    requires
-        Same_as<Decay<T>, Domain<F>> and
-        Same_as<Decay<T>, Codomain<F>>
+    template <Operation<T> Op>
     constexpr auto
-    fmap(F fun) -> array_k<T, k>&
+    fmap(Op op) -> array_k<T, k>&
     {
         using elements::copy;
-        copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
+        copy(first(at(this)), limit(at(this)), map_sink{op}(first(at(this))));
         return at(this);
     }
 
-    template <Unary_function F>
-    requires Same_as<Decay<T>, Domain<F>>
+    template <Regular_invocable<T> F>
     constexpr auto
-    fmap(F fun) const -> array_k<Codomain<F>, k>
+    fmap(F fun) const -> array_k<Return_type<F, T>, k>
     {
         using elements::map;
-        array_k<Codomain<F>, k> x;
+        array_k<Return_type<F, T>, k> x;
         map(first(at(this)), limit(at(this)), first(x), fun);
         return x;
     }
 
-    template <Unary_function F>
-    requires Same_as<Decay<T>, Domain<F>>
+    template <Regular_invocable<T> F>
     constexpr auto
-    flat_map(F fun) -> array_k<Value_type<Codomain<F>>, k * Size<Codomain<F>>>
+    flat_map(F fun) -> array_k<Value_type<Return_type<F, T>>, k * Size<Return_type<F, T>>>
     {
-        array_k<Value_type<Codomain<F>>, k * Size<Codomain<F>>> x;
+        array_k<Value_type<Return_type<F, T>>, k * Size<Return_type<F, T>>> x;
         auto src = first(at(this));
         auto lim = limit(at(this));
         auto dst = first(x);

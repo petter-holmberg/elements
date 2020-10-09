@@ -92,34 +92,28 @@ struct list_singly_linked_front
         return load(cur);
     }
 
-    template <Unary_function F>
-    requires
-        Same_as<Decay<T>, Domain<F>> and
-        Same_as<Decay<T>, Codomain<F>>
+    template <Operation<T> Op>
     constexpr auto
-    fmap(F fun) -> list_singly_linked_front<T>&
+    fmap(Op op) -> list_singly_linked_front<T>&
     {
         using elements::copy;
-        copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
+        copy(first(at(this)), limit(at(this)), map_sink{op}(first(at(this))));
         return at(this);
     }
 
-    template <Unary_function F>
-    requires Same_as<Decay<T>, Domain<F>>
+    template <Regular_invocable<T> F>
     constexpr auto
-    fmap(F fun) const -> list_singly_linked_front<Codomain<F>>
+    fmap(F fun) const -> list_singly_linked_front<Return_type<F, T>>
     {
         using elements::map;
-        list_singly_linked_front<Codomain<F>> x;
+        list_singly_linked_front<Return_type<F, T>> x;
         map(first(at(this)), limit(at(this)), insert_sink{}(front{x}), fun);
         reverse(x);
         return x;
     }
 
-    template <Unary_function F>
-    requires
-        Same_as<Decay<T>, Domain<F>> and
-        Same_as<list_singly_linked_front<Decay<T>>, Codomain<F>>
+    template <Regular_invocable<T> F>
+    requires Same_as<list_singly_linked_front<Decay<T>>, Return_type<F, T>>
     constexpr auto
     flat_map(F fun) -> list_singly_linked_front<T>&
     {
@@ -134,12 +128,10 @@ struct list_singly_linked_front
         return at(this);
     }
 
-    template <Unary_function F>
-    requires
-        Same_as<Decay<T>, Domain<F>> and
-        Regular<T>
+    template <Regular_invocable<T> F>
+    requires Regular<T>
     constexpr auto
-    flat_map(F fun) const -> Codomain<F>
+    flat_map(F fun) const -> Return_type<F, T>
     {
         using elements::flat_map;
         return flat_map(first(at(this)), limit(at(this)), fun);

@@ -23,25 +23,20 @@ struct pair
         , m1(mv(member1))
     {}
 
-    template <Unary_function F>
-    requires
-        Same_as<T0, T1> and
-        Same_as<Decay<T0>, Domain<F>> and
-        Same_as<Decay<T0>, Codomain<F>>
+    template <Operation<T0> Op>
+    requires Same_as<T0, T1>
     constexpr auto
-    fmap(F fun) -> pair<T0>&
+    fmap(Op op) -> pair<T0>&
     {
-        m0 = invoke(fun, mv(m0));
-        m1 = invoke(fun, mv(m1));
+        m0 = invoke(op, mv(m0));
+        m1 = invoke(op, mv(m1));
         return *this;
     }
 
-    template <Unary_function F>
-    requires
-        Same_as<T0, T1> and
-        Same_as<Decay<T0>, Domain<F>>
+    template <Regular_invocable<T0> F>
+    requires Same_as<T0, T1>
     constexpr auto
-    fmap(F fun) const -> pair<Codomain<F>>
+    fmap(F fun) const -> pair<Return_type<F, T0>>
     {
         return {invoke(fun, m0), invoke(fun, m1)};
     }

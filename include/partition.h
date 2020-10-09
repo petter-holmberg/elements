@@ -7,10 +7,8 @@
 
 namespace elements {
 
-template <Cursor C, Limit<C> L, Unary_predicate P>
-requires
-    Loadable<C> and
-    Same_as<Value_type<C>, Domain<P>>
+template <Cursor C, Limit<C> L, Predicate<Value_type<C>> P>
+requires Loadable<C>
 constexpr auto
 is_partitioned(C cur, L lim, P pred) -> bool
 //[[expects axiom: loadable_range(cur, lim)]]
@@ -18,10 +16,8 @@ is_partitioned(C cur, L lim, P pred) -> bool
     return !precedes(search_if_not(search_if(mv(cur), lim, pred), lim, pred), lim);
 }
 
-template <Forward_cursor C, Unary_predicate P>
-requires
-    Loadable<C> and
-    Same_as<Value_type<C>, Domain<P>>
+template <Forward_cursor C, Predicate<Value_type<C>> P>
+requires Loadable<C>
 constexpr auto
 partition_point_counted(C cur, Difference_type<C> dist, P pred) -> C
 //[[expects axiom: loadable_counted_range(cur, dist)]]
@@ -41,10 +37,8 @@ partition_point_counted(C cur, Difference_type<C> dist, P pred) -> C
     return cur;
 }
 
-template <Forward_cursor C, Limit<C> L, Unary_predicate P>
-requires
-    Loadable<C> and
-    Same_as<Value_type<C>, Domain<P>>
+template <Forward_cursor C, Limit<C> L, Predicate<Value_type<C>> P>
+requires Loadable<C>
 constexpr auto
 partition_point(C cur, L lim, P pred) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
@@ -53,10 +47,8 @@ partition_point(C cur, L lim, P pred) -> C
     return partition_point_counted(cur, lim - cur, pred);
 }
 
-template <Forward_cursor C, Limit<C> L, Unary_predicate P>
-requires
-    Mutable<C> and
-    Same_as<Value_type<C>, Domain<P>>
+template <Forward_cursor C, Limit<C> L, Predicate<Value_type<C>> P>
+requires Mutable<C>
 constexpr auto
 partition_semistable(C cur, L lim, P pred) -> C
 {
@@ -77,8 +69,7 @@ partition_semistable(C cur, L lim, P pred) -> C
     }
 }
 
-template <Loadable L, Predicate P>
-requires Same_as<Value_type<L>, Domain<P>>
+template <Loadable L, Predicate<Value_type<L>> P>
 struct predicate_source
 {
     P pred;
@@ -93,15 +84,13 @@ struct predicate_source
     }
 };
 
-template <Cursor S, Limit<S> L, Cursor D0, Cursor D1, Unary_predicate P>
+template <Cursor S, Limit<S> L, Cursor D0, Cursor D1, Predicate<S> P>
 requires
     Loadable<S> and
     Storable<D0> and
     Storable<D1> and
     Same_as<Value_type<S>, Value_type<D0>> and
-    Same_as<Value_type<S>, Value_type<D1>> and
-    Unary_predicate<P> and
-    Same_as<S, Domain<P>>
+    Same_as<Value_type<S>, Value_type<D1>>
 constexpr auto
 split_copy(S src, L lim, D0 dst_false, D1 dst_true, P pred) -> pair<D0, D1>
 {
@@ -115,15 +104,13 @@ split_copy(S src, L lim, D0 dst_false, D1 dst_true, P pred) -> pair<D0, D1>
     return {dst_false, dst_true};
 }
 
-template <Cursor S, Limit<S> L, Cursor D0, Cursor D1, Unary_predicate P>
+template <Cursor S, Limit<S> L, Cursor D0, Cursor D1, Predicate<Value_type<S>> P>
 requires
     Loadable<S> and
     Storable<D0> and
     Storable<D1> and
     Same_as<Value_type<S>, Value_type<D0>> and
-    Same_as<Value_type<S>, Value_type<D1>> and
-    Unary_predicate<P> and
-    Same_as<Value_type<S>, Domain<P>>
+    Same_as<Value_type<S>, Value_type<D1>>
 constexpr auto
 partition_copy(S src, L lim, D0 dst_false, D1 dst_true, P pred) -> pair<D0, D1>
 {
@@ -131,12 +118,11 @@ partition_copy(S src, L lim, D0 dst_false, D1 dst_true, P pred) -> pair<D0, D1>
     return split_copy(src, lim, dst_false, dst_true, pred_src);
 }
 
-template <Forward_cursor C, Limit<C> L, Forward_cursor B, Unary_predicate P>
+template <Forward_cursor C, Limit<C> L, Forward_cursor B, Predicate<Value_type<C>> P>
 requires
     Mutable<C> and
     Mutable<B> and
-    Same_as<Value_type<C>, Value_type<B>> and
-    Same_as<Value_type<C>, Domain<P>>
+    Same_as<Value_type<C>, Value_type<B>>
 constexpr auto
 partition_with_buffer(C cur, L lim, B buf, P pred) -> C
 //[[expects axiom: mutable_range(cur, lim)]]
@@ -147,10 +133,8 @@ partition_with_buffer(C cur, L lim, B buf, P pred) -> C
     return partition_points.m0;
 }
 
-template <Bidirectional_cursor C, Limit<C> L, Unary_predicate P>
-requires
-    Mutable<C> and
-    Same_as<Value_type<C>, Domain<P>>
+template <Bidirectional_cursor C, Limit<C> L, Predicate<Value_type<C>> P>
+requires Mutable<C>
 constexpr auto
 partition(C cur, L lim, P pred) -> C
 //[[expects axiom: mutable_range(cur, lim)]]

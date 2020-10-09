@@ -17,11 +17,11 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 `reverse_cursor` takes a `Bidirectional_cursor` and implements a `Bidirectional_cursor` where `increment` decrements and `decrement` increments. Loading and storing is done from the predecessor of the original cursor. It is used for traversing ranges in reverse.
 
-`filter_cursor` takes a `Storable` `Cursor` and a `Unary_predicate`, constructing a cursor type that stores and increments when `store` is called, if the predicate is true for the current element. `filter_sink` takes a `Unary_predicate`, constructing an `Invocable` type that returns a `filter_cursor` when invoked with a `Storable` `Cursor`.
+`filter_cursor` takes a `Storable` `Cursor` and a unary `Predicate`, constructing a cursor type that stores and increments when `store` is called, if the predicate is true for the current element. `filter_sink` takes a unary `Predicate`, constructing an `Invocable` type that returns a `filter_cursor` when invoked with a `Storable` `Cursor`.
 
 `insert_cursor` takes a `Storable` `Cursor`, constructing a cursor type that applies the function `insert` on the current element when `store` is called. `insert_sink` in an `Invocable` type that returns an `insert_cursor` when invoked with a `Storable` `Cursor`.
 
-`map_cursor` takes a `Storable` `Cursor` and a `Unary_function`, constructing a cursor type that applies the function on the current element when `store` is called. `map_sink` takes a `Unary_function`, constructing an `Invocable` type that returns a `map_cursor` when invoked with a `Storable` `Cursor`.
+`map_cursor` takes a `Storable` `Cursor` and a unary `Invocable`, constructing a cursor type that applies the function on the current element when `store` is called. `map_sink` takes a unary `Invocable`, constructing an `Invocable` type that returns a `map_cursor` when invoked with a `Storable` `Cursor`.
 
 # Algorithms
 
@@ -60,11 +60,11 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 `copy` takes a loadable range as source and a storable cursor as destination. It performs copying from the first to the last element of the source, which implies that the range starting at the destination cursor can overlap with the source cursor, as long as no source cursor is read after an aliased destination cursor.
 
-`copy_select` takes a loadable range as source, a storable cursor as destination, and a `Unary_predicate` to determine which of the elements from the source that should be copied to the destination.
+`copy_select` takes a loadable range as source, a storable cursor as destination, and a unary `Predicate` to determine which of the elements from the source that should be copied to the destination.
 
-`copy_if` takes a loadable range as source, a storable cursor as destination, and a `Unary_predicate` to determine which of the elements from the source that should be copied to the destination. The predicate is tested on the elements at the source cursors.
+`copy_if` takes a loadable range as source, a storable cursor as destination, and a unary `Predicate` to determine which of the elements from the source that should be copied to the destination. The predicate is tested on the elements at the source cursors.
 
-`copy_if_not` takes a loadable range as source, a storable cursor as destination, and a `Unary_predicate` to determine which of the elements from the source that should not be copied to the destination. The predicate is tested on the elements at the source cursors.
+`copy_if_not` takes a loadable range as source, a storable cursor as destination, and a unary `Predicate` to determine which of the elements from the source that should not be copied to the destination. The predicate is tested on the elements at the source cursors.
 
 ## Map
 
@@ -156,7 +156,7 @@ It will return a cursor pointing to the first subsequence in the first range tha
 
 ## Side effects
 
-`for_each` takes a loadable range and a procedure of `Arity` 1. It applies the procedure on each value in the range, returning a `for_each_result` containing a cursor and the procedure. The cursor points at the position where the iteration has stopped (which may not be reachable a second time), and the procedure is returned as it could have accumulated information during the traversal.
+`for_each` takes a loadable range and a procedure of arity 1. It applies the procedure on each value in the range, returning a `for_each_result` containing a cursor and the procedure. The cursor points at the position where the iteration has stopped (which may not be reachable a second time), and the procedure is returned as it could have accumulated information during the traversal.
 
 ## Quantifiers
 
@@ -313,15 +313,15 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 `Multiplicative_monoid` describes an `Multiplicative_semigroup` with an identity element, returned by the type function `One`.
 `axiom_Multiplicative_monoid` checks the concept for three given values.
 
-`Group` describes a `Monoid` with a `Unary_operation` `inverse_operation` that when invoked returns the inverse of an object.
+`Group` describes a `Monoid` with a unary `Operation` `inverse_operation` that when invoked returns the inverse of an object.
 `Additive_group` describes an `Additive_monoid` where the inverse of an object is returned by the unary `operator-`, and subtraction is implemented by the binary `operator-`.
 `axiom_Additive_group` checks the concept for three given values.
-`Multiplicative_group` describes a `Multiplicative_monoid` where the inverse of an object is returned by inoking the `Unary_operation` `reciprocal`, and division is implemented by `operator/`.
+`Multiplicative_group` describes a `Multiplicative_monoid` where the inverse of an object is returned by inoking the unary `Operation` `reciprocal`, and division is implemented by `operator/`.
 `axiom_Multiplicative_group` checks the concept for three given values.
 
 ### Ring-like
 
-`Semiring` describes a type that is a `Monoid` in two operations `Add_op` and `Mul_op`, defaulted to the operators returned by the `Binary_operation`s `sum` and `product`, which unless specialized invoke `operator+` and `operator*`. `Add_op` is expected to be commutative, and `Mul_op` is expected to distribute over `Add_op`.
+`Semiring` describes a type that is a `Monoid` in two operations `Add_op` and `Mul_op`, defaulted to the operators returned by the binary `Operation`s `sum` and `product`, which unless specialized invoke `operator+` and `operator*`. `Add_op` is expected to be commutative, and `Mul_op` is expected to distribute over `Add_op`.
 `axiom_Semiring` checks the concept for three given values.
 `Commutative_semiring` descrivbes a `Semiring` where `Mul_op` is commutative.
 
@@ -351,9 +351,9 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 ## Functional concepts
 
-`Functor` describes a `Movable` type together with a `Unary_function` type, where the `Value_type` of the type is the same as the `Domain` of the function type, and a member function `.map` is defined and applies the function onto the element(s) it contains, returning an object of the same type.
+`Functor` describes a `Movable` type together with a unary `Invocable` type, where the `Value_type` of the type is the same as the domain of the function type, and a member function `.map` is defined and applies the function onto the element(s) it contains, returning an object of the same type.
 
-`Monad` describes a type that is constructible from one value of its `Value_type` with the function `unit`, and where a value of the type and a `Unary_function` that takes a value of the `Monad`'s `Value_type` can be composed with the function `chain`, returning a `Monad` type of the same type category.
+`Monad` describes a type that is constructible from one value of its `Value_type` with the function `unit`, and where a value of the type and a unary `Invocable` that takes a value of the `Monad`'s `Value_type` can be composed with the function `chain`, returning an object of the same type.
 
 ## Integers
 
@@ -361,22 +361,11 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 ## Invocable concepts
 
-`Procedure` describes an invocable type with n input parameters.
-`Functional_procedure` describes a `Procedure` where all input parameters are `Regular`.
-`Unary_function` describes a `Functional_procedure` of `Arity` 1.
-`Binary_function` describes a `Functional_procedure` of `Arity` 2.
-`Homogeneous_function` describes a `Functional_procedure` of `Arity` > 0, where all input parameters are of the same type.
-
-`Operation` describes a `Homogeneous_function` with the same `Domain` and `Codomain`.
-`Unary_operation` describes an `Operation` of `Arity` 1.
-`Binary_operation` describes an `Operation` of `Arity` 2.
-
-`Predicate` describes a `Functional_procedure` where the `Codomain` is `Boolean_testable`.
-`Unary_predicate` describes a `Predicate` of `Arity` 1.
-`Binary_predicate` describes a `Predicate` of `Arity` 2.
-
-`Homogeneous_predicate` describes a `Predicate` that is also a `Homogeneous_function`.
-`Relation` describes a `Homogeneous_predicate` of `Arity` 2.
+`Invocable` describes a procedure that is not required to be equality-preserving.
+`Regular_invocable` describes an equality-preserving `Invocable`.
+`Operation` describes a `Regular_invocable` with arity > 0 and with the same domain and codomain.
+`Predicate` describes a `Regular_invocable` where the codomain is `Boolean_testable`.
+`Relation` describes a `Predicate` of arity 2 which accepts its arguments in any order.
 
 ## Ordered algebraic concepts
 
@@ -389,7 +378,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 ## Cursors
 
 Cursors are types representing a point in a space, such as a number in a numeric type or a memory address to an element in a data structure.
-When defined, cursors have successors and predecessors that can be accessed with the functions `increment` and `decrement`. The point value the cursor refers to can often be accessed via the cursor with the functions `load` and `store`.
+When defined, cursors have successors and predecessors that can be accessed with the functions `increment` and `decrement`. The value that the cursor points to can often be accessed via the cursor using the functions `load` and `store`.
 
 ### Linear traversal
 
@@ -424,7 +413,7 @@ returns either a reference or a constant reference to its held object.
 
 ### Ranges
 
-`Limit` describes a `Cursor` type together with a type that can be used to check if the limit of the range into which the cursor points has been reached. The check is done with the `Binary_predicate` `precedes`.
+`Limit` describes a `Cursor` type together with a type that can be used to check if the limit of the range into which the cursor points has been reached. The check is done with the binary `Predicate` `precedes`.
 
 `Range` describes a type with two functions `first` and `limit`, returning the half-open range of cursors describing it.
 `Mutable_range` describes a `Range` with a `Mutable` `Cursor_type`.
@@ -448,13 +437,7 @@ returns either a reference or a constant reference to its held object.
 
 ## Invocable
 
-`Codomain` is the return type of an invocable type.
-
-`Input_type` is the type of an invocable's parameter at a given index.
-
-`Arity` is the number of parameters of an invocable.
-
-`Domain` is the type of a homogeneous invocable's parameters.
+`Return_type` is the return type of an `Invocable` type with a given list of argument types.
 
 ## Cursors
 
@@ -675,18 +658,10 @@ Index
 
 `Integral`
 
-`Procedure`
-`Functional_procedure`
-`Unary_function`
-`Binary_function`
-`Homogeneous_function`
+`Invocable`
+`Regular_invocable`
 `Operation`
-`Unary_operation`
-`Binary_operation`
 `Predicate`
-`Unary_predicate`
-`Binary_predicate`
-`Homogeneous_predicate`
 `Relation`
 
 `Ordered_additive_semigroup`
@@ -736,10 +711,7 @@ Index
 `Element_type`
 `Error_type`
 
-`Codomain`
-`Input_type`
-`Arity`
-`Domain`
+`Return_type`
 
 `Pointer_type`
 `Value_type`

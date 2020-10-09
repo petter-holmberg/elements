@@ -4,7 +4,7 @@
 
 namespace elements {
 
-template <Cursor C, Procedure P>
+template <Cursor C, Invocable<Value_type<C>> P>
 struct for_each_result
 {
     C cursor;
@@ -23,11 +23,8 @@ struct for_each_result
     {}
 };
 
-template <Cursor C, Limit<C> L, Procedure P>
-requires
-    Loadable<C> and
-    (Arity<P> == 1) and
-    Convertible_to<Value_type<C>, Domain<P>>
+template <Cursor C, Limit<C> L, Invocable<Value_type<C>> P>
+requires Loadable<C>
 constexpr auto
 for_each(C cur, L lim, P proc) -> for_each_result<C, P>
 //[[expects axiom: loadable_range(cur, lim)]]
@@ -39,11 +36,8 @@ for_each(C cur, L lim, P proc) -> for_each_result<C, P>
     return {mv(cur), mv(proc)};
 }
 
-template <Segmented_cursor C, Procedure P>
-requires
-    Loadable<C> and
-    (Arity<P> == 1) and
-    Convertible_to<Value_type<C>, Domain<P>>
+template <Segmented_cursor C, Invocable<Value_type<C>> P>
+requires Loadable<C>
 constexpr auto
 for_each(C cur, C lim, P proc) -> for_each_result<C, P>
 {

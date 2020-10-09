@@ -186,33 +186,27 @@ struct array_segmented_double_ended
         }
     }
 
-    template <Unary_function F>
-    requires
-        Same_as<Decay<T>, Domain<F>> and
-        Same_as<Decay<T>, Codomain<F>>
+    template <Operation<T> Op>
     constexpr auto
-    fmap(F fun) -> array_segmented_double_ended<T, k>&
+    fmap(Op op) -> array_segmented_double_ended<T, k>&
     {
         using elements::copy;
-        copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
+        copy(first(at(this)), limit(at(this)), map_sink{op}(first(at(this))));
         return at(this);
     }
 
-    template <Unary_function F>
-    requires Same_as<Decay<T>, Domain<F>>
+    template <Regular_invocable<T> F>
     constexpr auto
-    fmap(F fun) const -> array_segmented_double_ended<Codomain<F>, k>
+    fmap(F fun) const -> array_segmented_double_ended<Return_type<F, T>, k>
     {
         using elements::map;
-        array_segmented_double_ended<Codomain<F>, k> x;
+        array_segmented_double_ended<Return_type<F, T>, k> x;
         map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
         return x;
     }
 
-    template <Unary_function F>
-    requires
-        Same_as<Decay<T>, Domain<F>> and
-        Same_as<array_segmented_double_ended<Decay<T>>, Codomain<F>>
+    template <Regular_invocable<T> F>
+    requires Same_as<array_segmented_double_ended<Decay<T>>, Return_type<F, T>>
     constexpr auto
     flat_map(F fun) -> array_segmented_double_ended<T, k>&
     {
@@ -222,12 +216,10 @@ struct array_segmented_double_ended
         return at(this);
     }
 
-    template <Unary_function F>
-    requires
-        Same_as<Decay<T>, Domain<F>> and
-        Regular<T>
+    template <Regular_invocable<T> F>
+    requires Regular<T>
     constexpr auto
-    flat_map(F fun) const -> Codomain<F>
+    flat_map(F fun) const -> Return_type<F, T>
     {
         using elements::flat_map;
         return flat_map(first(at(this)), limit(at(this)), fun);

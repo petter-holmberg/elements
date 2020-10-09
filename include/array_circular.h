@@ -230,25 +230,21 @@ struct array_circular
         }
     }
 
-    template <Unary_function F>
-    requires
-        Same_as<Decay<T>, Domain<F>> and
-        Same_as<Decay<T>, Codomain<F>>
+    template <Operation<T> Op>
     constexpr auto
-    fmap(F fun) -> array_circular<T>&
+    fmap(Op op) -> array_circular<T>&
     {
         using elements::copy;
-        copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
+        copy(first(at(this)), limit(at(this)), map_sink{op}(first(at(this))));
         return at(this);
     }
 
-    template <Unary_function F>
-    requires Same_as<Decay<T>, Domain<F>>
+    template <Regular_invocable<T> F>
     constexpr auto
-    fmap(F fun) const -> array_circular<Codomain<F>>
+    fmap(F fun) const -> array_circular<Return_type<F, T>>
     {
         using elements::map;
-        array_circular<Codomain<F>> x;
+        array_circular<Return_type<F, T>> x;
         reserve(x, size(at(this)));
         map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
         at(x.header).limit = at(x.header).limit_of_storage;

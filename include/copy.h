@@ -52,12 +52,10 @@ copy(S src, S lim, D dst) -> D
     }
 }
 
-template <Cursor S, Cursor D, Limit<S> L, Unary_predicate P>
+template <Cursor S, Cursor D, Limit<S> L, Predicate<S> P>
 requires
     Loadable<S> and
-    Storable<D> and
-    Same_as<Value_type<S>, Value_type<D>> and
-    Same_as<S, Domain<P>>
+    Storable<D>
 constexpr auto
 copy_select(S src, L lim, D dst, P pred) -> D
 //[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (# of iterators satisfying pred))]]
@@ -73,8 +71,7 @@ copy_select(S src, L lim, D dst, P pred) -> D
     return dst;
 }
 
-template <Loadable L, Unary_predicate P>
-requires Same_as<Value_type<L>, Domain<P>>
+template <Loadable L, Predicate<Value_type<L>> P>
 struct predicate_load
 {
     P pred;
@@ -91,12 +88,11 @@ struct predicate_load
     }
 };
 
-template <Cursor S, Cursor D, Limit<S> L, Unary_predicate P>
+template <Cursor S, Cursor D, Limit<S> L, Predicate<Value_type<S>> P>
 requires
     Loadable<S> and
     Storable<D> and
-    Same_as<Value_type<S>, Value_type<D>> and
-    Same_as<Value_type<S>, Domain<P>>
+    Same_as<Value_type<S>, Value_type<D>>
 constexpr auto
 copy_if(S src, L lim, D dst, P pred) -> D
 //[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (# of iterators satisfying pred))]]
@@ -104,17 +100,16 @@ copy_if(S src, L lim, D dst, P pred) -> D
     return copy_select(src, lim, dst, predicate_load<S, P>{pred});
 }
 
-template <Cursor S, Cursor D, Limit<S> L, Unary_predicate P>
+template <Cursor S, Cursor D, Limit<S> L, Predicate<Value_type<S>> P>
 requires
     Loadable<S> and
     Storable<D> and
-    Same_as<Value_type<S>, Value_type<D>> and
-    Same_as<Value_type<S>, Domain<P>>
+    Same_as<Value_type<S>, Value_type<D>>
 constexpr auto
 copy_if_not(S src, L lim, D dst, P pred) -> D
 //[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (# of iterators satisfying pred))]]
 {
-    return copy_if(src, lim, dst, negation{pred});
+    return copy_if(src, lim, dst, negation<Value_type<S>, P>{pred});
 }
 
 }

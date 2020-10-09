@@ -140,25 +140,21 @@ struct array_double_ended
         return load(first(at(this)) + i);
     }
 
-    template <Unary_function F>
-    requires
-        Same_as<Decay<T>, Domain<F>> and
-        Same_as<Decay<T>, Codomain<F>>
+    template <Operation<T> Op>
     constexpr auto
-    fmap(F fun) -> array_double_ended<T>&
+    fmap(Op op) -> array_double_ended<T>&
     {
         using elements::copy;
-        copy(first(at(this)), limit(at(this)), map_sink{fun}(first(at(this))));
+        copy(first(at(this)), limit(at(this)), map_sink{op}(first(at(this))));
         return at(this);
     }
 
-    template <Unary_function F>
-    requires Same_as<Decay<T>, Domain<F>>
+    template <Regular_invocable<T> F>
     constexpr auto
-    fmap(F fun) const -> array_double_ended<Codomain<F>>
+    fmap(F fun) const -> array_double_ended<Return_type<F, T>>
     {
         using elements::map;
-        array_double_ended<Codomain<F>> x;
+        array_double_ended<Return_type<F, T>> x;
         reserve(x, size(at(this)));
         map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
         at(x.header).limit = at(x.header).limit_of_storage;

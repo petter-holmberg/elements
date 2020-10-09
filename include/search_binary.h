@@ -6,79 +6,73 @@
 
 namespace elements {
 
-template <Relation R>
+template <typename T, Relation<T, T> R>
 struct search_binary_lower_predicate
 {
-    Domain<R> const& value;
+    T const& value;
     R rel;
 
     constexpr
-    search_binary_lower_predicate(Domain<R> const& value_, R rel_)
+    search_binary_lower_predicate(T const& value_, R rel_)
         : value{value_}
         , rel{rel_}
     {}
 
     constexpr auto
-    operator()(Domain<R> const& x)
+    operator()(T const& x)
     {
         return !invoke(rel, x, value);
     }
 };
 
-template <Relation R>
+template <typename T, Relation<T, T> R>
 struct search_binary_upper_predicate
 {
-    Domain<R> const& value;
+    T const& value;
     R rel;
 
     constexpr
-    search_binary_upper_predicate(Domain<R> const& value_, R rel_)
+    search_binary_upper_predicate(T const& value_, R rel_)
         : value{value_}
         , rel{rel_}
     {}
 
     constexpr auto
-    operator()(Domain<R> const& x)
+    operator()(T const& x)
     {
         return invoke(rel, value, x);
     }
 };
 
-template <Forward_cursor C, Limit<C> L, Relation R = less<Value_type<C>>>
-requires
-    Loadable<C> and
-    Same_as<Value_type<C>, Domain<R>>
+template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = less<Value_type<C>>>
+requires Loadable<C>
 constexpr auto
 search_binary_lower(C cur, L lim, Value_type<C> const& value, R rel = {}) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
 //[[expects axiom: weak_ordering(rel)]]
 {
-    return partition_point(mv(cur), mv(lim), search_binary_lower_predicate<R>{value, rel});
+    return partition_point(mv(cur), mv(lim), search_binary_lower_predicate<Value_type<C>, R>{value, rel});
 }
 
-template <Forward_cursor C, Limit<C> L, Relation R = less<Value_type<C>>>
-requires
-    Loadable<C> and
-    Same_as<Value_type<C>, Domain<R>>
+template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = less<Value_type<C>>>
+requires Loadable<C>
 constexpr auto
 search_binary_upper(C cur, L lim, Value_type<C> const& value, R rel = {}) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
 //[[expects axiom: weak_ordering(rel)]]
 {
-    return partition_point(mv(cur), mv(lim), search_binary_upper_predicate<R>{value, rel});
+    return partition_point(mv(cur), mv(lim), search_binary_upper_predicate<Value_type<C>, R>{value, rel});
 }
 
-template <Forward_cursor C, Limit<C> L, Relation R = less<Value_type<C>>>
-requires
-    Loadable<C> and
-    Same_as<Value_type<C>, Domain<R>>
+template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = less<Value_type<C>>>
+requires Loadable<C>
 constexpr auto
 search_binary(C cur, L lim, Value_type<C> const& value, R rel = {}) -> bounded_range<C>
 //[[expects axiom: loadable_range(cur, lim)]]
 //[[expects axiom: weak_ordering(rel)]]
 {
-    search_binary_lower_predicate<R> first_pred{value, rel};
-    search_binary_upper_predicate<R> limit_pred{value, rel};
+    search_binary_lower_predicate<Value_type<C>, R> first_pred{value, rel};
+    search_binary_upper_predicate<Value_type<C>, R> limit_pred{value, rel};
 
     auto dist = lim - cur;
     while (!is_zero(dist)) {

@@ -13,7 +13,7 @@ concept Functor =
         fmap(fw<T>(x), fun);
     };
 
-template <typename T, Unary_function F>
+template <typename T, typename F>
 constexpr auto
 fmap(T&& x, F fun) -> decltype(x.fmap(fun))
 {
@@ -34,36 +34,33 @@ concept Monad =
         m & fun;
     };
 
-template <Mutable_range R, Unary_function F>
-requires Convertible_to<Value_type<R>, Domain<F>>
+template <Mutable_range R, Regular_invocable<Value_type<R>> F>
 constexpr auto
-operator&(R& x, F fun) -> Codomain<F>
+operator&(R& x, F fun) -> Return_type<F, Value_type<R>>
 {
     return flat_map(first(x), limit(x), fun);
 }
 
-template <typename T, Unary_function F>
+template <typename T, Regular_invocable<T> F>
 constexpr auto
-operator&(T&& x, F fun) -> Codomain<F>
+operator&(T&& x, F fun) -> Return_type<F, T>
 {
     return x.flat_map(fun);
 }
 
-template <typename T, Unary_function... Fs>
+template <typename T, typename... Fs>
 constexpr Monad auto
 chain(T x, Fs... funcs)
 {
     return (x & ... & funcs);
 }
 
-template <Cursor C, Unary_predicate P>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<P>>
+template <Cursor C, typename P>
+requires Storable<C>
 struct filter_cursor
 {
     C cur{};
-    std::function<Codomain<P>(Input_type<P, 0>)> pred;
+    P pred;
 
     constexpr
     filter_cursor(C cur_, P pred_)
@@ -72,57 +69,45 @@ struct filter_cursor
     {}
 };
 
-template <Cursor C, Unary_predicate P>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<P>>
+template <Cursor C, typename P>
+requires Storable<C>
 struct value_type_t<filter_cursor<C, P>>
 {
     using type = Value_type<C>;
 };
 
-template <Cursor C, Unary_predicate P>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<P>>
+template <Cursor C, typename P>
+requires Storable<C>
 constexpr auto
 precedes(filter_cursor<C, P> const& cur0, C const& cur1) -> bool
 {
     return cur0.cur != cur1;
 }
 
-template <Cursor C, Unary_predicate P>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<P>>
+template <Cursor C, typename P>
+requires Storable<C>
 constexpr auto
 precedes(C const& cur0, filter_cursor<C, P> const& cur1) -> bool
 {
     return !(precedes(cur1, cur0));
 }
 
-template <Cursor C, Unary_predicate P>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<P>>
+template <Cursor C, typename P>
+requires Storable<C>
 constexpr void
 increment(filter_cursor<C, P>&)
 {}
 
-template <Cursor C, Unary_predicate P>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<P>>
+template <Cursor C, typename P>
+requires Storable<C>
 constexpr auto
 successor(filter_cursor<C, P> const& cur) -> filter_cursor<C, P>
 {
     return filter_cursor{successor(cur.cur)};
 }
 
-template <Cursor C, Unary_predicate P>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<P>>
+template <Cursor C, typename P>
+requires Storable<C>
 constexpr void
 store(filter_cursor<C, P>& cur, Value_type<C> const& x)
 {
@@ -132,10 +117,8 @@ store(filter_cursor<C, P>& cur, Value_type<C> const& x)
     }
 }
 
-template <Cursor C, Unary_predicate P>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Domain<P>>
+template <Cursor C, typename P>
+requires Storable<C>
 constexpr void
 store(filter_cursor<C, P>& cur, Value_type<C>&& x)
 {
@@ -145,10 +128,10 @@ store(filter_cursor<C, P>& cur, Value_type<C>&& x)
     }
 }
 
-template <Unary_predicate P>
+template <typename P>
 struct filter_sink
 {
-    std::function<Codomain<P>(Input_type<P, 0>)> pred;
+    P pred;
 
     explicit constexpr
     filter_sink(P pred_)
@@ -156,9 +139,7 @@ struct filter_sink
     {}
 
     template <Cursor C>
-    requires
-        Storable<C> and
-        Same_as<Decay<Value_type<C>>, Domain<P>>
+    requires Storable<C>
     constexpr auto
     operator()(C cur)
     {
@@ -166,14 +147,12 @@ struct filter_sink
     }
 };
 
-template <Cursor C, Unary_function F>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Codomain<F>>
+template <Cursor C, typename F>
+requires Storable<C>
 struct map_cursor
 {
     C cur;
-    std::function<Codomain<F>(Input_type<F, 0>)> fun;
+    F fun;
 
     constexpr
     map_cursor(C cur_, F fun_)
@@ -182,79 +161,65 @@ struct map_cursor
     {}
 };
 
-template <Cursor C, Unary_function F>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Codomain<F>>
+template <Cursor C, typename F>
+requires Storable<C>
 struct value_type_t<map_cursor<C, F>>
 {
     using type = Value_type<C>;
 };
 
-template <Cursor C, Unary_function F>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Codomain<F>>
+template <Cursor C, typename F>
+requires Storable<C>
 constexpr auto
 precedes(map_cursor<C, F> const& cur0, C const& cur1) -> bool
 {
     return cur0.cur != cur1;
 }
 
-template <Cursor C, Unary_function F>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Codomain<F>>
+template <Cursor C, typename F>
+requires Storable<C>
 constexpr auto
 precedes(C const& cur0, map_cursor<C, F> const& cur1) -> bool
 {
     return !(precedes(cur1, cur0));
 }
 
-template <Cursor C, Unary_function F>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Codomain<F>>
+template <Cursor C, typename F>
+requires Storable<C>
 constexpr void
 increment(map_cursor<C, F>& cur)
 {
     increment(cur.cur);
 }
 
-template <Cursor C, Unary_function F>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Codomain<F>>
+template <Cursor C, typename F>
+requires Storable<C>
 constexpr auto
 successor(map_cursor<C, F> const& cur) -> map_cursor<C, F>
 {
     return map_cursor{successor(cur.cur)};
 }
 
-template <Cursor C, Unary_function F>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Codomain<F>>
+template <Cursor C, typename F, typename T>
+requires Storable<C>
 constexpr void
-store(map_cursor<C, F>& cur, Domain<F> const& x)
+store(map_cursor<C, F>& cur, T const& x)
 {
     store(at(cur.cur), cur.fun(x));
 }
 
-template <Cursor C, Unary_function F>
-requires
-    Storable<C> and
-    Same_as<Decay<Value_type<C>>, Codomain<F>>
+template <Cursor C, typename F, typename T>
+requires Storable<C>
 constexpr void
-store(map_cursor<C, F>& cur, Domain<F>&& x)
+store(map_cursor<C, F>& cur, T&& x)
 {
-    store(at(cur.cur), cur.fun(fw<Domain<F>>(x)));
+    store(at(cur.cur), cur.fun(fw<T>(x)));
 }
 
-template <Unary_function F>
+template <typename F>
 struct map_sink
 {
-    std::function<Codomain<F>(Input_type<F, 0>)> fun;
+    F fun;
 
     explicit constexpr
     map_sink(F fun_)
@@ -262,9 +227,7 @@ struct map_sink
     {}
 
     template <Cursor C>
-    requires
-        Storable<C> and
-        Same_as<Decay<Value_type<C>>, Codomain<F>>
+    requires Storable<C>
     constexpr auto
     operator()(C cur)
     {
