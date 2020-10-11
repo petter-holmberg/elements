@@ -13,10 +13,10 @@ SCENARIO ("Lexicographical comparison", "[lexicographical]")
     {
         SECTION ("Checking if two ranges are lexicographically equivalent")
         {
-            REQUIRE (e::equivalent_lexicographical(x, x + 5, x, x + 5, e::equal<int>{}));
-            REQUIRE (!e::equivalent_lexicographical(x, x + 4, x, x + 5, e::equal<int>{}));
-            REQUIRE (!e::equivalent_lexicographical(x, x + 5, x, x + 4, e::equal<int>{}));
-            REQUIRE (!e::equivalent_lexicographical(x, x + 5, y, y + 5, e::equal<int>{}));
+            REQUIRE (e::equivalent_lexicographical(x, x + 5, x, x + 5, e::eq{}));
+            REQUIRE (!e::equivalent_lexicographical(x, x + 4, x, x + 5, e::eq{}));
+            REQUIRE (!e::equivalent_lexicographical(x, x + 5, x, x + 4, e::eq{}));
+            REQUIRE (!e::equivalent_lexicographical(x, x + 5, y, y + 5, e::eq{}));
         }
     }
 
@@ -35,13 +35,13 @@ SCENARIO ("Lexicographical comparison", "[lexicographical]")
     {
         SECTION ("Checking if one range is lexicographically less than another")
         {
-            REQUIRE (e::compare_lexicographical(x, x, x, x + 5, e::less<int>{}));
-            REQUIRE (!e::compare_lexicographical(x, x + 5, x, x, e::less<int>{}));
-            REQUIRE (e::compare_lexicographical(x, x + 4, x, x + 5, e::less<int>{}));
-            REQUIRE (!e::compare_lexicographical(x, x + 5, x, x + 4, e::less<int>{}));
-            REQUIRE (!e::compare_lexicographical(x, x + 5, x, x + 5, e::less<int>{}));
-            REQUIRE (!e::compare_lexicographical(x, x + 5, y, y + 5, e::less<int>{}));
-            REQUIRE (e::compare_lexicographical(y, y + 5, x, x + 5, e::less<int>{}));
+            REQUIRE (e::compare_lexicographical(x, x, x, x + 5, e::lt{}));
+            REQUIRE (!e::compare_lexicographical(x, x + 5, x, x, e::lt{}));
+            REQUIRE (e::compare_lexicographical(x, x + 4, x, x + 5, e::lt{}));
+            REQUIRE (!e::compare_lexicographical(x, x + 5, x, x + 4, e::lt{}));
+            REQUIRE (!e::compare_lexicographical(x, x + 5, x, x + 5, e::lt{}));
+            REQUIRE (!e::compare_lexicographical(x, x + 5, y, y + 5, e::lt{}));
+            REQUIRE (e::compare_lexicographical(y, y + 5, x, x + 5, e::lt{}));
         }
     }
 

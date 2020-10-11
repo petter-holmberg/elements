@@ -4,8 +4,7 @@
 
 namespace elements {
 
-template <typename I>
-requires Integral_domain<I>
+template <Integral_domain I>
 struct rational
 {
     constexpr
@@ -26,37 +25,31 @@ struct rational
     I q = One<I>;
 };
 
-template <typename I>
-requires Integral_domain<I>
+template <Integral_domain I>
 struct value_type_t<rational<I>>
 {
     using type = I;
 };
 
-template <typename I>
-requires Integral_domain<I>
+template <Integral_domain I>
 struct zero_type_t<rational<I>>
 {
     static rational<I> const value;
 };
 
-template <typename I>
-requires Integral_domain<I>
+template <Integral_domain I>
 rational<I> const zero_type_t<rational<I>>::value = rational<I>{Zero<I>, One<I>};
 
-template <typename I>
-requires Integral_domain<I>
+template <Integral_domain I>
 struct one_type_t<rational<I>>
 {
     static rational<I> const value;
 };
 
-template <typename I>
-requires Integral_domain<I>
+template <Integral_domain I>
 rational<I> const one_type_t<rational<I>>::value = rational<I>{One<I>, One<I>};
 
-template <typename I>
-requires Integral_domain<I>
+template <Integral_domain I>
 constexpr auto
 operator==(rational<I> const& x, rational<I> const& y) -> bool
 {
@@ -70,40 +63,35 @@ operator<(rational<I> const& x, rational<I> const& y) -> bool
     return x.p * y.q < x.q * y.p;
 }
 
-template <typename I>
-requires Integral_domain<I>
+template <Integral_domain I>
 constexpr auto
 operator+(rational<I> const& x, rational<I> const& y) -> rational<I>
 {
     return {x.p * y.q + x.q * y.p, x.q * y.q};
 }
 
-template <typename I>
-requires Integral_domain<I>
+template <Integral_domain I>
 constexpr auto
 operator*(rational<I> const& x, rational<I> const& y) -> rational<I>
 {
     return {x.p * y.p, x.q * y.q};
 }
 
-template <typename I>
-requires Integral_domain<I>
+template <Integral_domain I>
 constexpr auto
 operator-(rational<I> const& x) -> rational<I>
 {
     return {-x.p, x.q};
 }
 
-template <typename I>
-requires Integral_domain<I>
+template <Integral_domain I>
 constexpr auto
 operator-(rational<I> const& x, rational<I> const& y) -> rational<I>
 {
     return x + (-y);
 }
 
-template <typename I>
-requires Integral_domain<I>
+template <Integral_domain I>
 struct reciprocal<rational<I>>
 {
     constexpr auto
@@ -114,26 +102,21 @@ struct reciprocal<rational<I>>
     }
 };
 
-template <typename I>
-requires Integral_domain<I>
+template <Integral_domain I>
 constexpr auto
 operator/(rational<I> const& x, rational<I> const& y) -> rational<I>
 {
     return {x.p * y.q, x.q * y.p};
 }
 
-template <typename I>
-requires Integral_domain<I>
-// and Left_semimodule<rational<I>>
+template <Integral_domain I>
 constexpr auto
 operator*(I const& n, rational<I> const& x) -> rational<I>
 {
     return {n * x.p, x.q};
 }
 
-template <typename I>
-requires Integral_domain<I>
-// and Right_semimodule<rational<I>>
+template <Integral_domain I>
 constexpr auto
 operator*(rational<I> const& x, I const& n) -> rational<I>
 {

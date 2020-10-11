@@ -31,19 +31,19 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 ## Equivalence and ordering
 
-`select_0_2` takes a weak ordering and two values of its domain, and returns the minimum value. `min` uses `less` as the weak ordering.
-`select_1_2` takes a weak ordering and two values of its domain, and returns the maximum value. `max` uses `less` as the weak ordering.
-`select_0_3` takes a weak ordering and three values, returning the minimum. `min` uses `less` as the weak ordering.
-`select_2_3` takes a weak ordering and three values, returning the maximum. `max` uses `less` as the weak ordering.
-`select_1_3_ab` takes a weak ordering and three values, where the first two are in increasing order, returning the median. `select_1_3` takes a weak ordering and three values, returning the median. `median` uses `less` as the weak ordering.
-`select_2_3` takes a weak ordering and three values, returning the maximum. `max` uses `less` as the weak ordering.
+`select_0_2` takes a weak ordering and two values of its domain, and returns the minimum value. `min` uses `lt` as the weak ordering.
+`select_1_2` takes a weak ordering and two values of its domain, and returns the maximum value. `max` uses `lt` as the weak ordering.
+`select_0_3` takes a weak ordering and three values, returning the minimum. `min` uses `lt` as the weak ordering.
+`select_2_3` takes a weak ordering and three values, returning the maximum. `max` uses `lt` as the weak ordering.
+`select_1_3_ab` takes a weak ordering and three values, where the first two are in increasing order, returning the median. `select_1_3` takes a weak ordering and three values, returning the median. `median` uses `lt` as the weak ordering.
+`select_2_3` takes a weak ordering and three values, returning the maximum. `max` uses `lt` as the weak ordering.
 
-`equivalent_lexicographical` takes two loadable ranges and an equivalence relation, comparing them for equivalence. `equal_lexicographical` uses `equal` as the equivalence relation.
+`equivalent_lexicographical` takes two loadable ranges and an equivalence relation, comparing them for equivalence. `equal_lexicographical` uses `eq` as the equivalence relation.
 
-`compare_lexicographical` takes two loadable ranges and a weak ordering, comparing them for lexicographical ordering. `less_lexicographical` uses `less` as the ordering.
+`compare_lexicographical` takes two loadable ranges and a weak ordering, comparing them for lexicographical ordering. `less_lexicographical` uses `lt` as the ordering.
 
 `equal_range` takes two `Range`s, comparing them for equality.
-`less_range` takes two `Range`s, comparing them for `less` lexicographical ordering.
+`less_range` takes two `Range`s, comparing them for `lt` lexicographical ordering.
 
 ## Assigning
 
@@ -108,11 +108,11 @@ This algorithm minimizes the cost of applying the operation if the size of a red
 
 The functions in `search.h` implement algorithms based on binary search, as described in [Knuth3](#Knuth3), Chapter 6.2.
 
-`search_binary_lower` takes a loadable forward range and a relation defaulting to `less`, assuming that the range is ordered in accordance with the relation. It returns a cursor pointing to the first element satisfying the relation.
+`search_binary_lower` takes a loadable forward range and a relation defaulting to `lt`, assuming that the range is ordered in accordance with the relation. It returns a cursor pointing to the first element satisfying the relation.
 
-`search_binary_upper` takes a loadable forward range and a relation defaulting to `less`, assuming that the range is ordered in accordance with the relation. It returns the successor of a cursor pointing to the last element satisfying the relation.
+`search_binary_upper` takes a loadable forward range and a relation defaulting to `lt`, assuming that the range is ordered in accordance with the relation. It returns the successor of a cursor pointing to the last element satisfying the relation.
 
-`search_binary` takes a loadable forward range and a relation defaulting to `less`, assuming that the range is ordered in accordance with the relation. It finds the `bounded_range` of elements satisfying the relation.
+`search_binary` takes a loadable forward range and a relation defaulting to `lt`, assuming that the range is ordered in accordance with the relation. It finds the `bounded_range` of elements satisfying the relation.
 
 ### Linear search
 
@@ -134,14 +134,14 @@ For `search_not`, a match is defined as the first element `y` for which the give
 
 assume an element satisfying the applied predicate is known to exist in the given range. They take a cursor pointing to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration.
 
-`search_match` and `search_mismatch` take two loadable ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `equal`.
+`search_match` and `search_mismatch` take two loadable ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `eq`.
 
 `search_adjacent_match` and `search_adjacent_mismatch` take a loadable range and a relation,
-stopping at the first position where an element and its successor satisfy the relation, or does not satisfy the relation, respectively. The default relation is `equal`.
+stopping at the first position where an element and its successor satisfy the relation, or does not satisfy the relation, respectively. The default relation is `eq`.
 
 ### Subsequence search
 
-`search_subsequence` takes two loadable ranges, a cursor pointing to the first element of a mutable buffer of the `Difference_type` of the range cursor, with a size not less than the size of the second range, and an optional relation. The default relation is `equal`
+`search_subsequence` takes two loadable ranges, a cursor pointing to the first element of a mutable buffer of the `Difference_type` of the range cursor, with a size not less than the size of the second range, and an optional relation. The default relation is `eq`
 It will return a cursor pointing to the first subsequence in the first range that matches the second range, or the limit of the first range if no subsequence matching the second range is found.
 
 ## Permutations
@@ -292,8 +292,6 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 `Semiregular` describes a type that is both `Default_constructible`and `Copyable`.
 `Regular` describes a type that is `Semiregular` and `Equality_comparable`.
 `axiom_Regular` checks the concept for one given value.
-`Default_totally_ordered` describes a type that is `Regular` and implements a function object `less` that provides a default total ordering for the type.
-`axiom_Default_totally_ordered` checks the concept for one given value.
 `Totally_ordered` describes a type where the relational operators provide the natural total ordering for the type.
 `axiom_Totally_ordered` checks the concept for two given values where the first must be less than the second.
 
@@ -699,7 +697,6 @@ Index
 `Copyable`
 `Semiregular`
 `Regular`
-`Default_totally_ordered`
 `Totally_ordered`
 
 # Type functions

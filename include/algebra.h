@@ -56,13 +56,25 @@ operator+=(S& a, S const& b) -> S&
     return a;
 }
 
-template <Additive_semigroup S>
+template <typename T = void>
 struct sum
 {
+    template <Additive_semigroup S>
     constexpr auto
     operator()(S const& a, S const& b) const -> S
     {
         return a + b;
+    }
+};
+
+template <>
+struct sum<void>
+{
+    template <Additive_semigroup S>
+    constexpr auto
+    operator()(S const& a, S const& b) const -> S
+    {
+        return sum<S>{}(a, b);
     }
 };
 
@@ -118,13 +130,25 @@ operator*=(S& a, S const& b) -> S&
     return a;
 }
 
-template <Multiplicative_semigroup S>
+template <typename T = void>
 struct product
 {
+    template <Multiplicative_semigroup S>
     constexpr auto
     operator()(S const& a, S const& b) const -> S
     {
         return a * b;
+    }
+};
+
+template <>
+struct product<void>
+{
+    template <Multiplicative_semigroup S>
+    constexpr auto
+    operator()(S const& a, S const& b) const -> S
+    {
+        return product<S>{}(a, b);
     }
 };
 
@@ -198,9 +222,10 @@ operator+(M& a) -> M&
     return a;
 }
 
-template <Additive_monoid M>
+template <typename T = void>
 struct positive
 {
+    template <Additive_monoid M>
     constexpr auto
     operator()(M const& a) const -> M
     {
@@ -208,13 +233,36 @@ struct positive
     }
 };
 
-template <Additive_monoid M>
+template <>
+struct positive<void>
+{
+    template <Additive_monoid M>
+    constexpr auto
+    operator()(M const& a) const -> M
+    {
+        return positive<M>{}(a);
+    }
+};
+
+template <typename T = void>
 struct negative
 {
+    template <Additive_monoid M>
     constexpr auto
     operator()(M const& a) const -> M
     {
         return -a;
+    }
+};
+
+template <>
+struct negative<void>
+{
+    template <Additive_monoid M>
+    constexpr auto
+    operator()(M const& a) const -> M
+    {
+        return negative<M>{}(a);
     }
 };
 
@@ -224,7 +272,7 @@ struct inverse_operation<M, sum<M>>
     constexpr auto
     operator()(M const& a) const -> M
     {
-        return negative<M>()(a);
+        return negative{}(a);
     }
 };
 
@@ -252,13 +300,25 @@ axiom_Multiplicative_monoid(M const& a, M const& b, M const& c) noexcept -> bool
     return true;
 }
 
-template <Multiplicative_monoid M>
+template <typename T = void>
 struct reciprocal
 {
+    template <Multiplicative_monoid M>
     constexpr auto
     operator()(M const& a) const -> M
     {
         return One<M> / a;
+    }
+};
+
+template <>
+struct reciprocal<void>
+{
+    template <Multiplicative_monoid M>
+    constexpr auto
+    operator()(M const& a) const -> M
+    {
+        return reciprocal<M>{}(a);
     }
 };
 
@@ -268,7 +328,7 @@ struct inverse_operation<M, product<M>>
     constexpr auto
     operator()(M const& a) const -> M
     {
-        return reciprocal<M>()(a);
+        return reciprocal{}(a);
     }
 };
 
@@ -313,13 +373,25 @@ axiom_Additive_group(G const& a, G const& b, G const& c) noexcept -> bool
     return true;
 }
 
-template <Additive_group G>
+template <typename T = void>
 struct difference
 {
+    template <Additive_group G>
     constexpr auto
     operator()(G const& a, G const& b) const -> G
     {
         return a - b;
+    }
+};
+
+template <>
+struct difference<void>
+{
+    template <Additive_group G>
+    constexpr auto
+    operator()(G const& a, G const& b) const -> G
+    {
+        return difference<G>{}(a, b);
     }
 };
 
@@ -335,7 +407,7 @@ template <typename G>
 concept Multiplicative_group =
     Multiplicative_monoid<G> and
     requires (G const& a) {
-        { reciprocal<G>{}(a) } -> Same_as<G>;
+        { reciprocal{}(a) } -> Same_as<G>;
         { a / a } -> Same_as<G>;
     };
     // axiom inverse(reciprocal, product<G>, One<G>) {
@@ -358,13 +430,25 @@ axiom_Multiplicative_group(G const& a, G const& b, G const& c) noexcept -> bool
     return true;
 }
 
-template <Multiplicative_group G>
+template <typename T = void>
 struct quotient
 {
+    template <Multiplicative_group G>
     constexpr auto
     operator()(G const& a, G const& b) const -> G
     {
         return a / b;
+    }
+};
+
+template <>
+struct quotient<void>
+{
+    template <Multiplicative_group G>
+    constexpr auto
+    operator()(G const& a, G const& b) const -> G
+    {
+        return quotient<G>{}(a, b);
     }
 };
 

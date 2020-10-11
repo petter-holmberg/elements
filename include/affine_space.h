@@ -111,14 +111,14 @@ operator==(
 
 template <typename S, int32_t k, Default_totally_ordered E, typename S_add_op, typename S_mul_op>
 requires Semiring<S, S_add_op, S_mul_op>
-struct less<affine_vector<S, k, E, S_add_op, S_mul_op>>
+struct lt<affine_vector<S, k, E, S_add_op, S_mul_op>>
 {
     constexpr auto
     operator()(
         affine_vector<S, k, E, S_add_op, S_mul_op> const& x,
         affine_vector<S, k, E, S_add_op, S_mul_op> const& y) -> bool
     {
-        return less<E>{}(x.elements, y.elements);
+        return lt{}(x.elements, y.elements);
     }
 };
 
@@ -206,7 +206,7 @@ operator-(
     affine_vector<S, k, E, S_add_op, S_mul_op>
 {
     affine_vector<S, k, E, S_add_op, S_mul_op> z;
-    map(first(x), limit(x), first(y), first(z), difference<S>{});
+    map(first(x), limit(x), first(y), first(z), difference{});
     return z;
 }
 
@@ -357,12 +357,12 @@ operator==(affine_point<S, k, C, V> const& x, affine_point<S, k, C, V> const& y)
 }
 
 template <typename S, int32_t k, typename C, Default_totally_ordered V>
-struct less<affine_point<S, k, C, V>>
+struct lt<affine_point<S, k, C, V>>
 {
     constexpr auto
     operator()(affine_point<S, k, C, V> const& x, affine_point<S, k, C, V> const& y) -> bool
     {
-        return less<C>{}(x.coordinates, y.coordinates);
+        return lt{}(x.coordinates, y.coordinates);
     }
 };
 
@@ -417,7 +417,7 @@ constexpr auto
 operator-(affine_point<S, k, C, V> const& x, affine_point<S, k, C, V> const& y) -> V
 {
     V v;
-    map(first(x), limit(x), first(y), first(v), difference<S>{});
+    map(first(x), limit(x), first(y), first(v), difference{});
     return v;
 }
 

@@ -44,7 +44,7 @@ struct search_binary_upper_predicate
     }
 };
 
-template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = less<Value_type<C>>>
+template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = lt<Value_type<C>>>
 requires Loadable<C>
 constexpr auto
 search_binary_lower(C cur, L lim, Value_type<C> const& value, R rel = {}) -> C
@@ -54,7 +54,7 @@ search_binary_lower(C cur, L lim, Value_type<C> const& value, R rel = {}) -> C
     return partition_point(mv(cur), mv(lim), search_binary_lower_predicate<Value_type<C>, R>{value, rel});
 }
 
-template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = less<Value_type<C>>>
+template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = lt<Value_type<C>>>
 requires Loadable<C>
 constexpr auto
 search_binary_upper(C cur, L lim, Value_type<C> const& value, R rel = {}) -> C
@@ -64,7 +64,7 @@ search_binary_upper(C cur, L lim, Value_type<C> const& value, R rel = {}) -> C
     return partition_point(mv(cur), mv(lim), search_binary_upper_predicate<Value_type<C>, R>{value, rel});
 }
 
-template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = less<Value_type<C>>>
+template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = lt<Value_type<C>>>
 requires Loadable<C>
 constexpr auto
 search_binary(C cur, L lim, Value_type<C> const& value, R rel = {}) -> bounded_range<C>

@@ -62,23 +62,55 @@ concept Equality_comparable =
     //     bool(x == y) == bool(y == x);
     // }
 
-template <Equality_comparable T>
-struct equal
+template <typename T = void, typename U = T>
+struct eq
 {
-    constexpr auto
-    operator()(T const& x, T const& y) -> bool
+    constexpr decltype(auto)
+    operator()(T const& x, U const& y) const
     {
         return x == y;
     }
 };
 
+template <>
+struct eq<void>
+{
+    template <typename T, typename U>
+    constexpr decltype(auto)
+    operator()(T&& x, U&& y) const
+    {
+        return eq<Decay<T>, Decay<U>>{}(fw<T>(x), fw<U>(y));
+    }
+};
+
+template <typename T = void, typename U = T>
+struct ne
+{
+    constexpr decltype(auto)
+    operator()(T const& x, U const& y) const
+    {
+        return x != y;
+    }
+};
+
+template <>
+struct ne<void>
+{
+    template <typename T, typename U>
+    constexpr decltype(auto)
+    operator()(T&& x, U&& y) const
+    {
+        return ne<Decay<T>, Decay<U>>{}(fw<T>(x), fw<U>(y));
+    }
+};
+
 template <Equality_comparable T>
-struct equal_unary
+struct eq_unary
 {
     T const& x;
 
     constexpr
-    equal_unary(T const& x_) : x{x_} {}
+    eq_unary(T const& x_) : x{x_} {}
 
     constexpr auto
     operator()(T const& y) -> bool
@@ -87,13 +119,87 @@ struct equal_unary
     }
 };
 
-template <Equality_comparable T>
-struct less
+template <typename T = void, typename U = T>
+struct lt
 {
-    constexpr auto
-    operator()(T const& x, T const& y) -> bool
+    constexpr decltype(auto)
+    operator()(T const& x, U const& y) const
     {
         return x < y;
+    }
+};
+
+template <>
+struct lt<void>
+{
+    template <typename T, typename U>
+    constexpr decltype(auto)
+    operator()(T&& x, U&& y) const
+    {
+        return lt<Decay<T>, Decay<U>>{}(fw<T>(x), fw<U>(y));
+    }
+};
+
+template <typename T = void, typename U = T>
+struct ge
+{
+    constexpr decltype(auto)
+    operator()(T const& x, U const& y) const
+    {
+        return x >= y;
+    }
+};
+
+template <>
+struct ge<void>
+{
+    template <typename T, typename U>
+    constexpr decltype(auto)
+    operator()(T&& x, U&& y) const
+    {
+        return ge<Decay<T>, Decay<U>>{}(fw<T>(x), fw<U>(y));
+    }
+};
+
+template <typename T = void, typename U = T>
+struct gt
+{
+    constexpr decltype(auto)
+    operator()(T const& x, U const& y) const
+    {
+        return x > y;
+    }
+};
+
+template <>
+struct gt<void>
+{
+    template <typename T, typename U>
+    constexpr decltype(auto)
+    operator()(T&& x, U&& y) const
+    {
+        return gt<Decay<T>, Decay<U>>{}(fw<T>(x), fw<U>(y));
+    }
+};
+
+template <typename T = void, typename U = T>
+struct le
+{
+    constexpr decltype(auto)
+    operator()(T const& x, U const& y) const
+    {
+        return x <= y;
+    }
+};
+
+template <>
+struct le<void>
+{
+    template <typename T, typename U>
+    constexpr decltype(auto)
+    operator()(T&& x, U&& y) const
+    {
+        return le<Decay<T>, Decay<U>>{}(fw<T>(x), fw<U>(y));
     }
 };
 
@@ -289,10 +395,10 @@ template <typename T>
 concept Default_totally_ordered =
     Equality_comparable<T> and
     requires (T const& x, T const& y) {
-        { less<T>{}(x, y) } -> Boolean_testable;
+        { lt<T>{}(x, y) } -> Boolean_testable;
         // axiom total_ordering {
-        //    implication(less<T>{}(x, y) and less<T>{}(y, z), less<T>{}(x, z));
-        //    less<T>{}(x, y) xor less<T>{}(y, x) xor x == y;
+        //    implication(lt<T>{}(x, y) and lt<T>{}(y, z), lt<T>{}(x, z));
+        //    lt<T>{}(x, y) xor lt<T>{}(y, x) xor x == y;
         // }
         // complexity {
         //     O(areaof(x));
@@ -306,7 +412,7 @@ axiom_Default_totally_ordered(T const& x) noexcept -> bool
     if (!axiom_Regular(x)) return false;
 
     // Default total ordering
-    if (!less<T>{}(x, x)) return false;
+    if (!lt{}(x, x)) return false;
 
     return true;
 }

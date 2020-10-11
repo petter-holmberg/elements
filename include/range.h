@@ -58,12 +58,12 @@ operator==(bounded_range<C, L> const& x, bounded_range<C, L> const& y) -> bool
 
 template <Cursor C, Limit<C> L>
 requires Loadable<C>
-struct less<bounded_range<C, L>>
+struct lt<bounded_range<C, L>>
 {
     constexpr auto
     operator()(bounded_range<C, L> const& x, bounded_range<C, L> const& y) -> bool
     {
-        less<C> less_cur;
+        lt less_cur;
         return
             less_cur(first(x), first(y)) or
             (!less_cur(first(y), first(x)) and less_cur(limit(x), limit(y)));

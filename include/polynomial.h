@@ -6,10 +6,7 @@
 
 namespace elements {
 
-template <typename R, typename C = array_single_ended<R>>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
+template <Ring R, Dynamic_sequence C = array_single_ended<R>>
 struct polynomial
 {
     C coefficients;
@@ -39,58 +36,37 @@ struct polynomial
     }
 };
 
-template <typename R, typename C>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
+template <Ring R, Dynamic_sequence C>
 struct value_type_t<polynomial<R, C>>
 {
     using type = R;
 };
 
-template <typename R, typename C>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
+template <Ring R, Dynamic_sequence C>
 struct size_type_t<polynomial<R, C>>
 {
     using type = Size_type<C>;
 };
 
-template <typename R, typename C>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
+template <Ring R, Dynamic_sequence C>
 struct zero_type_t<polynomial<R, C>>
 {
     static polynomial<R, C> const value;
 };
 
-template <typename R, typename C>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
+template <Ring R, Dynamic_sequence C>
 polynomial<R, C> const zero_type_t<polynomial<R, C>>::value = polynomial<R, C>{};
 
-template <typename R, typename C>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
+template <Ring R, Dynamic_sequence C>
 struct one_type_t<polynomial<R, C>>
 {
     static polynomial<R, C> const value;
 };
 
-template <typename R, typename C>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
+template <Ring R, Dynamic_sequence C>
 polynomial<R, C> const one_type_t<polynomial<R, C>>::value = polynomial<R, C>{One<R>};
 
-template <typename R, typename C>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
+template <Ring R, Dynamic_sequence C>
 constexpr auto
 operator==(polynomial<R, C> const& x, polynomial<R, C> const& y) -> bool
 {
@@ -101,10 +77,7 @@ operator==(polynomial<R, C> const& x, polynomial<R, C> const& y) -> bool
         first(y.coefficients), first(y.coefficients) + successor(dy));
 }
 
-template <typename R, typename C>
-requires
-    Ordered_ring<R> and
-    Dynamic_sequence<C>
+template <Ordered_ring R, Dynamic_sequence C>
 constexpr auto
 operator<(polynomial<R, C> const& x, polynomial<R, C> const& y) -> bool
 {
@@ -116,28 +89,22 @@ operator<(polynomial<R, C> const& x, polynomial<R, C> const& y) -> bool
             first(y.coefficients), first(y.coefficients) + successor(dy)));
 }
 
-template <typename R, typename C>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
+template <Ring R, Dynamic_sequence C>
 constexpr auto
 operator+(polynomial<R, C> const& x, polynomial<R, C> const& y) -> polynomial<R, C>
 {
     if (size(y.coefficients) < size(x.coefficients)) {
         polynomial<R, C> z(x);
-        map(first(y.coefficients), limit(y.coefficients), first(z.coefficients), first(z.coefficients), sum<R>{});
+        map(first(y.coefficients), limit(y.coefficients), first(z.coefficients), first(z.coefficients), sum{});
         return z;
     } else {
         polynomial<R, C> z(y);
-        map(first(x.coefficients), limit(x.coefficients), first(z.coefficients), first(z.coefficients), sum<R>{});
+        map(first(x.coefficients), limit(x.coefficients), first(z.coefficients), first(z.coefficients), sum{});
         return z;
     }
 }
 
-template <typename R, typename C>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
+template <Ring R, Dynamic_sequence C>
 constexpr auto
 operator*(polynomial<R, C> const& x, polynomial<R, C> const& y) -> polynomial<R, C>
 {
@@ -170,10 +137,7 @@ operator*(polynomial<R, C> const& x, polynomial<R, C> const& y) -> polynomial<R,
     return z;
 }
 
-template <typename R, typename C>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
+template <Ring R, Dynamic_sequence C>
 constexpr auto
 operator-(polynomial<R, C> x) -> polynomial<R, C>
 {
@@ -181,21 +145,15 @@ operator-(polynomial<R, C> x) -> polynomial<R, C>
     return x;
 }
 
-template <typename R, typename C>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
+template <Ring R, Dynamic_sequence C>
 constexpr auto
 operator-(polynomial<R, C> const& x, polynomial<R, C> const& y) -> polynomial<R, C>
 {
     return x + (-y);
 }
 
-template <typename R, typename C, typename I>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
-// and Ordered_integral_domain<I>
+template <Ring R, Dynamic_sequence C, typename I>
+//requires Ordered_integral_domain<I>
 constexpr auto
 operator*(I const& n, polynomial<R, C> x) -> polynomial<R, C>
 {
@@ -205,21 +163,15 @@ operator*(I const& n, polynomial<R, C> x) -> polynomial<R, C>
     return x;
 }
 
-template <typename R, typename C, typename I>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
-// and Ordered_integral_domain<I>
+template <Ring R, Dynamic_sequence C, typename I>
+//requires Ordered_integral_domain<I>
 constexpr auto
 operator*(polynomial<R, C> const& x, I const& n) -> polynomial<R, C>
 {
     return n * x;
 }
 
-template <typename R, typename C>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
+template <Ring R, Dynamic_sequence C>
 constexpr auto
 degree(polynomial<R, C> const& x) -> Size_type<polynomial<R, C>>
 {
@@ -229,10 +181,7 @@ degree(polynomial<R, C> const& x) -> Size_type<polynomial<R, C>>
         [](R const& y){ return y != Zero<R>; }).cur - successor(first(x.coefficients));
 }
 
-template <typename R, typename C>
-requires
-    Ring<R> and
-    Dynamic_sequence<C>
+template <Ring R, Dynamic_sequence C>
 constexpr auto
 evaluate(polynomial<R, C> const& p, R const& x) -> R
 {

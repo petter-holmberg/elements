@@ -47,7 +47,7 @@ constexpr auto
 count(C cur, L lim, Value_type<C> const& value, N count = Zero<N>) -> N
 //[[expects axiom: loadable_range(cur, lim)]]
 {
-    return count_if(mv(cur), lim, equal_unary{value}, count);
+    return count_if(mv(cur), lim, eq_unary{value}, count);
 }
 
 template <Cursor C, Limit<C> L, Cursor N = Value_type<C>>
@@ -56,7 +56,7 @@ constexpr auto
 count_not(C cur, L lim, Value_type<C> const& value, N count = Zero<N>) -> N
 //[[expects axiom: loadable_range(cur, lim)]]
 {
-    return count_if_not(mv(cur), lim, equal_unary{value}, count);
+    return count_if_not(mv(cur), lim, eq_unary{value}, count);
 }
 
 }

@@ -10,14 +10,14 @@ SCENARIO ("Reduction", "[reduce]")
 
     SECTION ("Reduction of integer range")
     {
-        REQUIRE (e::reduce_nonempty(1, 6, e::product<int>{}) == 120);
+        REQUIRE (e::reduce_nonempty(1, 6, e::product{}) == 120);
     }
 
     SECTION ("Reduction of array")
     {
         REQUIRE (e::reduce(x, x, e::sum<int>{}, 5) == 5);
 
-        REQUIRE (e::reduce_nonempty(x, x + 5, e::sum<int>{}) == 10);
+        REQUIRE (e::reduce_nonempty(x, x + 5, e::sum{}) == 10);
     }
 }
 
@@ -27,6 +27,6 @@ SCENARIO ("Balanced reduction", "[reduce]")
 
     SECTION ("Balanced reduction of array")
     {
-        REQUIRE(e::reduce_balanced(x, x + 5, e::sum<int>(), 0) == 10);
+        REQUIRE(e::reduce_balanced(x, x + 5, e::sum{}, 0) == 10);
     }
 }

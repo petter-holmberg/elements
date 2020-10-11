@@ -28,14 +28,14 @@ template <Default_totally_ordered T>
 constexpr auto
 min(T const& a, T const& b) -> T const&
 {
-    return select_0_2(a, b, less<T>{});
+    return select_0_2(a, b, lt{});
 }
 
 template <Default_totally_ordered T>
 constexpr auto
 min(T& a, T& b) -> T&
 {
-    return select_0_2(a, b, less<T>{});
+    return select_0_2(a, b, lt{});
 }
 
 template <typename T, Relation<T, T> R>
@@ -60,14 +60,14 @@ template <Default_totally_ordered T>
 constexpr auto
 max(T const& a, T const& b) -> T const&
 {
-    return select_1_2(a, b, less<T>{});
+    return select_1_2(a, b, lt{});
 }
 
 template <Default_totally_ordered T>
 constexpr auto
 max(T& a, T& b) -> T const&
 {
-    return select_1_2(a, b, less<T>{});
+    return select_1_2(a, b, lt{});
 }
 
 // 3 values
@@ -92,14 +92,14 @@ template <Default_totally_ordered T>
 constexpr auto
 min(T const& a, T const& b, T const& c) -> T const&
 {
-    return select_0_3(a, b, c, less<T>{});
+    return select_0_3(a, b, c, lt{});
 }
 
 template <Default_totally_ordered T>
 constexpr auto
 min(T& a, T& b, T& c) -> T&
 {
-    return select_0_3(a, b, c, less<T>{});
+    return select_0_3(a, b, c, lt{});
 }
 
 template <typename T, Relation<T, T> R>
@@ -148,14 +148,14 @@ template <Default_totally_ordered T>
 constexpr auto
 median(T const& a, T const& b, T const& c) -> T const&
 {
-    return select_1_3(a, b, c, less<T>{});
+    return select_1_3(a, b, c, lt{});
 }
 
 template <Default_totally_ordered T>
 constexpr auto
 median(T& a, T& b, T& c) -> T&
 {
-    return select_1_3(a, b, c, less<T>{});
+    return select_1_3(a, b, c, lt{});
 }
 
 template <typename T, Relation<T, T> R>
@@ -178,14 +178,14 @@ template <Default_totally_ordered T>
 constexpr auto
 max(T const& a, T const& b, T const& c) -> T const&
 {
-    return select_2_3(a, b, c, less<T>{});
+    return select_2_3(a, b, c, lt{});
 }
 
 template <Default_totally_ordered T>
 constexpr auto
 max(T& a, T& b, T& c) -> T&
 {
-    return select_2_3(a, b, c, less<T>{});
+    return select_2_3(a, b, c, lt{});
 }
 
 }

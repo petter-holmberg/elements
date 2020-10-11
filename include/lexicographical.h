@@ -26,7 +26,7 @@ requires
 constexpr auto
 equal_lexicographical(C0 cur0, L0 lim0, C1 cur1, L1 lim1) -> bool
 {
-    return equivalent_lexicographical(mv(cur0), lim0, mv(cur1), lim1, equal<Value_type<C0>>{});
+    return equivalent_lexicographical(mv(cur0), lim0, mv(cur1), lim1, eq<Value_type<C0>>{});
 }
 
 template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation<Value_type<C0>, Value_type<C1>> R>
@@ -56,7 +56,7 @@ requires
 constexpr auto
 less_lexicographical(C0 cur0, L0 lim0, C1 cur1, L1 lim1) -> bool
 {
-    return compare_lexicographical(mv(cur0), lim0, mv(cur1), lim1, less<Value_type<C0>>{});
+    return compare_lexicographical(mv(cur0), lim0, mv(cur1), lim1, lt{});
 }
 
 template <Range R>

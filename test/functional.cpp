@@ -31,7 +31,7 @@ SCENARIO ("Using map_sink", "[map_sink]")
 
     SECTION ("Mapping with sink")
     {
-        auto cur = e::copy(x, x + 5, e::map_sink{e::negative<int>{}}(y + 0));
+        auto cur = e::copy(x, x + 5, e::map_sink{e::negative{}}(y + 0));
         REQUIRE(!precedes(cur, y + 5));
         CHECK (y[0] == 0);
         CHECK (y[1] == -1);

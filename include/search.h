@@ -86,7 +86,7 @@ constexpr auto
 search(C cur, L lim, T const& value) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
 {
-    return search_if(mv(cur), mv(lim), equal_unary{value});
+    return search_if(mv(cur), mv(lim), eq_unary{value});
 }
 
 template <Segmented_cursor C, Equality_comparable_with<Value_type<C>> T>
@@ -94,7 +94,7 @@ requires Loadable<C>
 constexpr auto
 search(C cur, C lim, T const& value) -> C
 {
-    return search_if(mv(cur), mv(lim), equal_unary{value});
+    return search_if(mv(cur), mv(lim), eq_unary{value});
 }
 
 template <Bidirectional_cursor C, Limit<C> L, Equality_comparable_with<Value_type<C>> T>
@@ -103,7 +103,7 @@ constexpr auto
 search_backward(C cur, L lim, T const& value) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
 {
-    return search_backward_if(mv(cur), mv(lim), equal_unary{value});
+    return search_backward_if(mv(cur), mv(lim), eq_unary{value});
 }
 
 template <Cursor C, Limit<C> L, Equality_comparable_with<Value_type<C>> T>
@@ -112,7 +112,7 @@ constexpr auto
 search_not(C cur, L lim, T const& value) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
 {
-    return search_if_not(mv(cur), mv(lim), equal_unary{value});
+    return search_if_not(mv(cur), mv(lim), eq_unary{value});
 }
 
 template <Segmented_cursor C, Equality_comparable_with<Value_type<C>> T>
@@ -120,7 +120,7 @@ requires Loadable<C>
 constexpr auto
 search_not(C cur, C lim, T const& value) -> C
 {
-    return search_if_not(mv(cur), mv(lim), equal_unary{value});
+    return search_if_not(mv(cur), mv(lim), eq_unary{value});
 }
 
 template <Bidirectional_cursor C, Limit<C> L, Equality_comparable_with<Value_type<C>> T>
@@ -129,7 +129,7 @@ constexpr auto
 search_backward_not(C cur, L lim, T const& value) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
 {
-    return search_backward_if_not(mv(cur), mv(lim), equal_unary{value});
+    return search_backward_if_not(mv(cur), mv(lim), eq_unary{value});
 }
 
 template <Cursor C, Predicate<Value_type<C>> P>
@@ -160,7 +160,7 @@ search_unguarded(C cur, T const& value) -> C
 //[[expects axiom: loadable_range(cur, _)]]
 //[[expects axiom: search(cur, _, value) != _]]
 {
-    return search_if_unguarded(mv(cur), equal_unary{value});
+    return search_if_unguarded(mv(cur), eq_unary{value});
 }
 
 template <Cursor C, Equality_comparable_with<Value_type<C>> T>
@@ -170,7 +170,7 @@ search_not_unguarded(C cur, T const& value) -> C
 //[[expects axiom: loadable_range(cur, _)]]
 //[[expects axiom: search_not(cur, _, value) != _]]
 {
-    return search_if_not_unguarded(mv(cur), equal_unary{value});
+    return search_if_not_unguarded(mv(cur), eq_unary{value});
 }
 
 template <Forward_cursor C, Predicate<Value_type<C>> P>
@@ -204,7 +204,7 @@ constexpr auto
 search_guarded(C first, C last, T const& value) -> C
 //[[expects axiom: mutable_range(cur, successor(last))]]
 {
-    return search_if_guarded(first, last, equal_unary{value}, value);
+    return search_if_guarded(first, last, eq_unary{value}, value);
 }
 
 template <Forward_cursor C, Equality_comparable_with<Value_type<C>> T>
@@ -214,10 +214,10 @@ search_not_guarded(C first, C last, T const& value, T const& sentinel) -> C
 //[[expects axiom: mutable_range(cur, successor(last))]]
 //[[expects axiom: value != sentinel]]
 {
-    return search_if_not_guarded(first, last, equal_unary{value}, sentinel);
+    return search_if_not_guarded(first, last, eq_unary{value}, sentinel);
 }
 
-template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation<Value_type<C0>, Value_type<C1>> R = equal<Value_type<C0>>>
+template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation<Value_type<C0>, Value_type<C1>> R = eq<Value_type<C0>>>
 requires
     Loadable<C0> and
     Loadable<C1>
@@ -234,7 +234,7 @@ search_match(C0 cur0, L0 lim0, C1 cur1, L1 lim1, R rel = {}) -> pair<C0, C1>
     return {mv(cur0), mv(cur1)};
 }
 
-template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation<Value_type<C0>, Value_type<C1>> R = equal<Value_type<C0>>>
+template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation<Value_type<C0>, Value_type<C1>> R = eq<Value_type<C0>>>
 requires
     Loadable<C0> and
     Loadable<C1>
@@ -246,7 +246,7 @@ search_mismatch(C0 cur0, L0 lim0, C1 cur1, L1 lim1, R rel = {}) -> pair<C0, C1>
     return search_match(mv(cur0), mv(lim0), mv(cur1), mv(lim1), complement<Value_type<C0>, Value_type<C1>, R>{rel});
 }
 
-template <Cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = equal<Value_type<C>>>
+template <Cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = eq<Value_type<C>>>
 requires Loadable<C>
 constexpr auto
 search_adjacent_match(C cur, L lim, R rel = {}) -> C
@@ -263,7 +263,7 @@ search_adjacent_match(C cur, L lim, R rel = {}) -> C
     return cur;
 }
 
-template <Cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = equal<Value_type<C>>>
+template <Cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = eq<Value_type<C>>>
 requires Loadable<C>
 constexpr auto
 search_adjacent_mismatch(C cur, L lim, R rel = {}) -> C
@@ -272,7 +272,7 @@ search_adjacent_mismatch(C cur, L lim, R rel = {}) -> C
     return search_adjacent_match(mv(cur), mv(lim), complement<Value_type<C>, Value_type<C>, R>{rel});
 }
 
-template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = equal<Value_type<C>>>
+template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = eq<Value_type<C>>>
 requires Loadable<C>
 constexpr auto
 search_adjacent_match(C cur, L lim, R rel = {}) -> C
@@ -289,7 +289,7 @@ search_adjacent_match(C cur, L lim, R rel = {}) -> C
     return cur;
 }
 
-template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = equal<Value_type<C>>>
+template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = eq<Value_type<C>>>
 requires Loadable<C>
 constexpr auto
 search_adjacent_mismatch(C cur, L lim, R rel = {}) -> C
@@ -298,7 +298,7 @@ search_adjacent_mismatch(C cur, L lim, R rel = {}) -> C
     return search_adjacent_match(cur, lim, complement<Value_type<C>, Value_type<C>, R>{rel});
 }
 
-template <Indexed_cursor C, Indexed_cursor B, Relation<Value_type<C>, Value_type<C>> R = equal<Value_type<C>>>
+template <Indexed_cursor C, Indexed_cursor B, Relation<Value_type<C>, Value_type<C>> R = eq<Value_type<C>>>
 requires
     Loadable<C> and
     Loadable<B> and
@@ -311,7 +311,7 @@ kmp_next(Value_type<B> k, C cur0, C cur1, B buf, R rel = {}) -> Value_type<B>
     return k;
 }
 
-template <Indexed_cursor C, Limit<C> L, Indexed_cursor B, Relation<Value_type<C>, Value_type<C>> R = equal<Value_type<C>>>
+template <Indexed_cursor C, Limit<C> L, Indexed_cursor B, Relation<Value_type<C>, Value_type<C>> R = eq<Value_type<C>>>
 requires
     Loadable<C> and
     Mutable<B> and
@@ -333,7 +333,7 @@ compute_kmp_next(C cur, L lim, B buf, R rel = {})
     }
 }
 
-template <Indexed_cursor C, Limit<C> L, Indexed_cursor B, Relation<Value_type<C>, Value_type<C>> R = equal<Value_type<C>>>
+template <Indexed_cursor C, Limit<C> L, Indexed_cursor B, Relation<Value_type<C>, Value_type<C>> R = eq<Value_type<C>>>
 requires
     Loadable<C> and
     Mutable<B> and
