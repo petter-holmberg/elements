@@ -13,50 +13,64 @@ SCENARIO ("Using built-in and library algebraic types", "[algebra]")
     SECTION ("Semigroups")
     {
         static_assert(e::Semigroup<int, e::sum<int>>);
+        static_assert(axiom_Semigroup(1, 2, 3, e::sum{}));
+
         static_assert(e::Semigroup<int, e::product<int>>);
+        static_assert(axiom_Semigroup(2, 3, 4, e::product{}));
 
         static_assert(e::Additive_semigroup<int>);
+        static_assert(e::axiom_Additive_semigroup(1, 2, 3));
 
         static_assert(e::Multiplicative_semigroup<int>);
+        static_assert(e::axiom_Multiplicative_semigroup(2, 3, 4));
     }
 
     SECTION ("Monoids")
     {
         static_assert(e::Monoid<int, e::sum<int>>);
+        static_assert(axiom_Monoid(1, 2, 3, e::sum{}));
+
         static_assert(e::Monoid<int, e::product<int>>);
+        static_assert(axiom_Monoid(2, 3, 4, e::product{}));
 
         static_assert(e::Additive_monoid<int>);
+        static_assert(e::axiom_Additive_monoid(1, 2, 3));
 
         static_assert(e::Multiplicative_monoid<int>);
+        static_assert(e::axiom_Multiplicative_monoid(2, 3, 4));
     }
 
     SECTION ("Groups")
     {
         static_assert(e::Group<int, e::sum<int>>);
-        static_assert(e::Group<int, e::product<int>>);
+        static_assert(e::axiom_Group(1, 2, 3, e::sum{}));
 
         static_assert(e::Additive_group<int>);
-
-        static_assert(e::Multiplicative_group<int>);
+        static_assert(e::axiom_Additive_group(1, 2, 3));
     }
 
     SECTION ("Semirings")
     {
         static_assert(e::Semiring<int>);
+        static_assert(e::axiom_Semiring(2, 3, 4));
 
         static_assert(e::Commutative_semiring<int>);
+        static_assert(e::axiom_Commutative_semiring(2, 3, 4));
     }
 
     SECTION ("Rings")
     {
         static_assert(e::Ring<int>);
+        static_assert(e::axiom_Ring(2, 3, 4));
 
         static_assert(e::Commutative_ring<int>);
+        static_assert(e::axiom_Commutative_ring(2, 3, 4));
     }
 
     SECTION ("Integral domains")
     {
         static_assert(e::Integral_domain<int>);
+        static_assert(e::axiom_Integral_domain(2, 3, 4));
     }
 
     SECTION ("Fields")

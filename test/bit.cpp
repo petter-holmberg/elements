@@ -25,7 +25,7 @@ SCENARIO ("Using bits", "[bit]")
             REQUIRE (b1 * b0 == b0);
             REQUIRE (b1 * b1 == b1);
 
-            REQUIRE (axiom_Commutative_semiring(b0, b1, b0));
+            REQUIRE (e::axiom_Commutative_semiring(b0, b1, b0));
         }
     }
 
