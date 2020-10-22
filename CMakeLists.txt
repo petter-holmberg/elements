@@ -9,7 +9,9 @@ configure_file (
 
 include_directories ("${PROJECT_SOURCE_DIR}/include")
 set (CMAKE_BUILD_TYPE Release)
-set (CMAKE_CXX_COMPILER clang++-12)
+#set (CMAKE_CXX_COMPILER clang++12)
+set (CMAKE_C_COMPILER gcc-10)
+set (CMAKE_CXX_COMPILER g++-10)
 
 add_custom_target (
     cppcheck

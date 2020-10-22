@@ -1,5 +1,6 @@
 #pragma once
 
+#include "intrinsics.h"
 #include "copy.h"
 
 namespace elements {

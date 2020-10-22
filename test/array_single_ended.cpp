@@ -7,7 +7,7 @@ namespace e = elements;
 
 SCENARIO ("Using single-ended array", "[array_single_ended]")
 {
-    e::array_single_ended<int> x{0, 1, 2, 3, 4};
+    e::array_single_ended x{0, 1, 2, 3, 4};
     static_assert(e::Dynamic_sequence<decltype(x), e::back<decltype(x)>>);
     static_assert(e::Affine_space<e::Cursor_type<decltype(x)>>);
 
@@ -48,7 +48,7 @@ SCENARIO ("Using single-ended array", "[array_single_ended]")
         }
 
         {
-            e::array_single_ended<int> y{0, 1, 2, 3};
+            e::array_single_ended y{0, 1, 2, 3};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -59,7 +59,7 @@ SCENARIO ("Using single-ended array", "[array_single_ended]")
         }
 
         {
-            e::array_single_ended<int> y{0, 1, 2, 3, 4, 5};
+            e::array_single_ended y{0, 1, 2, 3, 4, 5};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -70,7 +70,7 @@ SCENARIO ("Using single-ended array", "[array_single_ended]")
         }
 
         {
-            e::array_single_ended<int> y{0, -1, -2, -3, -4};
+            e::array_single_ended y{0, -1, -2, -3, -4};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -81,7 +81,7 @@ SCENARIO ("Using single-ended array", "[array_single_ended]")
         }
 
         {
-            e::array_single_ended<int> y{5, 6, 7, 8, 9};
+            e::array_single_ended y{5, 6, 7, 8, 9};
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -111,7 +111,7 @@ SCENARIO ("Using single-ended array", "[array_single_ended]")
         }
 
         {
-            e::array_single_ended<int> y{5, 6, 7, 8, 9};
+            e::array_single_ended y{5, 6, 7, 8, 9};
             e::swap(x, y);
 
             CHECK (x[0] == 5);

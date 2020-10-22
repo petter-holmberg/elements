@@ -5,19 +5,10 @@
 namespace elements {
 
 template <typename F, typename... Args>
-concept Invocable =
-    requires(F&& f, Args&&... args) {
-        std::invoke(fw<F>(f), fw<Args>(args)...);
-    };
-
-template <typename F, typename... Args>
-concept Regular_invocable = Invocable<F, Args...>;
-
-template <typename F, typename... Args>
 concept Operation =
     Regular_invocable<F, Args...> and
     sizeof...(Args) > 0 and
-    Same_as<Return_type<F, Args...>, Decay<std::tuple_element_t<0, std::tuple<Args...>>>>;
+    (Same_as<Return_type<F, Args...>, Decay<Args>> && ...);
 
 template <typename T, Operation<T, T> Op>
 struct transpose_op
@@ -34,11 +25,6 @@ struct transpose_op
     }
 };
 
-template <typename F, typename... Args>
-concept Predicate =
-    Regular_invocable<F, Args...> &&
-    Boolean_testable<Return_type<F, Args...>>;
-
 template <typename T, Predicate<T> P>
 struct negation
 {
@@ -53,13 +39,6 @@ struct negation
         return !invoke(pred, x);
     }
 };
-
-template <typename R, typename T, typename U>
-concept Relation =
-    Predicate<R, T, T> and
-    Predicate<R, U, U> and
-    Predicate<R, T, U> and
-    Predicate<R, U, T>;
 
 template <typename T, typename U, Relation<T, U> R>
 struct identity_relation

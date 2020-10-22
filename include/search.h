@@ -234,6 +234,23 @@ search_match(C0 cur0, L0 lim0, C1 cur1, L1 lim1, R rel = {}) -> pair<C0, C1>
     return {mv(cur0), mv(cur1)};
 }
 
+template <Cursor C0, Limit<C0> L0, Cursor C1, Relation<Value_type<C0>, Value_type<C1>> R = eq<Value_type<C0>>>
+requires
+    Loadable<C0> and
+    Loadable<C1>
+constexpr auto
+search_match(C0 cur0, L0 lim0, C1 cur1, R rel = {}) -> pair<C0, C1>
+//[[expects axiom: loadable_range(cur0, lim0)]]
+//[[expects axiom: loadable_range(cur0, _)]]
+{
+    while (precedes(cur0, lim0)) {
+        if (rel(load(cur0), load(cur1))) break;
+        increment(cur0);
+        increment(cur1);
+    }
+    return {mv(cur0), mv(cur1)};
+}
+
 template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation<Value_type<C0>, Value_type<C1>> R = eq<Value_type<C0>>>
 requires
     Loadable<C0> and
@@ -244,6 +261,18 @@ search_mismatch(C0 cur0, L0 lim0, C1 cur1, L1 lim1, R rel = {}) -> pair<C0, C1>
 //[[expects axiom: loadable_range(cur0, lim1)]]
 {
     return search_match(mv(cur0), mv(lim0), mv(cur1), mv(lim1), complement<Value_type<C0>, Value_type<C1>, R>{rel});
+}
+
+template <Cursor C0, Limit<C0> L0, Cursor C1, Relation<Value_type<C0>, Value_type<C1>> R = eq<Value_type<C0>>>
+requires
+    Loadable<C0> and
+    Loadable<C1>
+constexpr auto
+search_mismatch(C0 cur0, L0 lim0, C1 cur1, R rel = {}) -> pair<C0, C1>
+//[[expects axiom: loadable_range(cur0, lim0)]]
+//[[expects axiom: loadable_range(cur0, _)]]
+{
+    return search_match(mv(cur0), mv(lim0), mv(cur1), complement<Value_type<C0>, Value_type<C1>, R>{rel});
 }
 
 template <Cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = eq<Value_type<C>>>

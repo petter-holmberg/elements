@@ -134,7 +134,7 @@ For `search_not`, a match is defined as the first element `y` for which the give
 
 assume an element satisfying the applied predicate is known to exist in the given range. They take a cursor pointing to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration.
 
-`search_match` and `search_mismatch` take two loadable ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `eq`.
+`search_match` and `search_mismatch` take two loadable ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `eq`. If the second range is not shorter than the first, or if a match is known to exist before the end of the second range, the algorithm can be called with only a `cursor` to the first element of the second range.
 
 `search_adjacent_match` and `search_adjacent_mismatch` take a loadable range and a relation,
 stopping at the first position where an element and its successor satisfy the relation, or does not satisfy the relation, respectively. The default relation is `eq`.

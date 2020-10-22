@@ -41,13 +41,7 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/swap.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/zip.cpp)
 
-
-add_executable (tests ${TEST_SOURCES})
-target_link_libraries (tests -lpthread Catch)
-set_property (TARGET tests PROPERTY CXX_STANDARD 20)
-target_compile_options (
-    tests
-    PUBLIC
+set (WARNING_FLAGS
     -Wall
     -Werror
     -Wextra
@@ -67,7 +61,15 @@ target_compile_options (
     #-Weffc++
     -Wno-unused-variable
     -pedantic
+)
+
+add_executable (tests ${TEST_SOURCES})
+target_link_libraries (tests -lpthread Catch)
+target_compile_options (
+    tests
+    PUBLIC
     -std=c++20
+    ${WARNING_FLAGS}
 )
 
 add_test (elements tests)

@@ -4,9 +4,6 @@
 
 namespace elements {
 
-template <typename T>
-concept Integral = exposition_only::Is_integral<T>;
-
 template <Integral I>
 constexpr void
 increment(I& x)
