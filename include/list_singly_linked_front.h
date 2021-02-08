@@ -8,7 +8,7 @@
 
 namespace elements {
 
-template <Movable T>
+template <typename T>
 struct list_singly_linked_front
 {
     list_singly_linked_cursor<T> head;
@@ -28,23 +28,14 @@ struct list_singly_linked_front
         }
     }
 
+    constexpr
     list_singly_linked_front(list_singly_linked_front&& x)
     {
         head = x.head;
         x.head = {};
     }
 
-    list_singly_linked_front(std::initializer_list<T> x)
-    {
-        auto src = first(x);
-        auto dst = pointer_to(at(this).head.cur);
-        while (src != limit(x)) {
-            at(dst) = new list_node_singly_linked{load(src)};
-            dst = pointer_to(at(at(dst)).next);
-            increment(src);
-        }
-    }
-
+    constexpr
     list_singly_linked_front(Size_type<list_singly_linked_front<T>> size, T const& x)
     {
         while (!is_zero(size)) {
@@ -53,7 +44,7 @@ struct list_singly_linked_front
         }
     }
 
-    auto
+    constexpr auto
     operator=(list_singly_linked_front const& x) -> list_singly_linked_front&
     {
         using elements::swap;
@@ -62,7 +53,7 @@ struct list_singly_linked_front
         return at(this);
     }
 
-    auto
+    constexpr auto
     operator=(list_singly_linked_front&& x) -> list_singly_linked_front&
     {
         using elements::swap;
@@ -73,6 +64,7 @@ struct list_singly_linked_front
         return at(this);
     }
 
+    constexpr
     ~list_singly_linked_front()
     {
         erase_all(at(this));
@@ -138,25 +130,25 @@ struct list_singly_linked_front
     }
 };
 
-template <Movable T>
+template <typename T>
 struct value_type_t<list_singly_linked_front<T>>
 {
     using type = T;
 };
 
-template <Movable T>
+template <typename T>
 struct cursor_type_t<list_singly_linked_front<T>>
 {
     using type = list_singly_linked_cursor<T>;
 };
 
-template <Movable T>
+template <typename T>
 struct cursor_type_t<list_singly_linked_front<T const>>
 {
     using type = list_singly_linked_cursor<T const>;
 };
 
-template <Movable T>
+template <typename T>
 struct size_type_t<list_singly_linked_front<T>>
 {
     using type = pointer_diff;
@@ -176,14 +168,14 @@ operator<(list_singly_linked_front<T> const& x, list_singly_linked_front<T> cons
     return less_range(x, y);
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 swap(list_singly_linked_front<T>& x, list_singly_linked_front<T>& y)
 {
     swap(x.head, y.head);
 }
 
-template <Movable T, typename U>
+template <typename T, typename U>
 constexpr auto
 insert(front<list_singly_linked_front<T>> list, U&& x) -> front<list_singly_linked_front<T>>
 {
@@ -194,7 +186,7 @@ insert(front<list_singly_linked_front<T>> list, U&& x) -> front<list_singly_link
     return seq;
 }
 
-template <Movable T, Constructible_from<T> U>
+template <typename T, Constructible_from<T> U>
 constexpr auto
 insert(after<list_singly_linked_front<T>> list, U&& x) -> after<list_singly_linked_front<T>>
 {
@@ -210,21 +202,21 @@ insert(after<list_singly_linked_front<T>> list, U&& x) -> after<list_singly_link
     return after{seq, node};
 }
 
-template <Movable T, Constructible_from<T> U>
+template <typename T, Constructible_from<T> U>
 constexpr void
 emplace_first(list_singly_linked_front<T>& list, U&& x)
 {
     insert(front{list}, fw<U>(x));
 }
 
-template <Movable T, Constructible_from<T> U>
+template <typename T, Constructible_from<T> U>
 constexpr void
 push_first(list_singly_linked_front<T>& list, U x)
 {
     insert(front{list}, mv(x));
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 erase(front<list_singly_linked_front<T>> list) -> front<list_singly_linked_front<T>>
 {
@@ -235,7 +227,7 @@ erase(front<list_singly_linked_front<T>> list) -> front<list_singly_linked_front
     return list;
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 erase(after<list_singly_linked_front<T>> list) -> after<list_singly_linked_front<T>>
 {
@@ -245,42 +237,42 @@ erase(after<list_singly_linked_front<T>> list) -> after<list_singly_linked_front
     return list;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 erase_all(list_singly_linked_front<T>& x)
 {
     while (!is_empty(x)) erase(front{x});
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 pop_first(list_singly_linked_front<T>& list)
 {
     erase(front{list});
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 first(list_singly_linked_front<T> const& x) -> Cursor_type<list_singly_linked_front<T>>
 {
     return x.head;
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 limit(list_singly_linked_front<T> const&) -> Cursor_type<list_singly_linked_front<T>>
 {
     return {};
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 is_empty(list_singly_linked_front<T> const& x) -> bool
 {
     return first(x) == limit(x);
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 size(list_singly_linked_front<T> const& x) -> Size_type<list_singly_linked_front<T>>
 {
@@ -317,7 +309,7 @@ reverse_append(Cursor_type<S> cur, Cursor_type<S> lim, Cursor_type<S> head, S se
     return head;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 reverse(list_singly_linked_front<T>& x)
 {

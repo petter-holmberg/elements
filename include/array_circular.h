@@ -8,10 +8,10 @@
 
 namespace elements {
 
-template <Movable T>
+template <typename T>
 struct array_circular;
 
-template <Constructible_from T>
+template <typename T>
 struct array_circular_cursor
 {
     Pointer_type<array_circular<T>> arr{};
@@ -29,82 +29,82 @@ struct array_circular_cursor
     {}
 };
 
-template <Constructible_from T>
+template <typename T>
 struct value_type_t<array_circular_cursor<T>>
 {
     using type = T;
 };
 
-template <Constructible_from T>
+template <typename T>
 struct difference_type_t<array_circular_cursor<T>>
 {
     using type = Difference_type<Pointer_type<T>>;
 };
 
-template <Movable T>
+template <typename T>
 constexpr auto
 operator==(array_circular_cursor<T> const& cur0, array_circular_cursor<T> const& cur1) -> bool
 {
     return cur0.arr == cur1.arr and cur0.i == cur1.i;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 increment(array_circular_cursor<T>& cur)
 {
     increment(cur.i);
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 decrement(array_circular_cursor<T>& cur)
 {
     decrement(cur.i);
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 load(array_circular_cursor<T> const& cur) -> T const&
 {
     return load(cur.arr)[cur.i];
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 store(array_circular_cursor<T>& cur, T const& value)
 {
     at(cur.arr)[cur.i] = value;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 store(array_circular_cursor<T>& cur, Value_type<T>&& value)
 {
     at(cur.arr)[cur.i] = fw<T>(value);
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 at(array_circular_cursor<T> const& cur) -> T const&
 {
     return load(cur.arr)[cur.i];
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 at(array_circular_cursor<T>& cur) -> T&
 {
     return at(cur.arr)[cur.i];
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 precedes(array_circular_cursor<T> const& cur0, array_circular_cursor<T> const& cur1) -> bool
 {
     return cur0.i != cur1.i;
 }
 
-template <Movable T>
+template <typename T>
 struct array_circular_prefix
 {
     Pointer_type<T> first;
@@ -114,7 +114,7 @@ struct array_circular_prefix
     T x;
 };
 
-template <Movable T>
+template <typename T>
 constexpr auto
 allocate_array_circular(Difference_type<Pointer_type<T>> n) -> Pointer_type<array_circular_prefix<T>>
 {
@@ -128,14 +128,14 @@ allocate_array_circular(Difference_type<Pointer_type<T>> n) -> Pointer_type<arra
     return remote;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 deallocate_array_circular(Pointer_type<array_circular_prefix<T>> prefix)
 {
     deallocate(prefix);
 }
 
-template <Movable T>
+template <typename T>
 struct array_circular
 {
     Pointer_type<array_circular_prefix<T>> header{};
@@ -155,14 +155,6 @@ struct array_circular
     {
         header = x.header;
         x.header = {};
-    }
-
-    constexpr
-    array_circular(std::initializer_list<T> x)
-        : header{allocate_array_circular<T>(
-            Size_type<array_circular<T>>{static_cast<pointer_diff>(std::size(x))})}
-    {
-        insert_range(x, back{at(this)});
     }
 
     explicit constexpr
@@ -203,6 +195,7 @@ struct array_circular
         return at(this);
     }
 
+    constexpr
     ~array_circular()
     {
         erase_all(at(this));
@@ -252,25 +245,25 @@ struct array_circular
     }
 };
 
-template <Movable T>
+template <typename T>
 struct value_type_t<array_circular<T>>
 {
     using type = T;
 };
 
-template <Movable T>
+template <typename T>
 struct cursor_type_t<array_circular<T>>
 {
     using type = array_circular_cursor<T>;
 };
 
-template <Movable T>
+template <typename T>
 struct cursor_type_t<array_circular<T> const>
 {
     using type = array_circular_cursor<T const>;
 };
 
-template <Movable T>
+template <typename T>
 struct size_type_t<array_circular<T>>
 {
     using type = pointer_diff;
@@ -290,14 +283,14 @@ operator<(array_circular<T> const& x, array_circular<T> const& y) -> bool
     return less_range(x, y);
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 swap(array_circular<T>& x, array_circular<T>& y)
 {
     swap(x.header, y.header);
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 reserve(
     array_circular<T>& x,
@@ -319,7 +312,7 @@ reserve(
     swap(x, temp);
 }
 
-template <Movable T, typename U>
+template <typename T, typename U>
 constexpr auto
 insert(back<array_circular<T>> arr, U&& x) -> back<array_circular<T>>
 {
@@ -336,7 +329,7 @@ insert(back<array_circular<T>> arr, U&& x) -> back<array_circular<T>>
     return seq;
 }
 
-template <Movable T, typename U>
+template <typename T, typename U>
 constexpr auto
 insert(front<array_circular<T>> arr, U&& x) -> front<array_circular<T>>
 {
@@ -353,35 +346,35 @@ insert(front<array_circular<T>> arr, U&& x) -> front<array_circular<T>>
     return seq;
 }
 
-template <Movable T, typename U>
+template <typename T, typename U>
 constexpr void
 emplace(array_circular<T>& arr, U&& x)
 {
     insert(back{arr}, fw<U>(x));
 }
 
-template <Movable T, typename U>
+template <typename T, typename U>
 constexpr void
 push(array_circular<T>& arr, U x)
 {
     insert(back{arr}, mv(x));
 }
 
-template <Movable T, typename U>
+template <typename T, typename U>
 constexpr void
 emplace_first(array_circular<T>& arr, U&& x)
 {
     insert(front{arr}, fw<U>(x));
 }
 
-template <Movable T, typename U>
+template <typename T, typename U>
 constexpr void
 push_first(array_circular<T>& arr, T x)
 {
     insert(front{arr}, mv(x));
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 erase(back<array_circular<T>> arr) -> back<array_circular<T>>
 {
@@ -400,7 +393,7 @@ erase(back<array_circular<T>> arr) -> back<array_circular<T>>
     return arr;
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 erase(front<array_circular<T>> arr) -> front<array_circular<T>>
 {
@@ -419,28 +412,28 @@ erase(front<array_circular<T>> arr) -> front<array_circular<T>>
     return arr;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 erase_all(array_circular<T>& x)
 {
     while (!is_empty(x)) erase(back{x});
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 pop(array_circular<T>& arr)
 {
     erase(back{arr});
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 pop_first(array_circular<T>& arr)
 {
     erase(front{arr});
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 first(array_circular<T> const& x) -> Cursor_type<array_circular<T>>
 {
@@ -448,7 +441,7 @@ first(array_circular<T> const& x) -> Cursor_type<array_circular<T>>
     return array_circular_cursor{const_cast<Pointer_type<array_circular<T>>>(pointer_to(x))};
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 limit(array_circular<T> const& x) -> Cursor_type<array_circular<T>>
 {
@@ -456,7 +449,7 @@ limit(array_circular<T> const& x) -> Cursor_type<array_circular<T>>
     return array_circular_cursor{const_cast<Pointer_type<array_circular<T>>>(pointer_to(x)), size(x)};
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 is_empty(array_circular<T> const& x) -> bool
 {
@@ -464,7 +457,7 @@ is_empty(array_circular<T> const& x) -> bool
     return load(x.header).size == Zero<Size_type<array_circular<T>>>;
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 size(array_circular<T> const& x) -> Size_type<array_circular<T>>
 {
@@ -472,7 +465,7 @@ size(array_circular<T> const& x) -> Size_type<array_circular<T>>
     return load(x.header).size;
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 capacity(array_circular<T> const& x) -> Size_type<array_circular<T>>
 {

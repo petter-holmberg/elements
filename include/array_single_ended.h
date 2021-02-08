@@ -8,7 +8,7 @@
 
 namespace elements {
 
-template <Movable T>
+template <typename T>
 struct array_single_ended_prefix
 {
     Pointer_type<T> limit;
@@ -16,7 +16,7 @@ struct array_single_ended_prefix
     T x;
 };
 
-template <Movable T>
+template <typename T>
 constexpr auto
 allocate_array_single_ended(Difference_type<Pointer_type<T>> n) -> Pointer_type<array_single_ended_prefix<T>>
 {
@@ -28,14 +28,14 @@ allocate_array_single_ended(Difference_type<Pointer_type<T>> n) -> Pointer_type<
     return remote;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 deallocate_array_single_ended(Pointer_type<array_single_ended_prefix<T>> prefix)
 {
     deallocate(prefix);
 }
 
-template <Movable T>
+template <typename T>
 struct array_single_ended
 {
     Pointer_type<array_single_ended_prefix<T>> header{};
@@ -55,13 +55,6 @@ struct array_single_ended
     {
         header = x.header;
         x.header = {};
-    }
-
-    constexpr
-    array_single_ended(std::initializer_list<T> x)
-        : header{allocate_array_single_ended<T>(Size_type<array_single_ended<T>>{static_cast<pointer_diff>(std::size(x))})}
-    {
-        insert_range(x, back{at(this)});
     }
 
     explicit constexpr
@@ -104,6 +97,7 @@ struct array_single_ended
         return at(this);
     }
 
+    constexpr
     ~array_single_ended()
     {
         erase_all(at(this));
@@ -142,25 +136,25 @@ struct array_single_ended
     }
 };
 
-template <Movable T>
+template <typename T>
 struct value_type_t<array_single_ended<T>>
 {
     using type = T;
 };
 
-template <Movable T>
+template <typename T>
 struct cursor_type_t<array_single_ended<T>>
 {
     using type = Pointer_type<T>;
 };
 
-template <Movable T>
+template <typename T>
 struct cursor_type_t<array_single_ended<T> const>
 {
     using type = Pointer_type<T const>;
 };
 
-template <Movable T>
+template <typename T>
 struct size_type_t<array_single_ended<T>>
 {
     using type = pointer_diff;
@@ -180,14 +174,14 @@ operator<(array_single_ended<T> const& x, array_single_ended<T> const& y) -> boo
     return less_range(x, y);
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 swap(array_single_ended<T>& x, array_single_ended<T>& y)
 {
     swap(x.header, y.header);
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 reserve(array_single_ended<T>& x, Size_type<array_single_ended<T>> n)
 {
@@ -204,7 +198,7 @@ reserve(array_single_ended<T>& x, Size_type<array_single_ended<T>> n)
     swap(x, temp);
 }
 
-template <Movable T, typename U>
+template <typename T, typename U>
 constexpr auto
 insert(back<array_single_ended<T>> arr, U&& x) -> back<array_single_ended<T>>
 {
@@ -218,21 +212,21 @@ insert(back<array_single_ended<T>> arr, U&& x) -> back<array_single_ended<T>>
     return seq;
 }
 
-template <Movable T, typename U>
+template <typename T, typename U>
 constexpr void
 emplace(array_single_ended<T>& arr, U&& x)
 {
     insert(back{arr}, fw<U>(x));
 }
 
-template <Movable T, typename U>
+template <typename T, typename U>
 constexpr void
 push(array_single_ended<T>& arr, U x)
 {
     insert(back{arr}, mv(x));
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 erase(back<array_single_ended<T>> arr) -> back<array_single_ended<T>>
 {
@@ -247,21 +241,21 @@ erase(back<array_single_ended<T>> arr) -> back<array_single_ended<T>>
     return arr;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 erase_all(array_single_ended<T>& x)
 {
     while (!is_empty(x)) erase(back{x});
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 pop(array_single_ended<T>& arr)
 {
     erase(back{arr});
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 first(array_single_ended<T> const& x) -> Cursor_type<array_single_ended<T>>
 {
@@ -269,7 +263,7 @@ first(array_single_ended<T> const& x) -> Cursor_type<array_single_ended<T>>
     return pointer_to(at(x.header).x);
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 limit(array_single_ended<T> const& x) -> Cursor_type<array_single_ended<T>>
 {
@@ -277,7 +271,7 @@ limit(array_single_ended<T> const& x) -> Cursor_type<array_single_ended<T>>
     return at(x.header).limit;
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 limit_of_storage(array_single_ended<T> const& x) -> Cursor_type<array_single_ended<T>>
 {
@@ -285,21 +279,21 @@ limit_of_storage(array_single_ended<T> const& x) -> Cursor_type<array_single_end
     return at(x.header).limit_of_storage;
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 is_empty(array_single_ended<T> const& x) -> bool
 {
     return first(x) == limit(x);
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 size(array_single_ended<T> const& x) -> Size_type<array_single_ended<T>>
 {
     return limit(x) - first(x);
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 capacity(array_single_ended<T> const& x) -> Size_type<array_single_ended<T>>
 {

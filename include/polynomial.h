@@ -16,8 +16,10 @@ struct polynomial
     {}
 
     explicit polynomial(std::initializer_list<R> coefficients_)
-        : coefficients(coefficients_)
-    {}
+        : coefficients{static_cast<Size_type<C>>(coefficients_.size())}
+    {
+        insert_range(coefficients_, back{coefficients});
+    }
 
     polynomial(Size_type<C> const& size, R const& value)
         : coefficients(size, size, value)
@@ -141,7 +143,7 @@ template <Ring R, Dynamic_sequence C>
 constexpr auto
 operator-(polynomial<R, C> x) -> polynomial<R, C>
 {
-    map(first(x.coefficients), limit(x.coefficients), first(x.coefficients), negative<R>{});
+    map(first(x.coefficients), limit(x.coefficients), first(x.coefficients), negative{});
     return x;
 }
 

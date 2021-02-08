@@ -9,7 +9,7 @@
 
 namespace elements {
 
-template <Movable T>
+template <typename T>
 struct list_singly_linked_circular_cursor
 {
     Pointer_type<list_node_singly_linked<T>> cur{};
@@ -27,25 +27,26 @@ struct list_singly_linked_circular_cursor
     {}
 };
 
-template <Movable T>
+template <typename T>
 struct value_type_t<list_singly_linked_circular_cursor<T>>
 {
     using type = T;
 };
 
-template <Movable T>
+template <typename T>
 struct difference_type_t<list_singly_linked_circular_cursor<T>>
 {
     using type = Difference_type<Pointer_type<list_node_singly_linked<T>>>;
 };
 
-template <Movable T>
-bool operator==(list_singly_linked_circular_cursor<T> const& cur0, list_singly_linked_circular_cursor<T> const& cur1)
+template <typename T>
+constexpr auto
+operator==(list_singly_linked_circular_cursor<T> const& cur0, list_singly_linked_circular_cursor<T> const& cur1) -> bool
 {
     return cur0.cur == cur1.cur and cur0.back == cur1.back;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 increment(list_singly_linked_circular_cursor<T>& cur)
 {
@@ -56,78 +57,76 @@ increment(list_singly_linked_circular_cursor<T>& cur)
     }
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 load(list_singly_linked_circular_cursor<T> cur) -> T const&
 {
     return load(cur.cur).x;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 store(list_singly_linked_circular_cursor<T>& cur, T const& value)
 {
     store(cur.cur, value);
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 store(list_singly_linked_circular_cursor<T>& cur, T&& value)
 {
     store(cur.cur, fw<T>(value));
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 at(list_singly_linked_circular_cursor<T> const& cur) -> T const&
 {
     return load(cur.cur).x;
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 at(list_singly_linked_circular_cursor<T>& cur) -> T&
 {
     return at(cur.cur).x;
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 next_link(list_singly_linked_circular_cursor<T> const& cur) -> Pointer_type<list_node_singly_linked<T>>&
 {
     return at(cur.cur).next;
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 precedes(list_singly_linked_circular_cursor<T> const& cur0, list_singly_linked_circular_cursor<T> const& cur1) -> bool
 {
     return precedes(cur0.cur, cur1.cur);
 }
 
-template <Movable T>
+template <typename T>
 struct list_singly_linked_circular
 {
     Pointer_type<list_node_singly_linked<T>> tail{};
 
     list_singly_linked_circular() = default;
 
+    constexpr
     list_singly_linked_circular(list_singly_linked_circular const& x)
     {
         insert_range(x, back{at(this)});
     }
 
+    constexpr
     list_singly_linked_circular(list_singly_linked_circular&& x)
     {
         tail = x.tail;
         x.tail = {};
     }
 
-    list_singly_linked_circular(std::initializer_list<T> x)
-    {
-        insert_range(x, back{at(this)});
-    }
-
+    constexpr
     list_singly_linked_circular(Size_type<list_singly_linked_circular<T>> size, T const& x)
     {
         while (!is_zero(size)) {
@@ -136,7 +135,7 @@ struct list_singly_linked_circular
         }
     }
 
-    auto
+    constexpr auto
     operator=(list_singly_linked_circular const& x) -> list_singly_linked_circular&
     {
         using elements::swap;
@@ -145,7 +144,7 @@ struct list_singly_linked_circular
         return at(this);
     }
 
-    auto
+    constexpr auto
     operator=(list_singly_linked_circular&& x) -> list_singly_linked_circular&
     {
         using elements::swap;
@@ -156,6 +155,7 @@ struct list_singly_linked_circular
         return at(this);
     }
 
+    constexpr
     ~list_singly_linked_circular()
     {
         erase_all(at(this));
@@ -195,25 +195,25 @@ struct list_singly_linked_circular
     }
 };
 
-template <Movable T>
+template <typename T>
 struct value_type_t<list_singly_linked_circular<T>>
 {
     using type = T;
 };
 
-template <Movable T>
+template <typename T>
 struct cursor_type_t<list_singly_linked_circular<T>>
 {
     using type = list_singly_linked_circular_cursor<T>;
 };
 
-template <Movable T>
+template <typename T>
 struct cursor_type_t<list_singly_linked_circular<T const>>
 {
     using type = list_singly_linked_circular_cursor<T const>;
 };
 
-template <Movable T>
+template <typename T>
 struct size_type_t<list_singly_linked_circular<T>>
 {
     using type = pointer_diff;
@@ -233,14 +233,14 @@ operator<(list_singly_linked_circular<T> const& x, list_singly_linked_circular<T
     return less_range(x, y);
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 swap(list_singly_linked_circular<T>& x, list_singly_linked_circular<T>& y)
 {
     swap(x.tail, y.tail);
 }
 
-template <Movable T, typename U>
+template <typename T, typename U>
 constexpr auto
 insert(front<list_singly_linked_circular<T>> list, U&& x) -> front<list_singly_linked_circular<T>>
 {
@@ -255,7 +255,7 @@ insert(front<list_singly_linked_circular<T>> list, U&& x) -> front<list_singly_l
     return seq;
 }
 
-template <Movable T, typename U>
+template <typename T, typename U>
 constexpr auto
 insert(back<list_singly_linked_circular<T>> list, U&& x) -> back<list_singly_linked_circular<T>>
 {
@@ -270,7 +270,7 @@ insert(back<list_singly_linked_circular<T>> list, U&& x) -> back<list_singly_lin
     return seq;
 }
 
-template <Movable T, Constructible_from<T> U>
+template <typename T, Constructible_from<T> U>
 constexpr auto
 insert(after<list_singly_linked_circular<T>> list, U&& x) -> after<list_singly_linked_circular<T>>
 {
@@ -293,35 +293,35 @@ insert(after<list_singly_linked_circular<T>> list, U&& x) -> after<list_singly_l
     return after{seq, list_singly_linked_circular_cursor{node, last(seq).cur}};
 }
 
-template <Movable T, Constructible_from<T> U>
+template <typename T, Constructible_from<T> U>
 constexpr void
 emplace_first(list_singly_linked_circular<T>& list, U&& x)
 {
     insert(front{(list), fw<U>(x)});
 }
 
-template <Movable T, Constructible_from<T> U>
+template <typename T, Constructible_from<T> U>
 constexpr void
 push_first(list_singly_linked_circular<T>& list, U x)
 {
     insert(front{list}, mv(x));
 }
 
-template <Movable T, Constructible_from<T> U>
+template <typename T, Constructible_from<T> U>
 constexpr void
 emplace_last(list_singly_linked_circular<T>& list, U&& x)
 {
     insert(back{list}, fw<U>(x));
 }
 
-template <Movable T, Constructible_from<T> U>
+template <typename T, Constructible_from<T> U>
 constexpr void
 push_last(list_singly_linked_circular<T>& list, U x)
 {
     insert(back{list}, mv(x));
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 erase(front<list_singly_linked_circular<T>> list) -> front<list_singly_linked_circular<T>>
 {
@@ -336,7 +336,7 @@ erase(front<list_singly_linked_circular<T>> list) -> front<list_singly_linked_ci
     return list;
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 erase(after<list_singly_linked_circular<T>> list) -> after<list_singly_linked_circular<T>>
 {
@@ -356,21 +356,21 @@ erase(after<list_singly_linked_circular<T>> list) -> after<list_singly_linked_ci
     return list;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 erase_all(list_singly_linked_circular<T>& x)
 {
     while (!is_empty(x)) erase(front{x});
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 pop_first(list_singly_linked_circular<T>& list)
 {
     erase(front{list});
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 first(list_singly_linked_circular<T> const& x) -> Cursor_type<list_singly_linked_circular<T>>
 {
@@ -381,7 +381,7 @@ first(list_singly_linked_circular<T> const& x) -> Cursor_type<list_singly_linked
     }
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 last(list_singly_linked_circular<T> const& x) -> Cursor_type<list_singly_linked_circular<T>>
 {
@@ -392,21 +392,21 @@ last(list_singly_linked_circular<T> const& x) -> Cursor_type<list_singly_linked_
     }
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 limit(list_singly_linked_circular<T> const&) -> Cursor_type<list_singly_linked_circular<T>>
 {
     return {};
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 is_empty(list_singly_linked_circular<T> const& x) -> bool
 {
     return x.tail == nullptr;
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 size(list_singly_linked_circular<T> const& x) -> Size_type<list_singly_linked_circular<T>>
 {

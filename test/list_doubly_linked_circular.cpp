@@ -7,7 +7,13 @@ namespace e = elements;
 
 SCENARIO ("Using circular doubly linked list", "[list_doubly_linked_circular]")
 {
-    e::list_doubly_linked_circular<int> x{0, 1, 2, 3, 4};
+    e::list_doubly_linked_circular<int> x;
+    e::emplace_last(x, 0);
+    e::emplace_last(x, 1);
+    e::emplace_last(x, 2);
+    e::emplace_last(x, 3);
+    e::emplace_last(x, 4);
+
     static_assert(e::Dynamic_sequence<decltype(x), e::front<decltype(x)>>);
     static_assert(e::Linked_bidirectional_cursor<e::Cursor_type<decltype(x)>>);
 
@@ -48,7 +54,11 @@ SCENARIO ("Using circular doubly linked list", "[list_doubly_linked_circular]")
         }
 
         {
-            e::list_doubly_linked_circular<int> y{0, 1, 2, 3};
+            e::list_doubly_linked_circular<int> y;
+            e::emplace_last(y, 0);
+            e::emplace_last(y, 1);
+            e::emplace_last(y, 2);
+            e::emplace_last(y, 3);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -59,7 +69,13 @@ SCENARIO ("Using circular doubly linked list", "[list_doubly_linked_circular]")
         }
 
         {
-            e::list_doubly_linked_circular<int> y{0, 1, 2, 3, 4, 5};
+            e::list_doubly_linked_circular<int> y;
+            e::emplace_last(y, 0);
+            e::emplace_last(y, 1);
+            e::emplace_last(y, 2);
+            e::emplace_last(y, 3);
+            e::emplace_last(y, 4);
+            e::emplace_last(y, 5);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -70,7 +86,12 @@ SCENARIO ("Using circular doubly linked list", "[list_doubly_linked_circular]")
         }
 
         {
-            e::list_doubly_linked_circular<int> y{0, -1, -2, -3, -4};
+            e::list_doubly_linked_circular<int> y;
+            e::emplace_last(y, 0);
+            e::emplace_last(y, -1);
+            e::emplace_last(y, -2);
+            e::emplace_last(y, -3);
+            e::emplace_last(y, -4);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -81,7 +102,12 @@ SCENARIO ("Using circular doubly linked list", "[list_doubly_linked_circular]")
         }
 
         {
-            e::list_doubly_linked_circular<int> y{5, 6, 7, 8, 9};
+            e::list_doubly_linked_circular<int> y;
+            e::emplace_last(y, 5);
+            e::emplace_last(y, 6);
+            e::emplace_last(y, 7);
+            e::emplace_last(y, 8);
+            e::emplace_last(y, 9);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -111,7 +137,12 @@ SCENARIO ("Using circular doubly linked list", "[list_doubly_linked_circular]")
         }
 
         {
-            e::list_doubly_linked_circular<int> y{5, 6, 7, 8, 9};
+            e::list_doubly_linked_circular<int> y;
+            e::emplace_last(y, 5);
+            e::emplace_last(y, 6);
+            e::emplace_last(y, 7);
+            e::emplace_last(y, 8);
+            e::emplace_last(y, 9);
             e::swap(x, y);
 
             CHECK (x[0] == 5);
@@ -224,7 +255,10 @@ SCENARIO ("Using circular doubly linked list", "[list_doubly_linked_circular]")
 
     SECTION ("Erasing elements")
     {
-        e::list_doubly_linked_circular<int> x0{0, 1, 2};
+        e::list_doubly_linked_circular<int> x0;
+        e::emplace_last(x0, 0);
+        e::emplace_last(x0, 1);
+        e::emplace_last(x0, 2);
         e::list_doubly_linked_circular<int> x1;
 
         SECTION ("Erasing at front")
@@ -331,7 +365,12 @@ SCENARIO ("Using circular doubly linked list", "[list_doubly_linked_circular]")
 
     SECTION ("Monadic interface")
     {
-        auto fn0 = [](int const& i){ return e::list_doubly_linked_circular<int>{i, -i}; };
+        auto fn0 = [](int const& i){
+            e::list_doubly_linked_circular<int> ret;
+            e::emplace_last(ret, i);
+            e::emplace_last(ret, -i);
+            return ret;
+        };
         auto fn1 = [](int const& i){ return i + 0.5; };
 
         static_assert(e::Monad<decltype(x)>);

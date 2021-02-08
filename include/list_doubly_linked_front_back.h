@@ -7,7 +7,7 @@
 
 namespace elements {
 
-template <Movable T>
+template <typename T>
 struct list_doubly_linked_front_back
 {
     Pointer_type<list_node_doubly_linked<T>> next{};
@@ -34,14 +34,6 @@ struct list_doubly_linked_front_back
     {
         using elements::swap;
         swap(at(this), x);
-    }
-
-    constexpr
-    list_doubly_linked_front_back(std::initializer_list<T> x)
-        : next{reinterpret_cast<Pointer_type<list_node_doubly_linked<T>>>(this)}
-        , prev{reinterpret_cast<Pointer_type<list_node_doubly_linked<T>>>(this)}
-    {
-        insert_range(x, back{at(this)});
     }
 
     constexpr
@@ -75,6 +67,7 @@ struct list_doubly_linked_front_back
         return at(this);
     }
 
+    constexpr
     ~list_doubly_linked_front_back()
     {
         erase_all(at(this));
@@ -114,25 +107,25 @@ struct list_doubly_linked_front_back
     }
 };
 
-template <Movable T>
+template <typename T>
 struct value_type_t<list_doubly_linked_front_back<T>>
 {
     using type = T;
 };
 
-template <Movable T>
+template <typename T>
 struct cursor_type_t<list_doubly_linked_front_back<T>>
 {
     using type = list_doubly_linked_cursor<T>;
 };
 
-template <Movable T>
+template <typename T>
 struct cursor_type_t<list_doubly_linked_front_back<T const>>
 {
     using type = list_doubly_linked_cursor<T const>;
 };
 
-template <Movable T>
+template <typename T>
 struct size_type_t<list_doubly_linked_front_back<T>>
 {
     using type = pointer_diff;
@@ -152,7 +145,7 @@ operator<(list_doubly_linked_front_back<T> const& x, list_doubly_linked_front_ba
     return less_range(x, y);
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 swap_nonempty_empty(list_doubly_linked_front_back<T>& x, list_doubly_linked_front_back<T>& y)
     //[[expects: !empty(x)]]
@@ -166,7 +159,7 @@ swap_nonempty_empty(list_doubly_linked_front_back<T>& x, list_doubly_linked_fron
     x.prev = reinterpret_cast<Pointer_type<list_node_doubly_linked<T>>>(pointer_to(x));
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 swap(list_doubly_linked_front_back<T>& x, list_doubly_linked_front_back<T>& y)
 {
@@ -179,7 +172,7 @@ swap(list_doubly_linked_front_back<T>& x, list_doubly_linked_front_back<T>& y)
     swap(x.prev, y.prev);
 }
 
-template <Movable T, typename U>
+template <typename T, typename U>
 constexpr auto
 insert(front<list_doubly_linked_front_back<T>> list, U&& x) -> front<list_doubly_linked_front_back<T>>
 {
@@ -190,7 +183,7 @@ insert(front<list_doubly_linked_front_back<T>> list, U&& x) -> front<list_doubly
     return list;
 }
 
-template <Movable T, typename U>
+template <typename T, typename U>
 constexpr auto
 insert(back<list_doubly_linked_front_back<T>> list, U&& x) -> back<list_doubly_linked_front_back<T>>
 {
@@ -201,7 +194,7 @@ insert(back<list_doubly_linked_front_back<T>> list, U&& x) -> back<list_doubly_l
     return list;
 }
 
-template <Movable T, Constructible_from<T> U>
+template <typename T, Constructible_from<T> U>
 constexpr auto
 insert(before<list_doubly_linked_front_back<T>> list, U&& x) -> before<list_doubly_linked_front_back<T>>
 {
@@ -213,7 +206,7 @@ insert(before<list_doubly_linked_front_back<T>> list, U&& x) -> before<list_doub
     return before{seq, list_doubly_linked_cursor{node}};
 }
 
-template <Movable T, Constructible_from<T> U>
+template <typename T, Constructible_from<T> U>
 constexpr auto
 insert(after<list_doubly_linked_front_back<T>> list, U&& x) -> after<list_doubly_linked_front_back<T>>
 {
@@ -225,35 +218,35 @@ insert(after<list_doubly_linked_front_back<T>> list, U&& x) -> after<list_doubly
     return after{seq, list_doubly_linked_cursor{node}};
 }
 
-template <Movable T, Constructible_from<T> U>
+template <typename T, Constructible_from<T> U>
 constexpr void
 emplace_first(list_doubly_linked_front_back<T>& list, U&& x)
 {
     insert(front{(list), fw<U>(x)});
 }
 
-template <Movable T, Constructible_from<T> U>
+template <typename T, Constructible_from<T> U>
 constexpr void
 push_first(list_doubly_linked_front_back<T>& list, U x)
 {
     insert(front{list}, mv(x));
 }
 
-template <Movable T, Constructible_from<T> U>
+template <typename T, Constructible_from<T> U>
 constexpr void
 emplace_last(list_doubly_linked_front_back<T>& list, U&& x)
 {
     insert(back{list}, fw<U>(x));
 }
 
-template <Movable T, Constructible_from<T> U>
+template <typename T, Constructible_from<T> U>
 constexpr void
 push_last(list_doubly_linked_front_back<T>& list, U x)
 {
     insert(back{list}, mv(x));
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 erase(front<list_doubly_linked_front_back<T>> list) -> front<list_doubly_linked_front_back<T>>
 {
@@ -264,7 +257,7 @@ erase(front<list_doubly_linked_front_back<T>> list) -> front<list_doubly_linked_
     return list;
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 erase(back<list_doubly_linked_front_back<T>> list) -> back<list_doubly_linked_front_back<T>>
 {
@@ -275,7 +268,7 @@ erase(back<list_doubly_linked_front_back<T>> list) -> back<list_doubly_linked_fr
     return list;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 erase(list_doubly_linked_cursor<T> cur)
 {
@@ -283,42 +276,42 @@ erase(list_doubly_linked_cursor<T> cur)
     delete cur.cur;
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 erase_all(list_doubly_linked_front_back<T>& x)
 {
     while (!is_empty(x)) erase(front{x});
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 pop_first(list_doubly_linked_front_back<T>& list)
 {
     erase(front{list});
 }
 
-template <Movable T>
+template <typename T>
 constexpr void
 pop_last(list_doubly_linked_front_back<T>& list)
 {
     erase(back{list});
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 first(list_doubly_linked_front_back<T> const& x) -> Cursor_type<list_doubly_linked_front_back<T>>
 {
     return list_doubly_linked_cursor{x.next};
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 last(list_doubly_linked_front_back<T> const& x) -> Cursor_type<list_doubly_linked_front_back<T>>
 {
     return list_doubly_linked_cursor{x.prev};
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 limit(list_doubly_linked_front_back<T> const& x) -> Cursor_type<list_doubly_linked_front_back<T>>
 {
@@ -327,14 +320,14 @@ limit(list_doubly_linked_front_back<T> const& x) -> Cursor_type<list_doubly_link
             pointer_to(const_cast<list_doubly_linked_front_back<T>&>(x)))};
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 is_empty(list_doubly_linked_front_back<T> const& x) -> bool
 {
     return !precedes(first(x), limit(x));
 }
 
-template <Movable T>
+template <typename T>
 constexpr auto
 size(list_doubly_linked_front_back<T> const& x) -> Size_type<list_doubly_linked_front_back<T>>
 {

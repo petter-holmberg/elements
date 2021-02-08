@@ -5,9 +5,20 @@
 
 namespace e = elements;
 
+struct s
+{
+    e::array_circular<s> x;
+};
+
 SCENARIO ("Using circular array", "[array_circular]")
 {
-    e::array_circular x{0, 1, 2, 3, 4};
+    e::array_circular<int> x{5};
+    e::emplace(x, 0);
+    e::emplace(x, 1);
+    e::emplace(x, 2);
+    e::emplace(x, 3);
+    e::emplace(x, 4);
+
     static_assert(e::Dynamic_sequence<decltype(x), e::back<decltype(x)>>);
     static_assert(e::Dynamic_sequence<decltype(x), e::front<decltype(x)>>);
     static_assert(e::Affine_space<e::Cursor_type<decltype(x)>>);
@@ -49,7 +60,11 @@ SCENARIO ("Using circular array", "[array_circular]")
         }
 
         {
-            e::array_circular y{0, 1, 2, 3};
+            e::array_circular<int> y{4};
+            e::emplace(y, 0);
+            e::emplace(y, 1);
+            e::emplace(y, 2);
+            e::emplace(y, 3);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -60,7 +75,13 @@ SCENARIO ("Using circular array", "[array_circular]")
         }
 
         {
-            e::array_circular y{0, 1, 2, 3, 4, 5};
+            e::array_circular<int> y{6};
+            e::emplace(y, 0);
+            e::emplace(y, 1);
+            e::emplace(y, 2);
+            e::emplace(y, 3);
+            e::emplace(y, 4);
+            e::emplace(y, 5);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -71,7 +92,12 @@ SCENARIO ("Using circular array", "[array_circular]")
         }
 
         {
-            e::array_circular y{0, -1, -2, -3, -4};
+            e::array_circular<int> y{5};
+            e::emplace(y, 0);
+            e::emplace(y, -1);
+            e::emplace(y, -2);
+            e::emplace(y, -3);
+            e::emplace(y, -4);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -82,7 +108,12 @@ SCENARIO ("Using circular array", "[array_circular]")
         }
 
         {
-            e::array_circular y{5, 6, 7, 8, 9};
+            e::array_circular<int> y{5};
+            e::emplace(y, 5);
+            e::emplace(y, 6);
+            e::emplace(y, 7);
+            e::emplace(y, 8);
+            e::emplace(y, 9);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -112,7 +143,12 @@ SCENARIO ("Using circular array", "[array_circular]")
         }
 
         {
-            e::array_circular y{5, 6, 7, 8, 9};
+            e::array_circular<int> y{5};
+            e::emplace(y, 5);
+            e::emplace(y, 6);
+            e::emplace(y, 7);
+            e::emplace(y, 8);
+            e::emplace(y, 9);
             e::swap(x, y);
 
             CHECK (x[0] == 5);
@@ -130,7 +166,7 @@ SCENARIO ("Using circular array", "[array_circular]")
 
     SECTION ("Checking capacity")
     {
-        e::array_circular<int> x0(5);
+        e::array_circular<int> x0{5};
 
         REQUIRE (e::is_empty(x0));
         REQUIRE (e::size(x0) == 0);
@@ -273,7 +309,12 @@ SCENARIO ("Using circular array", "[array_circular]")
 
     SECTION ("Monadic interface")
     {
-        auto fn0 = [](int const& i){ return e::array_circular<int>{i, -i}; };
+        auto fn0 = [](int const& i){
+            e::array_circular<int> ret{2};
+            e::emplace(ret, i);
+            e::emplace(ret, -i);
+            return ret;
+        };
         auto fn1 = [](int const& i){ return i + 0.5; };
 
         static_assert(e::Monad<decltype(x)>);

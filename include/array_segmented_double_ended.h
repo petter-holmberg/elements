@@ -12,11 +12,11 @@
 
 namespace elements {
 
-template <Movable T, pointer_diff k = 256>
-requires (0 < k) and (k <= std::numeric_limits<pointer_diff>::max() / sizeof(T))
+template <typename T, pointer_diff k = 256>
+//requires (0 < k) and (k <= std::numeric_limits<pointer_diff>::max() / sizeof(T))
 struct array_segmented_double_ended;
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 struct array_segmented_double_ended_cursor
 {
     Pointer_type<array_double_ended<T>> index{};
@@ -35,121 +35,115 @@ struct array_segmented_double_ended_cursor
     {}
 };
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 struct value_type_t<array_segmented_double_ended_cursor<T, k>>
 {
     using type = T;
 };
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 struct difference_type_t<array_segmented_double_ended_cursor<T, k>>
 {
     using type = Difference_type<Pointer_type<T>>;
 };
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 struct index_cursor_type_t<array_segmented_double_ended_cursor<T, k>>
 {
     using type = Pointer_type<array_double_ended<T>>;
 };
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 struct segment_cursor_type_t<array_segmented_double_ended_cursor<T, k>>
 {
     using type = Pointer_type<T>;
 };
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 operator==(array_segmented_double_ended_cursor<T, k> const& cur0, array_segmented_double_ended_cursor<T, k> const& cur1) -> bool
 {
     return cur0.index == cur1.index and cur0.segment == cur1.segment;
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 index_cursor(array_segmented_double_ended_cursor<T, k> const& cur) -> Index_cursor_type<array_segmented_double_ended_cursor<T, k>> const&
 {
     return cur.index;
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 index_cursor(array_segmented_double_ended_cursor<T, k>& cur) -> Index_cursor_type<array_segmented_double_ended_cursor<T, k>>&
 {
     return cur.index;
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 segment_cursor(array_segmented_double_ended_cursor<T, k> const& cur) -> Segment_cursor_type<array_segmented_double_ended_cursor<T, k>> const&
 {
     return cur.segment;
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 segment_cursor(array_segmented_double_ended_cursor<T, k>& cur) -> Segment_cursor_type<array_segmented_double_ended_cursor<T, k>>&
 {
     return cur.segment;
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 load(array_segmented_double_ended_cursor<T, k> const& cur) -> T const&
 {
     return load(cur.segment);
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr void
 store(array_segmented_double_ended_cursor<T, k>& cur, T const& value)
 {
     store(cur.segment, value);
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr void
 store(array_segmented_double_ended_cursor<T, k>& cur, Value_type<T>&& value)
 {
     store(cur.segment, fw<T>(value));
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 at(array_segmented_double_ended_cursor<T, k> const& cur) -> T const&
 {
     return at(segment_cur(cur));
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 at(array_segmented_double_ended_cursor<T, k>& cur) -> T&
 {
     return at(segment_cur(cur));
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 precedes(array_segmented_double_ended_cursor<T, k> const& cur0, array_segmented_double_ended_cursor<T, k> const& cur1) -> bool
 {
     return precedes(cur0.index, cur1.index) or precedes(cur0.segment, cur1.segment);
 }
 
-template <Movable T, pointer_diff k>
-requires (0 < k) and (k <= std::numeric_limits<pointer_diff>::max() / sizeof(T))
+template <typename T, pointer_diff k>
+//requires (0 < k) and (k <= std::numeric_limits<pointer_diff>::max() / sizeof(T))
 struct array_segmented_double_ended
 {
     array_double_ended<array_double_ended<T>> index;
 
     constexpr
     array_segmented_double_ended() = default;
-
-    constexpr
-    array_segmented_double_ended(std::initializer_list<T> x)
-    {
-        insert_range(x, back{at(this)});
-    }
 
     constexpr
     array_segmented_double_ended(Size_type<array_segmented_double_ended<T, k>> size, T const& x)
@@ -226,52 +220,52 @@ struct array_segmented_double_ended
     }
 };
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 struct value_type_t<array_segmented_double_ended<T, k>>
 {
     using type = T;
 };
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 struct cursor_type_t<array_segmented_double_ended<T, k>>
 {
     using type = array_segmented_double_ended_cursor<T, k>;
 };
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 struct cursor_type_t<array_segmented_double_ended<T, k> const>
 {
     using type = array_segmented_double_ended_cursor<T const, k>;
 };
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 struct size_type_t<array_segmented_double_ended<T, k>>
 {
     using type = Difference_type<array_segmented_double_ended_cursor<T, k>>;
 };
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 operator==(array_segmented_double_ended<T, k> const& x, array_segmented_double_ended<T, k> const& y) -> bool
 {
     return x.index == y.index;
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 operator<(array_segmented_double_ended<T, k> const& x, array_segmented_double_ended<T, k> const& y) -> bool
 {
     return x.index < y.index;
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr void
 swap(array_segmented_double_ended<T, k>& x, array_segmented_double_ended<T, k>& y)
 {
     swap(x.index, y.index);
 }
 
-template <Movable T, pointer_diff k, typename U>
+template <typename T, pointer_diff k, typename U>
 constexpr auto
 insert(back<array_segmented_double_ended<T, k>> arr, U&& x) -> back<array_segmented_double_ended<T, k>>
 {
@@ -287,7 +281,7 @@ insert(back<array_segmented_double_ended<T, k>> arr, U&& x) -> back<array_segmen
     return seq;
 }
 
-template <Movable T, pointer_diff k, typename U>
+template <typename T, pointer_diff k, typename U>
 constexpr auto
 insert(front<array_segmented_double_ended<T, k>> arr, U&& x) -> front<array_segmented_double_ended<T, k>>
 {
@@ -303,35 +297,35 @@ insert(front<array_segmented_double_ended<T, k>> arr, U&& x) -> front<array_segm
     return seq;
 }
 
-template <Movable T, pointer_diff k, typename U>
+template <typename T, pointer_diff k, typename U>
 constexpr void
 emplace(array_segmented_double_ended<T, k>& arr, U&& x)
 {
     insert(back{arr}, fw<U>(x));
 }
 
-template <Movable T, pointer_diff k, typename U>
+template <typename T, pointer_diff k, typename U>
 constexpr void
 emplace_first(array_segmented_double_ended<T, k>& arr, U&& x)
 {
     insert(front{arr}, fw<U>(x));
 }
 
-template <Movable T, pointer_diff k, typename U>
+template <typename T, pointer_diff k, typename U>
 constexpr void
 push(array_segmented_double_ended<T, k>& arr, U x)
 {
     insert(back{arr}, mv(x));
 }
 
-template <Movable T, pointer_diff k, typename U>
+template <typename T, pointer_diff k, typename U>
 constexpr void
 push_first(array_segmented_double_ended<T, k>& arr, U x)
 {
     insert(front{arr}, mv(x));
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 erase(back<array_segmented_double_ended<T, k>> arr) -> back<array_segmented_double_ended<T, k>>
 {
@@ -344,7 +338,7 @@ erase(back<array_segmented_double_ended<T, k>> arr) -> back<array_segmented_doub
     return arr;
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 erase(front<array_segmented_double_ended<T, k>> arr) -> front<array_segmented_double_ended<T, k>>
 {
@@ -357,28 +351,28 @@ erase(front<array_segmented_double_ended<T, k>> arr) -> front<array_segmented_do
     return arr;
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr void
 erase_all(array_segmented_double_ended<T, k>& x)
 {
     erase_all(x.index);
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr void
 pop(array_segmented_double_ended<T, k>& arr)
 {
     erase(back{arr});
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr void
 pop_first(array_segmented_double_ended<T, k>& arr)
 {
     erase(front{arr});
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 first(array_segmented_double_ended<T, k> const& x) -> Cursor_type<array_segmented_double_ended<T, k>>
 {
@@ -386,7 +380,7 @@ first(array_segmented_double_ended<T, k> const& x) -> Cursor_type<array_segmente
     return {first(x.index), first(at(first(x.index)))};
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 limit(array_segmented_double_ended<T, k> const& x) -> Cursor_type<array_segmented_double_ended<T, k>>
 {
@@ -394,7 +388,7 @@ limit(array_segmented_double_ended<T, k> const& x) -> Cursor_type<array_segmente
     return {predecessor(limit(x.index)), limit(at(predecessor(limit(x.index))))};
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 first_of_storage(array_segmented_double_ended<T, k> const& x) -> Cursor_type<array_segmented_double_ended<T, k>>
 {
@@ -402,7 +396,7 @@ first_of_storage(array_segmented_double_ended<T, k> const& x) -> Cursor_type<arr
     return {first(x.index), first_of_storage(at(first(x.index)))};
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 limit_of_storage(array_segmented_double_ended<T, k> const& x) -> Cursor_type<array_segmented_double_ended<T, k>>
 {
@@ -410,14 +404,14 @@ limit_of_storage(array_segmented_double_ended<T, k> const& x) -> Cursor_type<arr
     return {predecessor(limit(x.index)), limit_of_storage(at(predecessor(limit(x.index))))};
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 is_empty(array_segmented_double_ended<T, k> const& x) -> bool
 {
     return is_empty(x.index);
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 size(array_segmented_double_ended<T, k> const& x) -> Size_type<array_segmented_double_ended<T, k>>
 {
@@ -427,7 +421,7 @@ size(array_segmented_double_ended<T, k> const& x) -> Size_type<array_segmented_d
     return size(load(first(x.index))) + (predecessor(predecessor(size(x.index))) * k) + size(load(predecessor(limit(x.index))));
 }
 
-template <Movable T, pointer_diff k>
+template <typename T, pointer_diff k>
 constexpr auto
 capacity(array_segmented_double_ended<T, k> const& x) -> Size_type<array_segmented_double_ended<T, k>>
 {

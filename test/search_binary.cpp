@@ -9,7 +9,7 @@ SCENARIO ("Binary search", "[search_binary]")
 {
     SECTION ("Emtpy array of integers")
     {
-        e::array_single_ended<int> x{};
+        e::array_single_ended<int> x;
 
         auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (cur == e::limit(x));
@@ -24,7 +24,8 @@ SCENARIO ("Binary search", "[search_binary]")
 
     SECTION ("Array with one 3")
     {
-        e::array_single_ended<int> x{3};
+        e::array_single_ended<int> x{1};
+        e::emplace(x, 3);
 
         auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (cur == e::first(x));
@@ -39,7 +40,9 @@ SCENARIO ("Binary search", "[search_binary]")
 
     SECTION ("Array with two 3s")
     {
-        e::array_single_ended<int> x{3, 3};
+        e::array_single_ended<int> x{2};
+        e::emplace(x, 3);
+        e::emplace(x, 3);
 
         auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (cur == e::first(x));
@@ -54,7 +57,11 @@ SCENARIO ("Binary search", "[search_binary]")
 
     SECTION ("Array with two 3s at the beginning")
     {
-        e::array_single_ended<int> x{3, 3, 4, 5};
+        e::array_single_ended<int> x{4};
+        e::emplace(x, 3);
+        e::emplace(x, 3);
+        e::emplace(x, 4);
+        e::emplace(x, 5);
 
         auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (cur == e::first(x));
@@ -69,7 +76,12 @@ SCENARIO ("Binary search", "[search_binary]")
 
     SECTION ("Array with two 3s at the end")
     {
-        e::array_single_ended<int> x{0, 1, 2, 3, 3};
+        e::array_single_ended<int> x{5};
+        e::emplace(x, 0);
+        e::emplace(x, 1);
+        e::emplace(x, 2);
+        e::emplace(x, 3);
+        e::emplace(x, 3);
 
         auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (cur == e::first(x) + 3);
@@ -84,7 +96,16 @@ SCENARIO ("Binary search", "[search_binary]")
 
     SECTION ("Array with three 3s in the first half")
     {
-        e::array_single_ended<int> x{0, 3, 3, 3, 4, 5, 6, 7, 8};
+        e::array_single_ended<int> x{9};
+        e::emplace(x, 0);
+        e::emplace(x, 3);
+        e::emplace(x, 3);
+        e::emplace(x, 3);
+        e::emplace(x, 4);
+        e::emplace(x, 5);
+        e::emplace(x, 6);
+        e::emplace(x, 7);
+        e::emplace(x, 8);
 
         auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (cur == e::first(x) + 1);
@@ -99,7 +120,12 @@ SCENARIO ("Binary search", "[search_binary]")
 
     SECTION ("Array with three 3s in the middle")
     {
-        e::array_single_ended<int> x{0, 3, 3, 3, 4};
+        e::array_single_ended<int> x{5};
+        e::emplace(x, 0);
+        e::emplace(x, 3);
+        e::emplace(x, 3);
+        e::emplace(x, 3);
+        e::emplace(x, 4);
 
         auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (cur == e::first(x) + 1);
@@ -114,7 +140,16 @@ SCENARIO ("Binary search", "[search_binary]")
 
     SECTION ("Array with three 3s in the second half")
     {
-        e::array_single_ended<int> x{0, 1, 1, 2, 2, 3, 3, 3, 4};
+        e::array_single_ended<int> x{9};
+        e::emplace(x, 0);
+        e::emplace(x, 1);
+        e::emplace(x, 1);
+        e::emplace(x, 2);
+        e::emplace(x, 2);
+        e::emplace(x, 3);
+        e::emplace(x, 3);
+        e::emplace(x, 3);
+        e::emplace(x, 4);
 
         auto cur = e::search_binary_lower(e::first(x), e::limit(x), 3);
         REQUIRE (cur == e::first(x) + 5);

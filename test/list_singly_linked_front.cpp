@@ -7,7 +7,13 @@ namespace e = elements;
 
 SCENARIO ("Using singly linked list with front access", "[list_singly_linked_front]")
 {
-    e::list_singly_linked_front<int> x{0, 1, 2, 3, 4};
+    e::list_singly_linked_front<int> x;
+    e::emplace_first(x, 4);
+    e::emplace_first(x, 3);
+    e::emplace_first(x, 2);
+    e::emplace_first(x, 1);
+    e::emplace_first(x, 0);
+
     static_assert(e::Dynamic_sequence<decltype(x), e::front<decltype(x)>>);
     static_assert(e::Linked_forward_cursor<e::Cursor_type<decltype(x)>>);
 
@@ -48,7 +54,11 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
         }
 
         {
-            e::list_singly_linked_front<int> y{0, 1, 2, 3};
+            e::list_singly_linked_front<int> y;
+            e::emplace_first(y, 3);
+            e::emplace_first(y, 2);
+            e::emplace_first(y, 1);
+            e::emplace_first(y, 0);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -59,7 +69,13 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
         }
 
         {
-            e::list_singly_linked_front<int> y{0, 1, 2, 3, 4, 5};
+            e::list_singly_linked_front<int> y;
+            e::emplace_first(y, 5);
+            e::emplace_first(y, 4);
+            e::emplace_first(y, 3);
+            e::emplace_first(y, 2);
+            e::emplace_first(y, 1);
+            e::emplace_first(y, 0);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -70,7 +86,12 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
         }
 
         {
-            e::list_singly_linked_front<int> y{0, -1, -2, -3, -4};
+            e::list_singly_linked_front<int> y;
+            e::emplace_first(y, -4);
+            e::emplace_first(y, -3);
+            e::emplace_first(y, -2);
+            e::emplace_first(y, -1);
+            e::emplace_first(y, 0);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -81,7 +102,12 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
         }
 
         {
-            e::list_singly_linked_front<int> y{5, 6, 7, 8, 9};
+            e::list_singly_linked_front<int> y;
+            e::emplace_first(y, 9);
+            e::emplace_first(y, 8);
+            e::emplace_first(y, 7);
+            e::emplace_first(y, 6);
+            e::emplace_first(y, 5);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -111,7 +137,12 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
         }
 
         {
-            e::list_singly_linked_front<int> y{5, 6, 7, 8, 9};
+            e::list_singly_linked_front<int> y;
+            e::emplace_first(y, 9);
+            e::emplace_first(y, 8);
+            e::emplace_first(y, 7);
+            e::emplace_first(y, 6);
+            e::emplace_first(y, 5);
             e::swap(x, y);
 
             CHECK (x[0] == 5);
@@ -198,7 +229,10 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
 
     SECTION ("Erasing elements")
     {
-        e::list_singly_linked_front<int> x0{0, 1, 2};
+        e::list_singly_linked_front<int> x0;
+        e::emplace_first(x0, 2);
+        e::emplace_first(x0, 1);
+        e::emplace_first(x0, 0);
         e::list_singly_linked_front<int> x1;
 
         SECTION ("Erasing at front")
@@ -261,7 +295,12 @@ SCENARIO ("Using singly linked list with front access", "[list_singly_linked_fro
 
     SECTION ("Monadic interface")
     {
-        auto fn0 = [](int const& i){ return e::list_singly_linked_front<int>{i, -i}; };
+        auto fn0 = [](int const& i){
+            e::list_singly_linked_front<int> ret;
+            e::emplace_first(ret, -i);
+            e::emplace_first(ret, i);
+            return ret;
+        };
         auto fn1 = [](int const& i){ return i + 0.5; };
 
         static_assert(e::Monad<decltype(x)>);

@@ -5,9 +5,20 @@
 
 namespace e = elements;
 
+struct s
+{
+    e::array_segmented_single_ended<s> x;
+};
+
 SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]")
 {
-    e::array_segmented_single_ended x{0, 1, 2, 3, 4};
+    e::array_segmented_single_ended<int> x;
+    e::emplace(x, 0);
+    e::emplace(x, 1);
+    e::emplace(x, 2);
+    e::emplace(x, 3);
+    e::emplace(x, 4);
+
     static_assert(e::Dynamic_sequence<decltype(x), e::back<decltype(x)>>);
     static_assert(e::Affine_space<e::Index_cursor_type<e::Cursor_type<decltype(x)>>>);
     static_assert(e::Affine_space<e::Segment_cursor_type<e::Cursor_type<decltype(x)>>>);
@@ -49,7 +60,11 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
         }
 
         {
-            e::array_segmented_single_ended y{0, 1, 2, 3};
+            e::array_segmented_single_ended<int> y;
+            e::emplace(y, 0);
+            e::emplace(y, 1);
+            e::emplace(y, 2);
+            e::emplace(y, 3);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -60,7 +75,13 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
         }
 
         {
-            e::array_segmented_single_ended y{0, 1, 2, 3, 4, 5};
+            e::array_segmented_single_ended<int> y;
+            e::emplace(y, 0);
+            e::emplace(y, 1);
+            e::emplace(y, 2);
+            e::emplace(y, 3);
+            e::emplace(y, 4);
+            e::emplace(y, 5);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -71,7 +92,12 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
         }
 
         {
-            e::array_segmented_single_ended y{0, -1, -2, -3, -4};
+            e::array_segmented_single_ended<int> y;
+            e::emplace(y, 0);
+            e::emplace(y, -1);
+            e::emplace(y, -2);
+            e::emplace(y, -3);
+            e::emplace(y, -4);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -82,7 +108,12 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
         }
 
         {
-            e::array_segmented_single_ended y{5, 6, 7, 8, 9};
+            e::array_segmented_single_ended<int> y;
+            e::emplace(y, 5);
+            e::emplace(y, 6);
+            e::emplace(y, 7);
+            e::emplace(y, 8);
+            e::emplace(y, 9);
 
             REQUIRE (!(x == y));
             REQUIRE (x != y);
@@ -112,7 +143,12 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
         }
 
         {
-            e::array_segmented_single_ended y{5, 6, 7, 8, 9};
+            e::array_segmented_single_ended<int> y;
+            e::emplace(y, 5);
+            e::emplace(y, 6);
+            e::emplace(y, 7);
+            e::emplace(y, 8);
+            e::emplace(y, 9);
             e::swap(x, y);
 
             CHECK (x[0] == 5);
@@ -130,7 +166,12 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
 
     SECTION ("Monadic interface")
     {
-        auto fn0 = [](int const& i){ return e::array_segmented_single_ended<int>{i, -i}; };
+        auto fn0 = [](int const& i){
+            e::array_segmented_single_ended<int> ret;
+            e::emplace(ret, i);
+            e::emplace(ret, -i);
+            return ret;
+        };
         auto fn1 = [](int const& i){ return i + 0.5; };
 
         static_assert(e::Monad<decltype(x)>);
@@ -150,8 +191,21 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
         REQUIRE (y[8] == 4.5);
         REQUIRE (y[9] == -3.5);
 
-        auto fn2 = [](int const& i){ return e::array_segmented_single_ended<int, 3>{i, -i}; };
-        e::array_segmented_single_ended<int, 3> z{0, 1, 2, 3, 4, 5, 6, 7};
+        auto fn2 = [](int const& i){
+            e::array_segmented_single_ended<int, 3> ret;
+            e::emplace(ret, i);
+            e::emplace(ret, -i);
+            return ret;
+        };
+        e::array_segmented_single_ended<int, 3> z;
+        e::emplace(z, 0);
+        e::emplace(z, 1);
+        e::emplace(z, 2);
+        e::emplace(z, 3);
+        e::emplace(z, 4);
+        e::emplace(z, 5);
+        e::emplace(z, 6);
+        e::emplace(z, 7);
 
         auto w = e::chain(z, fn2).fmap(fn1);
 
