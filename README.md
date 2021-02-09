@@ -260,6 +260,10 @@ Cursors of `array_circular` elements are larger and element access is slower tha
 `array_segmented_double_ended` implements a segmented array of elements, where elements are stored on the free store in multiple contiguously allocated blocks of a fixed size *k*, managed by an index of pointers, also contiguously allocated on the free store. All blocks in the array are full, except possibly the first and last one.
 `array_segmented_double_ended` supports insertion at the front and at back in amortized constant time using `emplace`, `push`, `emplace_first`, and `push_first`. If the last block is full, a new block is allocated and appended to the index. Existing elements are never moved when new allocations occur. Erasure at the front and back and front using `pop_first` or `pop` deallocates the first and last block if they become empty.
 
+### List pool
+
+`list_pool` implements a pool of contiguously allocated singly linked elements. `allocate` inserts a new element after a given position and returns the position of the new element. `free` removes an element at a given position. free_pool removes all elements starting at a given position until the last reachable element.
+
 ## Sum types
 
 `result` implements a type that carries either a value or an error. The presence of a value can be checked by boolean evaluation. An expected object is `Mutable` if its `Value_type` is.
@@ -622,6 +626,8 @@ Index
 
 `array_segmented_single_ended`
 `array_segmented_double_ended`
+
+`list_pool`
 
 `result`
 
