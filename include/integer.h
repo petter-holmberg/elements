@@ -20,16 +20,16 @@ decrement(I& x)
 
 template <Integral I>
 constexpr auto
-half(I const& a) -> I
+twice(I const& a) -> I
 {
-    return a >> I{1};
+    return a + a;
 }
 
 template <Integral I>
 constexpr auto
-twice(I const& a) -> I
+half(I const& a) -> I
 {
-    return a + a;
+    return a >> I{1};
 }
 
 template <Integral I>
@@ -94,5 +94,34 @@ precedes(I const& i0, I const& i1) -> bool
 {
     return i0 < i1;
 }
+
+template <typename, typename...>
+struct distance_type_t;
+
+template <typename T, typename... Us>
+using Distance_type = typename distance_type_t<T, Us...>::type;
+
+template <Integral I>
+struct distance_type_t<I>
+{
+    using type = Unsigned_type<I>;
+};
+
+template <typename I>
+concept Integer =
+    requires (I a) {
+        increment(a);
+        decrement(a);
+        { twice(a) } -> Same_as<I>;
+        { half(a) } -> Same_as<I>;
+        { binary_scale_up(a, a) } -> Same_as<I>;
+        { binary_scale_down(a, a) } -> Same_as<I>;
+        { is_positive(a) } -> Boolean_testable;
+        { is_negative(a) } -> Boolean_testable;
+        { is_zero(a) } -> Boolean_testable;
+        { is_one(a) } -> Boolean_testable;
+        { is_even(a) } -> Boolean_testable;
+        { is_odd(a) } -> Boolean_testable;
+    };
 
 }

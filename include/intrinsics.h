@@ -94,6 +94,18 @@ concept Totally_ordered = std::totally_ordered<T>;
 template <typename T>
 concept Integral = std::is_integral_v<T>;
 
+template <Integral T>
+using Signed_type = typename std::make_signed<T>::type;
+
+template <Integral T>
+using Unsigned_type = typename std::make_unsigned<T>::type;
+
+template <typename T>
+concept Signed_integral = Integral<T> and std::is_signed_v<T>;
+
+template <typename T>
+concept Unsigned_integral = Integral<T> and !Signed_integral<T>;
+
 template <typename F, typename... Args>
 concept Invocable = std::invocable<F, Args...>;
 

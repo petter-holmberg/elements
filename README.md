@@ -165,6 +165,19 @@ It will return a cursor pointing to the first subsequence in the first range tha
 `none_of` takes a loadable range and a unary predicate. It checks if none of the values in the range satisfies the predicate.
 `any_of` takes a loadable range and a unary predicate. It checks if any value in the range satisfies the predicate.
 
+## Transformations
+
+`distance` takes a `Transformation` and two values of the its `Return_type`, where the second value is reachable from the first. It returns the number of invocations of the transformation it takes to go from the first to the second value.
+`collision_point` takes a `Transformation`, a starting value of its `Return_type`, and a unary `Predicate`. It returns the terminal point (if the transformation is terminating) or the collision point of the transformation (if the transformation is non-terminating). The collision point is the value where the transformation (starting with the given starting value) applied n times equals the transformation applied 2n + 1 times. The predicate guards against going outside of the transformation's definition space.
+`collision_point_nonterminating_orbit` takes a `Transformation` and a starting value of its `Return_type`. The transformation has to be total or nonterminating for the given value.
+`is_terminating` takes a `Transformation`, a starting value of its `Return_type`, and a unary `Predicate`. It determines if the given transformation is terminating.
+`is_circular` takes a `Transformation`, a starting value of its `Return_type`, and a unary `Predicate`. It determines if the given transformation is circular.
+`is_circular_nonterminating_orbit` takes a `Transformation` and a starting value of its `Return_type`. The transformation has to be total or nonterminating for the given value. It determines if the given transformation is circular.
+`connection_point` takes a `Transformation`, a starting value of its `Return_type`, and a unary `Predicate`. It returns the connection point of the transformation, i.e. the point where a cycle starts, or the terminal element for a terminating transformation.
+`connection_point_nonterminating_orbit` takes a `Transformation` and a starting value of its `Return_type`. It returns the connection point of the transformation, i.e. the point where a cycle starts, or the terminal element for a terminating transformation.
+`orbit_structure` takes a `Transformation`, a starting value of its `Return_type`, and a unary `Predicate`. It returns a structure that measures all orbit sizes.
+`orbit_structure_nonterminating_orbit` takes a `Transformation` and a starting value of its `Return_type`. It returns a structure that measures all orbit sizes.
+
 ## Zipping/Unzipping
 
 `zip` takes two loadable ranges as sources and a storable cursor as destination. It performs copying from the first to the last element of the sources, starting with the first source and alternating between the sources for every element. If one of the source ranges is longer than the other, its remaining elements are appended at the end.
@@ -359,7 +372,13 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 ## Integers
 
-`Integral` describes a `Totally_ordered` integral type represented like a built-in machine type, with all its standard operators.
+`Integral` describes a built-in binary integer type.
+
+`Signed_integral` describes a built-in binary integer type.
+
+`Unsigned_integral` describes a built-in binary integer type.
+
+`Integer` describes a `Totally_ordered` integral type represented like a built-in machine type, with all its standard operators.
 
 ## Invocable concepts
 
@@ -368,6 +387,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 `Operation` describes a `Regular_invocable` with arity > 0 and with the same domain and codomain.
 `Predicate` describes a `Regular_invocable` where the codomain is `Boolean_testable`.
 `Relation` describes a `Predicate` of arity 2 which accepts its arguments in any order.
+`Transformation` describes a unary `Operation` with an `Integer` `Distance_type`.
 
 ## Ordered algebraic concepts
 
@@ -441,6 +461,8 @@ returns either a reference or a constant reference to its held object.
 
 `Return_type` is the return type of an `Invocable` type with a given list of argument types.
 
+`Distance_type` is an `Integer` type large enough to count the number of invocations of a `Transformation` that is necessary to go from any return value to another.
+
 ## Cursors
 
 `Pointer_type` is the type of a pointer to an object of a given type.
@@ -462,6 +484,12 @@ returns either a reference or a constant reference to its held object.
 `Zero` is the additive identity element of a given type.
 
 `One` is the multiplicative identity element of a given type.
+
+## Integers
+
+`Signed_type` returns a signed type of the same size as a given `Integral` type.
+
+`Unsigned_type` returns an unsigned type of the same size as a given `Integral` type.
 
 # Appendix A: On nomenclature
 
@@ -582,6 +610,20 @@ Index
 `none_of`
 `any_of`
 
+`zip`
+`unzip`
+
+`distance`
+`collision_point`
+`collision_point_nonterminating_orbit`
+`is_terminating`
+`is_circular`
+`is_circular_nonterminating_orbit`
+`connection_point`
+`connection_point_nonterminating_orbit`
+`orbit_structure`
+`orbit_structure_nonterminating_orbit`
+
 `contradiction`
 `conjunction`
 `nonimplication`
@@ -661,12 +703,15 @@ Index
 `Monad`
 
 `Integral`
+`Signed_integral`
+`Unsigned_integral`
 
 `Invocable`
 `Regular_invocable`
 `Operation`
 `Predicate`
 `Relation`
+`Transformation`
 
 `Ordered_additive_semigroup`
 `Ordered_additive_monoid`
@@ -715,6 +760,7 @@ Index
 `Error_type`
 
 `Return_type`
+`Distance_type`
 
 `Pointer_type`
 `Value_type`
@@ -727,6 +773,9 @@ Index
 
 `Zero`
 `One`
+
+`Signed_type`
+`Unsigned_type`
 
 References
 ----------
