@@ -4,7 +4,7 @@
 
 namespace elements {
 
-template <Integral I>
+template <Integer I>
 constexpr auto
 choose(I n, I k) -> I
 {

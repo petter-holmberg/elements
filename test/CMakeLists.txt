@@ -17,6 +17,7 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/fill.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/for_each.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/functional.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/integer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lexicographical.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/list_doubly_linked_circular.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/list_doubly_linked_front_back.cpp

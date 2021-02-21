@@ -10,7 +10,7 @@ template <Regular S, Operation<S, S> Op>
 constexpr auto
 axiom_Associative(S const& a, S const& b, S const& c, Op op) noexcept -> bool
 {
-    if (op(op(a, b), c) != op(a, op(b, c))) return false;
+    if (invoke(op, invoke(op, a, b), c) != invoke(op, a, invoke(op, b, c))) return false;
 
     return true;
 }
@@ -19,7 +19,7 @@ template <Regular S, Operation<S, S> Op>
 constexpr auto
 axiom_Commutative(S const& a, S const& b, Op op) noexcept -> bool
 {
-    if (op(a, b) != op(b, a)) return false;
+    if (invoke(op, a, b) != invoke(op, b, a)) return false;
 
     return true;
 }
@@ -225,8 +225,8 @@ axiom_Monoid(M const& a, M const& b, M const& c, Op op) noexcept -> bool
     if (!axiom_Semigroup(a, b, c, op)) return false;
 
     // Identity
-    if (op(a, Identity_element<M, Op>) != a) return false;
-    if (op(a, Identity_element<M, Op>) != op(Identity_element<M, Op>, a)) return false;
+    if (invoke(op, a, Identity_element<M, Op>) != a) return false;
+    if (invoke(op, a, Identity_element<M, Op>) != invoke(op, Identity_element<M, Op>, a)) return false;
 
     return true;
 }
@@ -401,8 +401,8 @@ axiom_Group(G const& a, G const& b, G const& c, Op op) noexcept -> bool
     if (!axiom_Monoid(a, b, c, op)) return false;
 
     // Inverse
-    if (op(a, inverse_operation<G, Op>{}(a)) != Identity_element<G, Op>) return false;
-    if (op(inverse_operation<G, Op>{}(a), a) != Identity_element<G, Op>) return false;
+    if (invoke(op, a, inverse_operation<G, Op>{}(a)) != Identity_element<G, Op>) return false;
+    if (invoke(op, inverse_operation<G, Op>{}(a), a) != Identity_element<G, Op>) return false;
 
     return true;
 }
@@ -529,8 +529,8 @@ requires
 constexpr auto
 axiom_Distributive(S const& a, S const& b, S const& c, Add_op add_op = {}, Mul_op mul_op = {}) noexcept -> bool
 {
-    if (mul_op(a, add_op(b, c)) != add_op(mul_op(a, b), mul_op(a, c))) return false;
-    if (mul_op(add_op(a, b), c) != add_op(mul_op(a, c), mul_op(b, c))) return false;
+    if (invoke(mul_op, a, invoke(add_op, b, c)) != invoke(add_op, invoke(mul_op, a, b), invoke(mul_op, a, c))) return false;
+    if (invoke(mul_op, invoke(add_op, a, b), c) != invoke(add_op, invoke(mul_op, a, c), invoke(mul_op, b, c))) return false;
 
     return true;
 }
@@ -542,8 +542,8 @@ requires
 constexpr auto
 axiom_Annihilation(S const& a, Mul_op mul_op = {}) noexcept -> bool
 {
-    if (mul_op(Identity_element<S, Add_op>, a) != Identity_element<S, Add_op>) return false;
-    if (mul_op(a, Identity_element<S, Add_op>) != Identity_element<S, Add_op>) return false;
+    if (invoke(mul_op, Identity_element<S, Add_op>, a) != Identity_element<S, Add_op>) return false;
+    if (invoke(mul_op, a, Identity_element<S, Add_op>) != Identity_element<S, Add_op>) return false;
 
     return true;
 }
@@ -646,7 +646,7 @@ axiom_Integral_domain(I const& a, I const& b, I const& c, Add_op add_op = {}, Mu
 
     // No non-zero divisors
     if (a != Identity_element<I, Add_op> and b != Identity_element<I, Add_op>) {
-        if (mul_op(a, b) == Identity_element<I, Add_op>) return false;
+        if (invoke(mul_op, a, b) == Identity_element<I, Add_op>) return false;
     }
 
     return true;

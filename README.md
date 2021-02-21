@@ -25,6 +25,14 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 # Algorithms
 
+## Algebra
+
+`power_left_associated` takes a left-associative binary `Operation`, a value of its `Return_type`, and  positive `Integer`. It raises the value to the power of the integer.
+`power_right_associated` takes a right-associative binary `Operation`, a value of its `Return_type`, and  positive `Integer`. It raises the value to the power of the integer.
+`power_semigroup` takes a `Semigroup` operation, a value of its `Return type`, and a positive `Integer`. It raises the value to the power of the integer.
+`power_monoid` takes a `Monoid` operation, a value of its `Return type`, and a non-negative `Integer`. It raises the value to the power of the integer, returning the `Identity_element` of the operation if the integer is zero.
+`power_group` takes a `Monoid` operation, a value of its `Return type`, and an `Integer`. It raises the value to the power of the integer.
+
 ## Combinatorics
 
 `choose` selects the n choose k binomial coefficent.
@@ -165,18 +173,19 @@ It will return a cursor pointing to the first subsequence in the first range tha
 `none_of` takes a loadable range and a unary predicate. It checks if none of the values in the range satisfies the predicate.
 `any_of` takes a loadable range and a unary predicate. It checks if any value in the range satisfies the predicate.
 
-## Transformations
+## Transformations and Actions
 
-`distance` takes a `Transformation` and two values of the its `Return_type`, where the second value is reachable from the first. It returns the number of invocations of the transformation it takes to go from the first to the second value.
-`collision_point` takes a `Transformation`, a starting value of its `Return_type`, and a unary `Predicate`. It returns the terminal point (if the transformation is terminating) or the collision point of the transformation (if the transformation is non-terminating). The collision point is the value where the transformation (starting with the given starting value) applied n times equals the transformation applied 2n + 1 times. The predicate guards against going outside of the transformation's definition space.
-`collision_point_nonterminating_orbit` takes a `Transformation` and a starting value of its `Return_type`. The transformation has to be total or nonterminating for the given value.
-`is_terminating` takes a `Transformation`, a starting value of its `Return_type`, and a unary `Predicate`. It determines if the given transformation is terminating.
-`is_circular` takes a `Transformation`, a starting value of its `Return_type`, and a unary `Predicate`. It determines if the given transformation is circular.
-`is_circular_nonterminating_orbit` takes a `Transformation` and a starting value of its `Return_type`. The transformation has to be total or nonterminating for the given value. It determines if the given transformation is circular.
-`connection_point` takes a `Transformation`, a starting value of its `Return_type`, and a unary `Predicate`. It returns the connection point of the transformation, i.e. the point where a cycle starts, or the terminal element for a terminating transformation.
-`connection_point_nonterminating_orbit` takes a `Transformation` and a starting value of its `Return_type`. It returns the connection point of the transformation, i.e. the point where a cycle starts, or the terminal element for a terminating transformation.
-`orbit_structure` takes a `Transformation`, a starting value of its `Return_type`, and a unary `Predicate`. It returns a structure that measures all orbit sizes.
-`orbit_structure_nonterminating_orbit` takes a `Transformation` and a starting value of its `Return_type`. It returns a structure that measures all orbit sizes.
+`power_unary` takes a `Transformation` or `Action`, a starting value of its `Return_type`, and a non-negative `Integer`. It invokes the `Transformation` or `Action` as many times as given by the `Integer`.
+`distance` takes a `Transformation` or `Action` and two values of the its `Return_type`, where the second value is reachable from the first. It returns the number of invocations of the transformation it takes to go from the first to the second value.
+`collision_point` takes a `Transformation` or `Action`, a starting value of its `Return_type`, and a unary `Predicate`. It returns the terminal point (if the transformation is terminating) or the collision point of the transformation (if the transformation is non-terminating). The collision point is the value where the transformation (starting with the given starting value) applied n times equals the transformation applied 2n + 1 times. The predicate guards against going outside of the transformation's definition space.
+`collision_point_nonterminating_orbit` takes a `Transformation` or `Action` and a starting value of its `Return_type`. The transformation has to be total or nonterminating for the given value.
+`is_terminating` takes a `Transformation` or `Action`, a starting value of its `Return_type`, and a unary `Predicate`. It determines if the given transformation is terminating.
+`is_circular` takes a `Transformation` or `Action`, a starting value of its `Return_type`, and a unary `Predicate`. It determines if the given transformation is circular.
+`is_circular_nonterminating_orbit` takes a `Transformation` or `Action` and a starting value of its `Return_type`. The transformation has to be total or nonterminating for the given value. It determines if the given transformation is circular.
+`connection_point` takes a `Transformation` or `Action`, a starting value of its `Return_type`, and a unary `Predicate`. It returns the connection point of the transformation, i.e. the point where a cycle starts, or the terminal element for a terminating transformation.
+`connection_point_nonterminating_orbit` takes a `Transformation` or `Action` and a starting value of its `Return_type`. It returns the connection point of the transformation, i.e. the point where a cycle starts, or the terminal element for a terminating transformation.
+`orbit_structure` takes a `Transformation` or `Action`, a starting value of its `Return_type`, and a unary `Predicate`. It returns a structure that measures all orbit sizes.
+`orbit_structure_nonterminating_orbit` takes a `Transformation` or `Action` and a starting value of its `Return_type`. It returns a structure that measures all orbit sizes.
 
 ## Zipping/Unzipping
 
@@ -388,6 +397,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 `Predicate` describes a `Regular_invocable` where the codomain is `Boolean_testable`.
 `Relation` describes a `Predicate` of arity 2 which accepts its arguments in any order.
 `Transformation` describes a unary `Operation` with an `Integer` `Distance_type`.
+`Action` describes a unary function that takes an object by non-constant reference. It is equivalent with a corresponding transformation that returns a modified copy of the argument.
 
 ## Ordered algebraic concepts
 
@@ -461,7 +471,7 @@ returns either a reference or a constant reference to its held object.
 
 `Return_type` is the return type of an `Invocable` type with a given list of argument types.
 
-`Distance_type` is an `Integer` type large enough to count the number of invocations of a `Transformation` that is necessary to go from any return value to another.
+`Distance_type` is an `Integer` type large enough to count the number of invocations of a `Transformation`  or `Action` that is necessary to go from any return value to another.
 
 ## Cursors
 
@@ -521,6 +531,12 @@ Index
 `map_sink`
 
 # Algorithms
+
+`power_left_associated`
+`power_right_associated`
+`power_semigroup`
+`power_monoid`
+`power_group`
 
 `choose`
 
@@ -712,6 +728,7 @@ Index
 `Predicate`
 `Relation`
 `Transformation`
+`Action`
 
 `Ordered_additive_semigroup`
 `Ordered_additive_monoid`
