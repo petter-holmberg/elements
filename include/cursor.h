@@ -1,8 +1,18 @@
 #pragma once
 
+#include "algebra.h"
 #include "integer.h"
 
 namespace elements {
+
+template <typename T>
+struct value_type_t
+{
+    using type = T;
+};
+
+template <typename T>
+using Value_type = typename value_type_t<T>::type;
 
 template <typename T>
 using Pointer_type = T*;

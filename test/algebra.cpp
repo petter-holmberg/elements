@@ -12,11 +12,11 @@ SCENARIO ("Using built-in and library algebraic types", "[algebra]")
 {
     SECTION ("Semigroups")
     {
-        static_assert(e::Semigroup<int, e::sum<int>>);
-        static_assert(axiom_Semigroup(1, 2, 3, e::sum{}));
+        static_assert(e::Semigroup<int, e::add_op<int>>);
+        static_assert(axiom_Semigroup(1, 2, 3, e::add));
 
-        static_assert(e::Semigroup<int, e::product<int>>);
-        static_assert(axiom_Semigroup(2, 3, 4, e::product{}));
+        static_assert(e::Semigroup<int, e::mul_op<int>>);
+        static_assert(axiom_Semigroup(2, 3, 4, e::multiply));
 
         static_assert(e::Additive_semigroup<int>);
         static_assert(e::axiom_Additive_semigroup(1, 2, 3));
@@ -27,11 +27,11 @@ SCENARIO ("Using built-in and library algebraic types", "[algebra]")
 
     SECTION ("Monoids")
     {
-        static_assert(e::Monoid<int, e::sum<int>>);
-        static_assert(axiom_Monoid(1, 2, 3, e::sum{}));
+        static_assert(e::Monoid<int, e::add_op<int>>);
+        static_assert(axiom_Monoid(1, 2, 3, e::add));
 
-        static_assert(e::Monoid<int, e::product<int>>);
-        static_assert(axiom_Monoid(2, 3, 4, e::product{}));
+        static_assert(e::Monoid<int, e::mul_op<int>>);
+        static_assert(axiom_Monoid(2, 3, 4, e::multiply));
 
         static_assert(e::Additive_monoid<int>);
         static_assert(e::axiom_Additive_monoid(1, 2, 3));
@@ -42,8 +42,8 @@ SCENARIO ("Using built-in and library algebraic types", "[algebra]")
 
     SECTION ("Groups")
     {
-        static_assert(e::Group<int, e::sum<int>>);
-        static_assert(e::axiom_Group(1, 2, 3, e::sum{}));
+        static_assert(e::Group<int, e::add_op<int>>);
+        static_assert(e::axiom_Group(1, 2, 3, e::add));
 
         static_assert(e::Additive_group<int>);
         static_assert(e::axiom_Additive_group(1, 2, 3));

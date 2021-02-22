@@ -39,13 +39,11 @@ axiom_Semigroup(S const& a, S const& b, S const& c, Op op) noexcept -> bool
     return true;
 }
 
-template <typename S, typename Op>
-requires Semigroup<S, Op>
+template <Regular T, typename F>
 struct identity_element_t;
 
-template <typename S, typename Op>
-requires Semigroup<S, Op>
-S const Identity_element = identity_element_t<S, Op>::value;
+template <Regular T, typename F>
+T const Identity_element = identity_element_t<T, F>::value;
 
 template <typename S>
 concept Additive_semigroup =
@@ -76,7 +74,7 @@ operator+=(S& a, S const& b) -> S&
 }
 
 template <typename T = void>
-struct sum
+struct add_op
 {
     template <Additive_semigroup S>
     constexpr auto
@@ -87,15 +85,17 @@ struct sum
 };
 
 template <>
-struct sum<void>
+struct add_op<void>
 {
     template <Additive_semigroup S>
     constexpr auto
     operator()(S const& a, S const& b) const -> S
     {
-        return sum<S>{}(a, b);
+        return add_op<S>{}(a, b);
     }
 };
+
+constexpr auto add = add_op<void>{};
 
 template <Additive_semigroup S>
 struct zero_type_t
@@ -113,22 +113,22 @@ template <Additive_semigroup S>
 constexpr auto zero = S::zero_v;
 
 template <Additive_semigroup S>
-struct identity_element_t<S, sum<S>>
+struct identity_element_t<S, add_op<S>>
 {
     static S const value;
 };
 
 template <Additive_semigroup S>
-struct identity_element_t<S, sum<void>>
+struct identity_element_t<S, add_op<void>>
 {
     static S const value;
 };
 
 template <Additive_semigroup S>
-S const identity_element_t<S, sum<S>>::value = Zero<S>;
+S const identity_element_t<S, add_op<S>>::value = Zero<S>;
 
 template <Additive_semigroup S>
-S const identity_element_t<S, sum<void>>::value = Zero<S>;
+S const identity_element_t<S, add_op<void>>::value = Zero<S>;
 
 template <typename S>
 concept Multiplicative_semigroup =
@@ -156,7 +156,7 @@ operator*=(S& a, S const& b) -> S&
 }
 
 template <typename T = void>
-struct product
+struct mul_op
 {
     template <Multiplicative_semigroup S>
     constexpr auto
@@ -167,15 +167,17 @@ struct product
 };
 
 template <>
-struct product<void>
+struct mul_op<void>
 {
     template <Multiplicative_semigroup S>
     constexpr auto
     operator()(S const& a, S const& b) const -> S
     {
-        return product<S>{}(a, b);
+        return mul_op<S>{}(a, b);
     }
 };
+
+constexpr auto multiply = mul_op<void>{};
 
 template <Multiplicative_semigroup S>
 struct one_type_t;
@@ -190,22 +192,22 @@ struct one_type_t
 };
 
 template <Multiplicative_semigroup S>
-struct identity_element_t<S, product<S>>
+struct identity_element_t<S, mul_op<S>>
 {
     static S const value;
 };
 
 template <Multiplicative_semigroup S>
-struct identity_element_t<S, product<void>>
+struct identity_element_t<S, mul_op<void>>
 {
     static S const value;
 };
 
 template <Multiplicative_semigroup S>
-S const identity_element_t<S, product<S>>::value = One<S>;
+S const identity_element_t<S, mul_op<S>>::value = One<S>;
 
 template <Multiplicative_semigroup S>
-S const identity_element_t<S, product<void>>::value = One<S>;
+S const identity_element_t<S, mul_op<void>>::value = One<S>;
 
 template <Multiplicative_semigroup S>
 S const one_type_t<S>::value = S(1);
@@ -233,7 +235,10 @@ axiom_Monoid(M const& a, M const& b, M const& c, Op op) noexcept -> bool
 
 template <typename M, typename Op>
 requires Monoid<M, Op>
-struct inverse_operation;
+struct inverse_op;
+
+template <typename M, typename Op>
+constexpr auto inverse = inverse_op<M, Op>{};
 
 template <typename M>
 concept Additive_monoid =
@@ -263,7 +268,7 @@ operator+(M& a) -> M&
 }
 
 template <typename T = void>
-struct positive
+struct pos_op
 {
     template <Additive_monoid M>
     constexpr auto
@@ -274,18 +279,20 @@ struct positive
 };
 
 template <>
-struct positive<void>
+struct pos_op<void>
 {
     template <Additive_monoid M>
     constexpr auto
     operator()(M const& a) const -> M
     {
-        return positive<M>{}(a);
+        return pos_op<M>{}(a);
     }
 };
 
+constexpr auto positive = pos_op<void>{};
+
 template <typename T = void>
-struct negative
+struct neg_op
 {
     template <Additive_monoid M>
     constexpr auto
@@ -296,33 +303,47 @@ struct negative
 };
 
 template <>
-struct negative<void>
+struct neg_op<void>
 {
     template <Additive_monoid M>
     constexpr auto
     operator()(M const& a) const -> M
     {
-        return negative<M>{}(a);
+        return neg_op<M>{}(a);
     }
 };
 
+constexpr auto negative = neg_op<void>{};
+
 template <Additive_monoid M>
-struct inverse_operation<M, sum<M>>
+struct inverse_op<M, add_op<M>>
 {
     constexpr auto
     operator()(M const& a) const -> M
     {
-        return negative<M>{}(a);
+        return neg_op<M>{}(a);
+    }
+
+    constexpr auto
+    operator()(M const& a, M const& b) const -> M
+    {
+        return a - b;
     }
 };
 
 template <Additive_monoid M>
-struct inverse_operation<M, sum<void>>
+struct inverse_op<M, add_op<void>>
 {
     constexpr auto
     operator()(M const& a) const -> M
     {
-        return negative<M>{}(a);
+        return neg_op<M>{}(a);
+    }
+
+    constexpr auto
+    operator()(M const& a, M const& b) const -> M
+    {
+        return a - b;
     }
 };
 
@@ -347,7 +368,7 @@ axiom_Multiplicative_monoid(M const& a, M const& b, M const& c) noexcept -> bool
 }
 
 template <typename T = void>
-struct reciprocal
+struct reciprocal_op
 {
     template <Multiplicative_monoid M>
     constexpr auto
@@ -358,40 +379,54 @@ struct reciprocal
 };
 
 template <>
-struct reciprocal<void>
+struct reciprocal_op<void>
 {
     template <Multiplicative_monoid M>
     constexpr auto
     operator()(M const& a) const -> M
     {
-        return reciprocal<M>{}(a);
+        return reciprocal_op<M>{}(a);
     }
 };
 
+constexpr auto reciprocal = reciprocal_op<void>{};
+
 template <Multiplicative_monoid M>
-struct inverse_operation<M, product<M>>
+struct inverse_op<M, mul_op<M>>
 {
     constexpr auto
     operator()(M const& a) const -> M
     {
-        return reciprocal{}(a);
+        return reciprocal_op<M>{}(a);
+    }
+
+    constexpr auto
+    operator()(M const& a, M const& b) const -> M
+    {
+        return a / b;
     }
 };
 
 template <Multiplicative_monoid M>
-struct inverse_operation<M, product<void>>
+struct inverse_op<M, mul_op<void>>
 {
     constexpr auto
     operator()(M const& a) const -> M
     {
-        return reciprocal{}(a);
+        return reciprocal_op<M>{}(a);
+    }
+
+    constexpr auto
+    operator()(M const& a, M const& b) const -> M
+    {
+        return a / b;
     }
 };
 
 template <typename G, typename Op>
 concept Group =
     Monoid<G, Op> and
-    Operation<inverse_operation<G, Op>, G>;
+    Operation<inverse_op<G, Op>, G>;
 
 template <typename G, typename Op>
 requires Group<G, Op>
@@ -401,8 +436,8 @@ axiom_Group(G const& a, G const& b, G const& c, Op op) noexcept -> bool
     if (!axiom_Monoid(a, b, c, op)) return false;
 
     // Inverse
-    if (invoke(op, a, inverse_operation<G, Op>{}(a)) != Identity_element<G, Op>) return false;
-    if (invoke(op, inverse_operation<G, Op>{}(a), a) != Identity_element<G, Op>) return false;
+    if (invoke(op, a, inverse_op<G, Op>{}(a)) != Identity_element<G, Op>) return false;
+    if (invoke(op, inverse_op<G, Op>{}(a), a) != Identity_element<G, Op>) return false;
 
     return true;
 }
@@ -469,7 +504,7 @@ template <typename G>
 concept Multiplicative_group =
     Multiplicative_monoid<G> and
     requires (G const& a) {
-        { reciprocal{}(a) } -> Same_as<G>;
+        { reciprocal(a) } -> Same_as<G>;
         { a / a } -> Same_as<G>;
     };
 
@@ -482,8 +517,8 @@ axiom_Multiplicative_group(G const& a, G const& b, G const& c) noexcept -> bool
     if (!axiom_Multiplicative_monoid(a, b, c)) return false;
 
     // Inverse
-    if (a * reciprocal{}(a) != One<G>) return false;
-    if (reciprocal{}(a) * a != One<G>) return false;
+    if (a * reciprocal(a) != One<G>) return false;
+    if (reciprocal(a) * a != One<G>) return false;
 
     // Division
     if (a / One<G> != a) return false;
@@ -491,28 +526,6 @@ axiom_Multiplicative_group(G const& a, G const& b, G const& c) noexcept -> bool
 
     return true;
 }
-
-template <typename T = void>
-struct quotient
-{
-    template <Multiplicative_group G>
-    constexpr auto
-    operator()(G const& a, G const& b) const -> G
-    {
-        return a / b;
-    }
-};
-
-template <>
-struct quotient<void>
-{
-    template <Multiplicative_group G>
-    constexpr auto
-    operator()(G const& a, G const& b) const -> G
-    {
-        return quotient<G>{}(a, b);
-    }
-};
 
 template <Multiplicative_group G>
 constexpr auto
@@ -522,7 +535,7 @@ operator/=(G& x, G const& y) -> G&
     return x;
 }
 
-template <typename S, typename Add_op = sum<S>, typename Mul_op = product<S>>
+template <typename S, typename Add_op = add_op<S>, typename Mul_op = mul_op<S>>
 requires
     Monoid<S, Add_op> and
     Monoid<S, Mul_op>
@@ -535,7 +548,7 @@ axiom_Distributive(S const& a, S const& b, S const& c, Add_op add_op = {}, Mul_o
     return true;
 }
 
-template <typename S, typename Add_op = sum<S>, typename Mul_op = product<S>>
+template <typename S, typename Add_op = add_op<S>, typename Mul_op = mul_op<S>>
 requires
     Monoid<S, Add_op> and
     Monoid<S, Mul_op>
@@ -548,12 +561,12 @@ axiom_Annihilation(S const& a, Mul_op mul_op = {}) noexcept -> bool
     return true;
 }
 
-template <typename S, typename Add_op = sum<S>, typename Mul_op = product<S>>
+template <typename S, typename Add_op = add_op<S>, typename Mul_op = mul_op<S>>
 concept Semiring =
     Monoid<S, Add_op> and
     Monoid<S, Mul_op>;
 
-template <typename S, typename Add_op = sum<S>, typename Mul_op = product<S>>
+template <typename S, typename Add_op = add_op<S>, typename Mul_op = mul_op<S>>
 requires Semiring<S, Add_op, Mul_op>
 constexpr auto
 axiom_Semiring(S const& a, S const& b, S const& c, Add_op add_op = {}, Mul_op mul_op = {}) noexcept -> bool
@@ -575,11 +588,11 @@ axiom_Semiring(S const& a, S const& b, S const& c, Add_op add_op = {}, Mul_op mu
     return true;
 }
 
-template <typename S, typename Add_op = sum<S>, typename Mul_op = product<S>>
+template <typename S, typename Add_op = add_op<S>, typename Mul_op = mul_op<S>>
 concept Commutative_semiring =
     Semiring<S, Add_op, Mul_op>;
 
-template <typename S, typename Add_op = sum<S>, typename Mul_op = product<S>>
+template <typename S, typename Add_op = add_op<S>, typename Mul_op = mul_op<S>>
 requires Commutative_semiring<S, Add_op, Mul_op>
 constexpr auto
 axiom_Commutative_semiring(S const& a, S const& b, S const& c, Add_op add_op = {}, Mul_op mul_op = {}) noexcept -> bool
@@ -593,12 +606,12 @@ axiom_Commutative_semiring(S const& a, S const& b, S const& c, Add_op add_op = {
     return true;
 }
 
-template <typename R, typename Add_op = sum<R>, typename Mul_op = product<R>>
+template <typename R, typename Add_op = add_op<R>, typename Mul_op = mul_op<R>>
 concept Ring =
     Semiring<R, Add_op, Mul_op> and
     Group<R, Add_op>;
 
-template <typename R, typename Add_op = sum<R>, typename Mul_op = product<R>>
+template <typename R, typename Add_op = add_op<R>, typename Mul_op = mul_op<R>>
 requires Ring<R, Add_op, Mul_op>
 constexpr auto
 axiom_Ring(R const& a, R const& b, R const& c, Add_op add_op = {}, Mul_op mul_op = {}) noexcept -> bool
@@ -611,11 +624,11 @@ axiom_Ring(R const& a, R const& b, R const& c, Add_op add_op = {}, Mul_op mul_op
     return true;
 }
 
-template <typename R, typename Add_op = sum<R>, typename Mul_op = product<R>>
+template <typename R, typename Add_op = add_op<R>, typename Mul_op = mul_op<R>>
 concept Commutative_ring =
     Ring<R, Add_op, Mul_op>;
 
-template <typename R, typename Add_op = sum<R>, typename Mul_op = product<R>>
+template <typename R, typename Add_op = add_op<R>, typename Mul_op = mul_op<R>>
 requires Commutative_ring<R, Add_op, Mul_op>
 constexpr auto
 axiom_Commutative_ring(R const& a, R const& b, R const& c, Add_op add_op = {}, Mul_op mul_op = {}) noexcept -> bool
@@ -631,11 +644,11 @@ axiom_Commutative_ring(R const& a, R const& b, R const& c, Add_op add_op = {}, M
     return true;
 }
 
-template <typename I, typename Add_op = sum<I>, typename Mul_op = product<I>>
+template <typename I, typename Add_op = add_op<I>, typename Mul_op = mul_op<I>>
 concept Integral_domain =
     Commutative_ring<I, Add_op, Mul_op>;
 
-template <typename I, typename Add_op = sum<I>, typename Mul_op = product<I>>
+template <typename I, typename Add_op = add_op<I>, typename Mul_op = mul_op<I>>
 requires Integral_domain<I, Add_op, Mul_op>
 constexpr auto
 axiom_Integral_domain(I const& a, I const& b, I const& c, Add_op add_op = {}, Mul_op mul_op = {}) noexcept -> bool
@@ -652,12 +665,12 @@ axiom_Integral_domain(I const& a, I const& b, I const& c, Add_op add_op = {}, Mu
     return true;
 }
 
-template <typename F, typename Add_op = sum<F>, typename Mul_op = product<F>>
+template <typename F, typename Add_op = add_op<F>, typename Mul_op = mul_op<F>>
 concept Field =
     Integral_domain<F, Add_op, Mul_op> and
     Group<F, Mul_op>;
 
-template <typename F, typename Add_op = sum<F>, typename Mul_op = product<F>>
+template <typename F, typename Add_op = add_op<F>, typename Mul_op = mul_op<F>>
 requires Field<F, Add_op, Mul_op>
 constexpr auto
 axiom_Field(F const& a, F const& b, F const& c, Add_op add_op = {}, Mul_op mul_op = {}) noexcept -> bool
@@ -671,17 +684,17 @@ axiom_Field(F const& a, F const& b, F const& c, Add_op add_op = {}, Mul_op mul_o
 }
 
 template <typename T>
-struct value_type_t
+struct scalar_type_t
 {
     using type = T;
 };
 
 template <typename T>
-using Value_type = typename value_type_t<T>::type;
+using Scalar_type = typename scalar_type_t<T>::type;
 
 template <
-    typename V, typename V_add_op = sum<V>,
-    typename S = Value_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename V, typename V_add_op = add_op<V>,
+    typename S = Scalar_type<V>, typename S_add_op = add_op<S>, typename S_mul_op = mul_op<S>>
 concept Left_semimodule =
     Monoid<V, V_add_op> and
     Commutative_semiring<S, S_add_op, S_mul_op> and
@@ -705,8 +718,8 @@ concept Left_semimodule =
     // }
 
 template <
-    typename V, typename V_add_op = sum<V>,
-    typename S = Value_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename V, typename V_add_op = add_op<V>,
+    typename S = Scalar_type<V>, typename S_add_op = add_op<S>, typename S_mul_op = mul_op<S>>
 concept Right_semimodule =
     Monoid<V, V_add_op> and
     Commutative_semiring<S, S_add_op, S_mul_op> and
@@ -729,7 +742,7 @@ concept Right_semimodule =
     //     a * One<V> == a;
     // }
 
-template <typename V, typename S = Value_type<V>>
+template <typename V, typename S = Scalar_type<V>>
 requires Right_semimodule<V, S>
 constexpr auto
 operator*=(V& v, S const& a) -> V&
@@ -739,42 +752,42 @@ operator*=(V& v, S const& a) -> V&
 }
 
 template <
-    typename V, typename V_add_op = sum<V>,
-    typename S = Value_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename V, typename V_add_op = add_op<V>,
+    typename S = Scalar_type<V>, typename S_add_op = add_op<S>, typename S_mul_op = mul_op<S>>
 concept Semimodule =
     Left_semimodule<V, V_add_op, S, S_add_op, S_mul_op> and
     Right_semimodule<V, V_add_op, S, S_add_op, S_mul_op>;
 
 template <
-    typename V, typename V_add_op = sum<V>,
-    typename S = Value_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename V, typename V_add_op = add_op<V>,
+    typename S = Scalar_type<V>, typename S_add_op = add_op<S>, typename S_mul_op = mul_op<S>>
 concept Left_module =
     Left_semimodule<V, V_add_op, S, S_add_op, S_mul_op> and
     Group<V, V_add_op> and
     Ring<S, S_add_op, S_mul_op>;
 
 template <
-    typename V, typename V_add_op = sum<V>,
-    typename S = Value_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename V, typename V_add_op = add_op<V>,
+    typename S = Scalar_type<V>, typename S_add_op = add_op<S>, typename S_mul_op = mul_op<S>>
 concept Right_module =
     Right_semimodule<V, V_add_op, S, S_add_op, S_mul_op> and
     Group<V, V_add_op> and
     Ring<S, S_add_op, S_mul_op>;
 
 template <
-    typename V, typename V_add_op = sum<V>,
-    typename S = Value_type<V>, typename S_add_op = sum<S>, typename S_mul_op = product<S>>
+    typename V, typename V_add_op = add_op<V>,
+    typename S = Scalar_type<V>, typename S_add_op = add_op<S>, typename S_mul_op = mul_op<S>>
 concept Module =
     Left_module<V, V_add_op, S, S_add_op, S_mul_op> and
     Right_module<V, V_add_op, S, S_add_op, S_mul_op> and
     Commutative_ring<S, S_add_op, S_mul_op>;
 
-template <typename V, typename S = Value_type<V>>
+template <typename V, typename S = Scalar_type<V>>
 concept Vector_space =
-    Module<V, sum<V>, S, sum<S>, product<S>> and
-    Field<S, sum<S>, product<S>>;
+    Module<V, add_op<V>, S, add_op<S>, mul_op<S>> and
+    Field<S, add_op<S>, mul_op<S>>;
 
-template <typename V, typename S = Value_type<V>>
+template <typename V, typename S = Scalar_type<V>>
 requires Vector_space<V, S>
 constexpr auto
 operator-(V const& v, V const& w) -> V
@@ -782,18 +795,18 @@ operator-(V const& v, V const& w) -> V
     return v + (-w);
 }
 
-template <typename V, typename S = Value_type<V>>
+template <typename V, typename S = Scalar_type<V>>
 requires Vector_space<V>
 constexpr auto
-operator/(V const& v, Value_type<V> const& a) -> V
+operator/(V const& v, Scalar_type<V> const& a) -> V
 {
-    return (One<Value_type<V>> / a) * v;
+    return (One<Scalar_type<V>> / a) * v;
 }
 
-template <typename V, typename S = Value_type<V>>
+template <typename V, typename S = Scalar_type<V>>
 requires Vector_space<V>
 constexpr auto
-operator/=(V const& v, Value_type<V> const& a) -> V
+operator/=(V const& v, Scalar_type<V> const& a) -> V
 {
     v = v / a;
     return v;

@@ -110,8 +110,8 @@ struct distance_type_t<I>
 template <typename I>
 concept Integer =
     requires (I a) {
-        increment(a);
-        decrement(a);
+        { increment(a) } -> Same_as<void>;
+        { decrement(a) } -> Same_as<void>;
         { twice(a) } -> Same_as<I>;
         { half(a) } -> Same_as<I>;
         { binary_scale_up(a, a) } -> Same_as<I>;
@@ -123,72 +123,5 @@ concept Integer =
         { is_even(a) } -> Boolean_testable;
         { is_odd(a) } -> Boolean_testable;
     };
-
-template <Integer I, typename T, Operation<T, T> Op>
-constexpr auto
-power_left_associated(T a, I n, Op op) -> T
-//[[expects: is_positive(n)]]
-{
-    if (n == One<I>) return a;
-    return invoke(op, power_left_associated(a, n - One<I>, op), a);
-}
-
-template <Integer I, typename T, Operation<T, T> Op>
-constexpr auto
-power_right_associated(T a, I n, Op op) -> T
-//[[expects: is_positive(n)]]
-{
-    if (n == One<I>) return a;
-    return invoke(op, a, power_right_associated(a, n - One<I>, op));
-}
-
-template <Integer I, typename Op, Semigroup<Op> S>
-constexpr auto
-power_accumulate_semigroup(S r, S a, I n, Op op) -> S
-//[[expects: axiom_Semigroup(a, a, a, op) and is_positive(n)]]
-{
-    while (true) {
-        if (is_odd(n)) {
-            r = invoke(op, r, a);
-            if (is_one(n)) return r;
-        }
-        a = invoke(op, a, a);
-        n = half(n);
-    }
-}
-
-template <Integer I, typename Op, Semigroup<Op> S>
-constexpr auto
-power_semigroup(S a, I n, Op op) -> S
-//[[expects: axiom_Semigroup(a, a, a, op) and is_positive(n)]]
-{
-    while (is_even(n)) {
-        a = invoke(op, a, a);
-        n = half(n);
-    }
-    if (is_one(n)) return a;
-    return power_accumulate_semigroup(a, invoke(op, a, a), half(n - One<I>), op);
-}
-
-template <Integer I, typename Op, Monoid<Op> M>
-constexpr auto
-power_monoid(M a, I n, Op op) -> M
-//[[expects: axiom_Monoid(a, a, a, op) and !is_negative(n)]]
-{
-    if (is_zero(n)) return Identity_element<M, Op>;
-    return power_semigroup(a, n, op);
-}
-
-template <Integer I, typename Op, Group<Op> G>
-constexpr auto
-power_group(G a, I n, Op op) -> G
-//[[expects: axiom_Group(a, a, a, op)]]
-{
-    if (is_negative(n)) {
-        n = negative{}(n);
-        a = inverse_operation<G, Op>{}(a);
-    }
-    return power_monoid(a, n, op);
-}
 
 }

@@ -11,7 +11,7 @@ SCENARIO ("Mapping", "[map]")
 
     SECTION ("Unary mapping")
     {
-        auto cur = e::map(x, x + 5, y, e::negative{});
+        auto cur = e::map(x, x + 5, y, e::negative);
 
         REQUIRE (!e::precedes(cur, y + 5));
 
@@ -24,7 +24,7 @@ SCENARIO ("Mapping", "[map]")
 
     SECTION ("Binary mapping")
     {
-        auto cur = e::map(x, x + 5, y, y + 0, e::sum{});
+        auto cur = e::map(x, x + 5, y, y + 0, e::add);
 
         REQUIRE (!e::precedes(cur, y + 5));
 

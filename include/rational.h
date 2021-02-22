@@ -26,7 +26,7 @@ struct rational
 };
 
 template <Integral_domain I>
-struct value_type_t<rational<I>>
+struct element_type_t<rational<I>, 0>
 {
     using type = I;
 };
@@ -92,7 +92,7 @@ operator-(rational<I> const& x, rational<I> const& y) -> rational<I>
 }
 
 template <Integral_domain I>
-struct reciprocal<rational<I>>
+struct reciprocal_op<rational<I>>
 {
     constexpr auto
     operator()(rational<I> const& x) const -> rational<I>
@@ -121,6 +121,34 @@ constexpr auto
 operator*(rational<I> const& x, I const& n) -> rational<I>
 {
     return {x.p * n, x.q};
+}
+
+template <Integral_domain I>
+constexpr auto
+successor(rational<I> const& x) -> rational<I>
+{
+    return {successor(x.p), x.q};
+}
+
+template <Integral_domain I>
+constexpr auto
+predecessor(rational<I> const& x) -> rational<I>
+{
+    return {predecessor(x.p), x.q};
+}
+
+template <Integral_domain I>
+constexpr auto
+twice(rational<I> const& x) -> rational<I>
+{
+    return {twice(x.p), x.q};
+}
+
+template <Integral_domain I>
+constexpr auto
+half(rational<I> const& x) -> rational<I>
+{
+    return {x.p, twice(x.q)};
 }
 
 }

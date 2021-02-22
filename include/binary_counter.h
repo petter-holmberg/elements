@@ -1,6 +1,7 @@
 #pragma once
 
 #include "array_k.h"
+#include "integer.h"
 
 namespace elements {
 

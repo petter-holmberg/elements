@@ -1,6 +1,7 @@
 set (CMAKE_BUILD_TYPE Debug)
 set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/accumulation.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/affine_space.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/algebra.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/array_circular.cpp
@@ -17,7 +18,6 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/fill.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/for_each.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/functional.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/integer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lexicographical.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/list_doubly_linked_circular.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/list_doubly_linked_front_back.cpp

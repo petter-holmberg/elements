@@ -97,11 +97,11 @@ operator+(polynomial<R, C> const& x, polynomial<R, C> const& y) -> polynomial<R,
 {
     if (size(y.coefficients) < size(x.coefficients)) {
         polynomial<R, C> z(x);
-        map(first(y.coefficients), limit(y.coefficients), first(z.coefficients), first(z.coefficients), sum{});
+        map(first(y.coefficients), limit(y.coefficients), first(z.coefficients), first(z.coefficients), add);
         return z;
     } else {
         polynomial<R, C> z(y);
-        map(first(x.coefficients), limit(x.coefficients), first(z.coefficients), first(z.coefficients), sum{});
+        map(first(x.coefficients), limit(x.coefficients), first(z.coefficients), first(z.coefficients), add);
         return z;
     }
 }
@@ -143,7 +143,7 @@ template <Ring R, Dynamic_sequence C>
 constexpr auto
 operator-(polynomial<R, C> x) -> polynomial<R, C>
 {
-    map(first(x.coefficients), limit(x.coefficients), first(x.coefficients), negative{});
+    map(first(x.coefficients), limit(x.coefficients), first(x.coefficients), negative);
     return x;
 }
 

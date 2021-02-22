@@ -27,11 +27,27 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 ## Algebra
 
-`power_left_associated` takes a left-associative binary `Operation`, a value of its `Return_type`, and  positive `Integer`. It raises the value to the power of the integer.
-`power_right_associated` takes a right-associative binary `Operation`, a value of its `Return_type`, and  positive `Integer`. It raises the value to the power of the integer.
-`power_semigroup` takes a `Semigroup` operation, a value of its `Return type`, and a positive `Integer`. It raises the value to the power of the integer.
-`power_monoid` takes a `Monoid` operation, a value of its `Return type`, and a non-negative `Integer`. It raises the value to the power of the integer, returning the `Identity_element` of the operation if the integer is zero.
-`power_group` takes a `Monoid` operation, a value of its `Return type`, and an `Integer`. It raises the value to the power of the integer.
+### Accumulation
+
+`power_left_associated` takes a left-associative binary `Operation` or `Accumulation_procedure`, a value of its `Return_type`, and  positive `Integer`. It raises the value to the power of the integer.
+`power_right_associated` takes a right-associative binary `Operation` or `Accumulation_procedure`, a value of its `Return_type`, and  positive `Integer`. It raises the value to the power of the integer.
+`power_semigroup` takes a `Semigroup` operation or `Semigroup_accumulator`, a value of its `Return type`, and a positive `Integer`. It raises the value to the power of the integer.
+`power_monoid` takes a `Monoid` operation or `Monoid_accumulator`, a value of its `Return type`, and a non-negative `Integer`. It raises the value to the power of the integer, returning the `Identity_element` of the operation if the integer is zero.
+`power_group` takes a `Group` operation or `Group_accumulator`, a value of its `Return type`, and an `Integer`. It raises the value to the power of the integer.
+
+### Ordered algebra
+
+`abs` returns the absolute value of a member of an `Ordered_group`, with respect to its inverse operation. It defaults to using negation, the inverse operation of `add`.
+
+`cancel` performs cancellation (i.e. partial subtraction) on a member of a `Cancellable_monoid`.
+
+`quotient` returns the quotient of a member of a `Halvable_monoid` with respect to another member and a given operation.
+
+`remainder` returns the remainder of a member of a `Halvable_monoid` with respect to another member and a given operation.
+
+`quotient_remainder` returns the quotient and remainder of a member of an `Archimedean_monoid` with respect to another member and a given operation. The default operation is `add`. If the members satisfy an `Archimedean_group`, it uses the `inverse_operation` instead of `cancel`. If called with `multiply` it calculates logarithm and remainder.
+
+`gcd` returns the greatest common divisor of two members of an `Euclidean_semimodule`.
 
 ## Combinatorics
 
@@ -136,11 +152,11 @@ For `search_not`, a match is defined as the first element `y` for which the give
 
 `search_backward`, `search_backward_not`, `search_backward_if`, and `search_backward_if_not` are variations of the functions above that search backward through the loadable range.
 
-`search_unguarded`, `search_not_unguarded`, `search_if_unguarded`, and `search_if_not_unguarded` are variations of the functions above that assume an element satisfying the applied predicate is known to exist in the given range (which necessarily is nonempty). They take a cursor pointing to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration. Iteration is faster because the end of the range doesn't need to be checked.
+`search_unguarded`, `search_not_unguarded`, `search_if_unguarded`, and `search_if_not_unguarded` are variations of the functions above that assum_ope an element satisfying the applied predicate is known to exist in the given range (which necessarily is nonempty). They take a cursor pointing to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration. Iteration is faster because the end of the range doesn't need to be checked.
 
 `search_guarded`, `search_not_guarded`, `search_if_guarded`, and `search_if_not_guarded` are variations of the functions above that temporarily put a `sentinel` value at the last position of the range, to enable search nearly as fast as for the unguarded variations. They require the range to be `Mutable` and take a cursor pointing to the last element of the range instead of its limit. `search_not_guarded`, `search_if_guarded`, and `search_if_not_guarded` also take a sentinel value to be used to ensure termination.
 
-assume an element satisfying the applied predicate is known to exist in the given range. They take a cursor pointing to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration.
+assum_ope an element satisfying the applied predicate is known to exist in the given range. They take a cursor pointing to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration.
 
 `search_match` and `search_mismatch` take two loadable ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `eq`. If the second range is not shorter than the first, or if a match is known to exist before the end of the second range, the algorithm can be called with only a `cursor` to the first element of the second range.
 
@@ -345,7 +361,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 ### Ring-like
 
-`Semiring` describes a type that is a `Monoid` in two operations `Add_op` and `Mul_op`, defaulted to the operators returned by the binary `Operation`s `sum` and `product`, which unless specialized invoke `operator+` and `operator*`. `Add_op` is expected to be commutative, and `Mul_op` is expected to distribute over `Add_op`.
+`Semiring` describes a type that is a `Monoid` in two operations `Add_op` and `Mul_op`, defaulted to the operators returned by the binary `Operation`s `add` and `multiply`, which unless specialized invoke `operator+` and `operator*`. `Add_op` is expected to be commutative, and `Mul_op` is expected to distribute over `Add_op`.
 `axiom_Semiring` checks the concept for three given values.
 `Commutative_semiring` descrivbes a `Semiring` where `Mul_op` is commutative.
 
@@ -359,7 +375,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 ### Module-like
 
-`Left_semimodule` describes a "vector" type that is a `Monoid` with a binary operation `V_add_op` defaulted to `sum`, together with a "scalar" type that is a `Commutative_semiring` with two binary operations `S_add_op` and `S_mul_op` defaulted to `sum`and `product`, and where an `operator*` with the scalar on the left side and the vector on the right side is defined, is commutative, distributive over `V_add_op`, compatible with `S_mul_op` and has an identity element `One`.
+`Left_semimodule` describes a "vector" type that is a `Monoid` with a binary operation `V_add_op` defaulted to `add_op`, together with a "scalar" type that is a `Commutative_semiring` with two binary operations `S_add_op` and `S_mul_op` defaulted to `add`and `multiply`, and where an `operator*` with the scalar on the left side and the vector on the right side is defined, is commutative, distributive over `V_add_op`, compatible with `S_mul_op` and has an identity element `One`.
 `Right_semimodule` describes a similar structure where `operator*` has the vector on the left side and the scalar on the right side.
 `Semimodule` describes a pair of types that form both a `Left_semimodule` and a `Right_semimodule`.
 
@@ -397,13 +413,26 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 `Predicate` describes a `Regular_invocable` where the codomain is `Boolean_testable`.
 `Relation` describes a `Predicate` of arity 2 which accepts its arguments in any order.
 `Transformation` describes a unary `Operation` with an `Integer` `Distance_type`.
-`Action` describes a unary function that takes an object by non-constant reference. It is equivalent with a corresponding transformation that returns a modified copy of the argument.
+`Action` describes a unary function that takes an object by non-constant reference. It is equivalent with a corresponding `Transformation` that returns a modified copy of the argument.
+`Accumulation_procedure` describes a binary `Invocable` procedure that modifies its first argument, using itself and the second argument. It is equivalent with a corresponding binary `Operation`.
+`Semigroup_accumulator` describes an associative `Accumulation_procedure`.
+`Monoid_accumulator` describes a `Semigroup_accumulator` with an identity element, returned by the type function `Identity_element`.
+`Group_accumulator` descrives a `Monoid_accumulator` with a unary `Operation` `inverse_operation` that when invoked returns the inverse of an object.
 
 ## Ordered algebraic concepts
 
+`Ordered_semigroup` describes a `Semigroup` that is also `Totally_ordered`.
 `Ordered_additive_semigroup` describes an `Additive_semigroup` that is also `Totally_ordered`.
+`Ordered_monoid` describes a `Monoid` that is also `Totally_ordered`.
 `Ordered_additive_monoid` describes an `Additive_monoid` that is also `Totally_ordered`.
+`Ordered_group` describes a `Group` that is also `Totally_ordered`.
 `Ordered_additive_group` describes an `Additive_group` that is also `Totally_ordered`.
+`Cancellable_monoid` describes an `Ordered_monoid` that has a binary operation `cancel` that
+implements cancellation.
+`Archimedean_monoid` describes a `Cancellable_monoid` that has a `Quotient_type` that is an `Integral_domain`.
+`Halvable_monoid` describes a `Archimedean_monoid` that has a `half` function.
+`Archimedean_group` describes an `Archimedean_monoid` that is also a `Group`.
+`Euclidean_semimodule` describes a `Semimodule` that has a `quotient` and `remainder` function, and where Euclid's algorithm terminates.
 `Ordered_ring` describes a `Ring` that is also `Totally_ordered`.
 `Ordered_integral_domain` describes an `Integral_domain` that is also `Totally_ordered`.
 
@@ -467,6 +496,10 @@ returns either a reference or a constant reference to its held object.
 
 `Error_type` is the type of the error that can be stored in a `result`.
 
+## Algebra
+
+`Scalar_type` is the associated scalar type of a `Module`-like object.
+
 ## Invocable
 
 `Return_type` is the return type of an `Invocable` type with a given list of argument types.
@@ -475,9 +508,9 @@ returns either a reference or a constant reference to its held object.
 
 ## Cursors
 
-`Pointer_type` is the type of a pointer to an object of a given type.
-
 `Value_type` is either a type directly, or, in the case of a `Cursor` type or a `Range` type, the type it is parameterized on.
+
+`Pointer_type` is the type of a pointer to an object of a given type.
 
 `Difference_type` is a type capable of storing the (signed) difference between two cursors of the given type.
 
@@ -537,6 +570,13 @@ Index
 `power_semigroup`
 `power_monoid`
 `power_group`
+
+`abs`
+`cancel`
+`quotient`
+`remainder`
+`quotient_remainder`
+`gcd`
 
 `choose`
 
@@ -729,10 +769,22 @@ Index
 `Relation`
 `Transformation`
 `Action`
+`Accumulation_procedure`
+`Semigroup_accumulator`
+`Monoid_accumulator`
+`Group_accumulator`
 
+`Ordered_semigroup`
 `Ordered_additive_semigroup`
+`Ordered_monoid`
 `Ordered_additive_monoid`
+`Ordered_group`
 `Ordered_additive_group`
+`Cancellable_monoid`
+`Archimedean_monoid`
+`Halvable_monoid`
+`Archimedean_group`
+`Euclidean_semimodule`
 `Ordered_ring`
 `Ordered_integral_domain`
 
@@ -776,11 +828,13 @@ Index
 `Element_type`
 `Error_type`
 
+`Scalar_type`
+
 `Return_type`
 `Distance_type`
 
-`Pointer_type`
 `Value_type`
+`Pointer_type`
 `Difference_type`
 `Cursor_type`
 `Size_type`

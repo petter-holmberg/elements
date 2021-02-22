@@ -38,8 +38,8 @@ operator-=(P& p, V const& v) -> P&
 template <
     typename S, int32_t k,
     typename E = array_k<S, k>,
-    typename S_add_op = sum<S>,
-    typename S_mul_op = product<S>>
+    typename S_add_op = add_op<S>,
+    typename S_mul_op = mul_op<S>>
 requires
     Semiring<S, S_add_op, S_mul_op> and
     Sequence<E>
@@ -68,6 +68,13 @@ struct affine_vector
     {
         return elements[i];
     }
+};
+
+template <typename S, int32_t k, typename E, typename S_add_op, typename S_mul_op>
+requires Semiring<S, S_add_op, S_mul_op>
+struct scalar_type_t<affine_vector<S, k, E, S_add_op, S_mul_op>>
+{
+    using type = S;
 };
 
 template <typename S, int32_t k, typename E, typename S_add_op, typename S_mul_op>
@@ -193,7 +200,7 @@ operator-(
     affine_vector<S, k, E, S_add_op, S_mul_op>
 {
     affine_vector<S, k, E, S_add_op, S_mul_op> y;
-    map(first(x), limit(x), first(y), inverse_operation<S, S_add_op>{});
+    map(first(x), limit(x), first(y), inverse_op<S, S_add_op>{});
     return y;
 }
 

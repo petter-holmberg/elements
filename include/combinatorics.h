@@ -1,5 +1,6 @@
 #pragma once
 
+#include "integer.h"
 #include "swap.h"
 
 namespace elements {
