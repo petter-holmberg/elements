@@ -225,6 +225,20 @@ It will return a cursor pointing to the first subsequence in the first range tha
 
 `binary counter` implements a binary counter of k elements, using a given binary operation and identity element. When calling it with an object, if the object is not equal to the identity element of the counter, it will be reduced with the existing elements in the counter, resetting each element to the identity element until either an identity element is found or the end of the elements are reached. If an identity element is found, the reduced value replaces it. If the end of the elements are reached, it is appended as the new last element.
 
+## Memory management
+
+`memory` implements a descriptor for a contiguous sequence of `byte`s, with a pointer to the first byte and the size of the sequence.
+
+`empty_allocator` implements an `Allocator` that always fails.
+`choice_allocator` implements an `Allocator` that composes an `Ownership_aware_allocator` with an `Allocator`. When allocating, it tries the first allocator, and if it fails it tries the second.
+`static_allocator` implements a stateful `Allocator` that stores data in a locally allocated array. It can be queried with `available` for its remaining space. It only suppports deallocation of the last allocated `memory`.
+`dynamic_allocator` implements a stateless `Allocator` that allocates using `allocate_dynamic`.
+`affix_allocator` is an `Allocator` that stores another `Allocator` and adds the option to store a prefix and a postfix object to the allocated bytes. If any of the types are `void` no object is stored. By default no postfix is stored. `prefix` and `postfix` return a reference to the stored affix object.
+`partition_allocator` implements an `Allocator` that stores two `Allocator`s and a `Pseudopredicate`. When allocating, it uses the first allocator if the pseudopredicate returns false and the second allocator if the pseudopredicate returns true.
+
+A single instance `default_allocator` is defined. It can statically allocate up to 1KB and then dynamically allocates with suitable alignment for all built-in scalar types. To avoid exhausing the static buffer, deallocation needs to be done in reverse order of allocation.
+A function `array_allocator` that returns a reference to `default_allocator` is also defined. It is used as the default allocator for all array data structures.
+
 ## Linear data structures
 
 ### Ranges
@@ -279,11 +293,11 @@ In extent-based data structures, the elements are stored in one or more *extents
 Arrays have regular semantics, lexicographic comparison operators, and supporting functions and type functions for iteration and element access.
 Arrays are also `Monad`s.
 
-`array_single_ended` implements an array of elements contiguously allocated on the free store. It stores a single pointer on the stack, keeping the array size and capacity in a header
+`array_single_ended` implements an array of dynamically allocated elements. It stores a single pointer on the stack, keeping the array size and capacity in a header
 to the array elements.
 `array_single_ended` supports insertion at the back in amortized constant time using `emplace` and `push`. If the capacity is exceeded it reallocates and moves its elements.
 
-`array_double_ended` implements an array of elements contiguously allocated on the free store. It stores a single pointer on the stack, keeping the array size and capacity in a header
+`array_double_ended` implements an array of dynamically allocated elements. It stores a single pointer on the stack, keeping the array size and capacity in a header
 to the array elements.
 `array_double_ended` supports insertion at the back and the front in amortized constant time using `emplace`, `push`, `emplace_first`, and `push_first`. If the capacity is exceeded it reallocates and moves its elements.
 
@@ -292,10 +306,10 @@ It stores a single pointer on the stack, keeping the array size and capacity in 
 Cursors of `array_circular` elements are larger and element access is slower than for `array_single_ended` and `array_double_ended`.
 `array_circular` supports insertion at the back and the front in amortized constant time using `emplace`, `push`, `emplace_first`, and `push_first`. If the capacity is exceeded it reallocates and moves its elements.
 
-`array_segmented_single_ended` implements a segmented array of elements, where elements are stored on the free store in multiple contiguously allocated blocks of a fixed size *k*, managed by an index of pointers, also contiguously allocated on the free store. All blocks in the array are full, except possibly the last one.
+`array_segmented_single_ended` implements a segmented array of elements, where elements are dynamically allocated in multiple contiguously allocated blocks of a fixed size *k*, managed by an index of pointers, also dynamically allocated. All blocks in the array are full, except possibly the last one.
 `array_segmented_single_ended` supports insertion at the back in amortized constant time using `push`. If the last block is full, a new block is allocated and appended to the index. Existing elements are never moved when new allocations occur. Erasure at the back using `pop` deallocates the last block if it becomes empty.
 
-`array_segmented_double_ended` implements a segmented array of elements, where elements are stored on the free store in multiple contiguously allocated blocks of a fixed size *k*, managed by an index of pointers, also contiguously allocated on the free store. All blocks in the array are full, except possibly the first and last one.
+`array_segmented_double_ended` implements a segmented array of elements, where elements are dynamically allocated in multiple contiguously allocated blocks of a fixed size *k*, managed by an index of pointers, also dynamically allocated. All blocks in the array are full, except possibly the first and last one.
 `array_segmented_double_ended` supports insertion at the front and at back in amortized constant time using `emplace`, `push`, `emplace_first`, and `push_first`. If the last block is full, a new block is allocated and appended to the index. Existing elements are never moved when new allocations occur. Erasure at the front and back and front using `pop_first` or `pop` deallocates the first and last block if they become empty.
 
 ### List pool
@@ -312,7 +326,7 @@ Cursors of `array_circular` elements are larger and element access is slower tha
 
 The concepts in this library are largely based on definitions in [StepanovMcJones](#StepanovMcJones), with some name changes and adaptations to modern C++ features, such as move semantics.
 
-### Regular types
+## Regular types
 
 `Same_as` describes a pair of types that are the same.
 
@@ -411,6 +425,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 `Regular_invocable` describes an equality-preserving `Invocable`.
 `Operation` describes a `Regular_invocable` with arity > 0 and with the same domain and codomain.
 `Predicate` describes a `Regular_invocable` where the codomain is `Boolean_testable`.
+`Pseudopedicate` describes an `Invocable` where the codomain is `Boolean_testable`.
 `Relation` describes a `Predicate` of arity 2 which accepts its arguments in any order.
 `Transformation` describes a unary `Operation` with an `Integer` `Distance_type`.
 `Action` describes a unary function that takes an object by non-constant reference. It is equivalent with a corresponding `Transformation` that returns a modified copy of the argument.
@@ -435,6 +450,11 @@ implements cancellation.
 `Euclidean_semimodule` describes a `Semimodule` that has a `quotient` and `remainder` function, and where Euclid's algorithm terminates.
 `Ordered_ring` describes a `Ring` that is also `Totally_ordered`.
 `Ordered_integral_domain` describes an `Integral_domain` that is also `Totally_ordered`.
+
+## Memory management
+
+`Allocator` describes a `Semiregular` type managing blocks of raw memory. A function `allocate` that takes a reference to an `Allocator` and a desired number of `byte`s will try to allocate a contiguous sequence of `byte`s and return a `memory` descriptor to it. The caller must keep the descriptor around for deallocation when supported.
+`Ownership_aware_allocator` describes an `Allocator` that supports the `Predicate` `is_owner`, which takes an `Allocator` and a `memory` block allocated from it, and checks if `allocate` was called with that `Allocator` to obtain it.
 
 ## Cursors
 
@@ -500,6 +520,10 @@ returns either a reference or a constant reference to its held object.
 
 `Scalar_type` is the associated scalar type of a `Module`-like object.
 
+`Zero` is the additive identity element of a given type.
+
+`One` is the multiplicative identity element of a given type.
+
 ## Invocable
 
 `Return_type` is the return type of an `Invocable` type with a given list of argument types.
@@ -520,13 +544,11 @@ returns either a reference or a constant reference to its held object.
 
 `Size` is the size of a given type (when known at compile time).
 
-`Index_cursor_type` and `Segment_cursor_type` describe the two `Cursor` types of a `Segment_cursor`.
+`Index_cursor_type` and `Segment_cursor_type` describe the two `Cursor` types of a `Segment_cursor`
 
-## Algebra
+## Memory management
 
-`Zero` is the additive identity element of a given type.
-
-`One` is the multiplicative identity element of a given type.
+`Allocator_alignment` returns the alignment of a given `Allocator`.
 
 ## Integers
 
@@ -705,6 +727,12 @@ Index
 `rational`
 `polynomial`
 
+`memory`
+`static_allocator`
+`dynamic_allocator`
+`affix_allocator`
+`partition_allocator`
+
 `bounded_range`
 
 `pair`
@@ -730,6 +758,21 @@ Index
 `result`
 
 # Concepts
+
+`Same_as`
+`Equality_comparable`
+`Equality_comparable_with`
+`Destructible`
+`Constructible`
+`Default_initializable`
+`Move_constructible`
+`Copy_constructible`
+`Assignable`
+`Movable`
+`Copyable`
+`Semiregular`
+`Regular`
+`Totally_ordered`
 
 `Semigroup`
 `Additive_semigroup`
@@ -788,6 +831,9 @@ Index
 `Ordered_ring`
 `Ordered_integral_domain`
 
+`Allocator`
+`Ownership_aware_allocator`
+
 `Cursor`
 `Forward_cursor`
 `Bidirectional_cursor`
@@ -804,21 +850,6 @@ Index
 `Sequence`
 `Dynamic_sequence`
 
-`Same_as`
-`Equality_comparable`
-`Equality_comparable_with`
-`Destructible`
-`Constructible`
-`Default_initializable`
-`Move_constructible`
-`Copy_constructible`
-`Assignable`
-`Movable`
-`Copyable`
-`Semiregular`
-`Regular`
-`Totally_ordered`
-
 # Type functions
 
 `Remove_const`
@@ -829,6 +860,8 @@ Index
 `Error_type`
 
 `Scalar_type`
+`Zero`
+`One`
 
 `Return_type`
 `Distance_type`
@@ -842,8 +875,7 @@ Index
 `Index_cursor_type`
 `Segment_cursor_type`
 
-`Zero`
-`One`
+`Allocator_alignment`
 
 `Signed_type`
 `Unsigned_type`

@@ -6,6 +6,7 @@
 #include <functional>
 #include <initializer_list>
 #include <limits>
+#include <memory>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -91,8 +92,16 @@ concept Totally_ordered = std::totally_ordered<T>;
 //     O(areaof(x));
 // }
 
+using byte = std::byte;
+
 template <typename T>
 concept Integral = std::is_integral_v<T>;
+
+template <Integral T>
+constexpr auto Min_integral = std::numeric_limits<T>::min();
+
+template <Integral T>
+constexpr auto Max_integral = std::numeric_limits<T>::max();
 
 template <Integral T>
 using Signed_type = typename std::make_signed<T>::type;
@@ -103,8 +112,68 @@ using Unsigned_type = typename std::make_unsigned<T>::type;
 template <typename T>
 concept Signed_integral = Integral<T> and std::is_signed_v<T>;
 
+template <std::uint8_t>
+struct signed_integral_t;
+
+template <>
+struct signed_integral_t<8>
+{
+    using type = std::int8_t;
+};
+
+template <>
+struct signed_integral_t<16>
+{
+    using type = std::int16_t;
+};
+
+template <>
+struct signed_integral_t<32>
+{
+    using type = std::int32_t;
+};
+
+template <>
+struct signed_integral_t<64>
+{
+    using type = std::int64_t;
+};
+
+template <std::uint8_t n>
+using Z = signed_integral_t<n>::type;
+
 template <typename T>
 concept Unsigned_integral = Integral<T> and !Signed_integral<T>;
+
+template <std::uint8_t>
+struct unsigned_integral_t;
+
+template <>
+struct unsigned_integral_t<8>
+{
+    using type = std::uint8_t;
+};
+
+template <>
+struct unsigned_integral_t<16>
+{
+    using type = std::uint16_t;
+};
+
+template <>
+struct unsigned_integral_t<32>
+{
+    using type = std::uint32_t;
+};
+
+template <>
+struct unsigned_integral_t<64>
+{
+    using type = std::uint64_t;
+};
+
+template <std::uint8_t n>
+using N = unsigned_integral_t<n>::type;
 
 template <typename F, typename... Args>
 concept Invocable = std::invocable<F, Args...>;
@@ -162,6 +231,11 @@ concept Boolean_testable =
         { !fw<T>(t) } -> exposition_only::Boolean_testable;
     };
 
+template <typename F, typename... Args>
+concept Pseudopredicate =
+    std::invocable<F, Args...> and
+    Boolean_testable<Return_type<F, Args...>>;
+
 template <typename T>
 constexpr auto
 mv(T&& x) noexcept -> Remove_ref<T>&&
@@ -183,11 +257,31 @@ first(std::initializer_list<T> const& x) -> T const*
     return std::cbegin(x);
 }
 
+constexpr auto lt_address = std::less<void>{};
+
+constexpr auto ge_address = std::greater_equal<void>{};
+
+constexpr auto gt_address = std::greater<void>{};
+
+constexpr auto le_address = std::less_equal<void>{};
+
 template <typename T>
 constexpr auto
 limit(std::initializer_list<T> const& x) -> T const*
 {
     return std::cend(x);
 }
+
+constexpr auto allocate_dynamic = std::malloc;
+
+constexpr auto reallocate_dynamic = std::realloc;
+
+constexpr auto deallocate_dynamic = std::free;
+
+template <typename T>
+constexpr auto construct_at = std::construct_at<T>;
+
+template <typename T>
+constexpr auto destroy_at = std::destroy_at<T>;
 
 }

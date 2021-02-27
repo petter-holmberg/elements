@@ -27,6 +27,7 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/list_singly_linked_front.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/list_singly_linked_front_back.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/map.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/memory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ordered_algebra.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ordering.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pair.cpp

@@ -3,18 +3,19 @@
 #include "functional.h"
 #include "lexicographical.h"
 #include "map.h"
+#include "memory.h"
 #include "ordering.h"
 #include "swap.h"
 
 namespace elements {
 
-template <typename T>
+template <typename T, Invocable auto alloc = array_allocator<T>>
 struct array_circular;
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 struct array_circular_cursor
 {
-    Pointer_type<array_circular<T>> arr{};
+    Pointer_type<array_circular<T, alloc>> arr{};
     Difference_type<Pointer_type<T>> i{Zero<Difference_type<Pointer_type<T>>>};
 
     constexpr
@@ -22,89 +23,89 @@ struct array_circular_cursor
 
     explicit constexpr
     array_circular_cursor(
-        Pointer_type<array_circular<T>> arr_,
+        Pointer_type<array_circular<T, alloc>> arr_,
         Difference_type<Pointer_type<T>> i_ = Zero<Difference_type<Pointer_type<T>>>)
         : arr{arr_}
         , i{i_}
     {}
 };
 
-template <typename T>
-struct value_type_t<array_circular_cursor<T>>
+template <typename T, Invocable auto alloc>
+struct value_type_t<array_circular_cursor<T, alloc>>
 {
     using type = T;
 };
 
-template <typename T>
-struct difference_type_t<array_circular_cursor<T>>
+template <typename T, Invocable auto alloc>
+struct difference_type_t<array_circular_cursor<T, alloc>>
 {
     using type = Difference_type<Pointer_type<T>>;
 };
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-operator==(array_circular_cursor<T> const& cur0, array_circular_cursor<T> const& cur1) -> bool
+operator==(array_circular_cursor<T, alloc> const& cur0, array_circular_cursor<T, alloc> const& cur1) -> bool
 {
     return cur0.arr == cur1.arr and cur0.i == cur1.i;
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr void
-increment(array_circular_cursor<T>& cur)
+increment(array_circular_cursor<T, alloc>& cur)
 {
     increment(cur.i);
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr void
-decrement(array_circular_cursor<T>& cur)
+decrement(array_circular_cursor<T, alloc>& cur)
 {
     decrement(cur.i);
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-load(array_circular_cursor<T> const& cur) -> T const&
+load(array_circular_cursor<T, alloc> const& cur) -> T const&
 {
     return load(cur.arr)[cur.i];
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr void
-store(array_circular_cursor<T>& cur, T const& value)
+store(array_circular_cursor<T, alloc>& cur, T const& value)
 {
     at(cur.arr)[cur.i] = value;
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr void
-store(array_circular_cursor<T>& cur, Value_type<T>&& value)
+store(array_circular_cursor<T, alloc>& cur, Value_type<T>&& value)
 {
     at(cur.arr)[cur.i] = fw<T>(value);
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-at(array_circular_cursor<T> const& cur) -> T const&
+at(array_circular_cursor<T, alloc> const& cur) -> T const&
 {
     return load(cur.arr)[cur.i];
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-at(array_circular_cursor<T>& cur) -> T&
+at(array_circular_cursor<T, alloc>& cur) -> T&
 {
     return at(cur.arr)[cur.i];
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-precedes(array_circular_cursor<T> const& cur0, array_circular_cursor<T> const& cur1) -> bool
+precedes(array_circular_cursor<T, alloc> const& cur0, array_circular_cursor<T, alloc> const& cur1) -> bool
 {
     return cur0.i != cur1.i;
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 struct array_circular_prefix
 {
     Pointer_type<T> first;
@@ -114,12 +115,13 @@ struct array_circular_prefix
     T x;
 };
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-allocate_array_circular(Difference_type<Pointer_type<T>> n) -> Pointer_type<array_circular_prefix<T>>
+allocate_array_circular(Difference_type<Pointer_type<T>> n) -> Pointer_type<array_circular_prefix<T, alloc>>
 {
     if (is_zero(n)) return nullptr;
-    auto remote = allocate<array_circular_prefix<T>>(predecessor(n) * static_cast<pointer_diff>(sizeof(T)));
+    auto remote = reinterpret_cast<Pointer_type<array_circular_prefix<T, alloc>>>(
+        allocate(alloc(), static_cast<pointer_diff>(sizeof(array_circular_prefix<T, alloc>)) + predecessor(n) * static_cast<pointer_diff>(sizeof(T))).first);
     auto const& first = pointer_to(at(remote).x);
     at(remote).first = first;
     at(remote).limit = first;
@@ -128,24 +130,24 @@ allocate_array_circular(Difference_type<Pointer_type<T>> n) -> Pointer_type<arra
     return remote;
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr void
-deallocate_array_circular(Pointer_type<array_circular_prefix<T>> prefix)
+deallocate_array_circular(Pointer_type<array_circular_prefix<T, alloc>> prefix)
 {
-    deallocate(prefix);
+    deallocate(alloc(), memory{reinterpret_cast<Pointer_type<byte>>(prefix), prefix->limit_of_storage - prefix->first});
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 struct array_circular
 {
-    Pointer_type<array_circular_prefix<T>> header{};
+    Pointer_type<array_circular_prefix<T, alloc>> header{};
 
     constexpr
     array_circular() = default;
 
     constexpr
     array_circular(array_circular const& x)
-        : header{allocate_array_circular<T>(size(x))}
+        : header{allocate_array_circular<T, alloc>(size(x))}
     {
         insert_range(x, back{at(this)});
     }
@@ -158,16 +160,16 @@ struct array_circular
     }
 
     explicit constexpr
-    array_circular(Size_type<array_circular<T>> capacity)
-        : header{allocate_array_circular<T>(capacity)}
+    array_circular(Size_type<array_circular<T, alloc>> capacity)
+        : header{allocate_array_circular<T, alloc>(capacity)}
     {}
 
     constexpr
     array_circular(
-        Size_type<array_circular<T>> capacity,
-        Size_type<array_circular<T>> size,
+        Size_type<array_circular<T, alloc>> capacity,
+        Size_type<array_circular<T, alloc>> size,
         T const& x)
-        : array_circular<T>(capacity)
+        : array_circular<T, alloc>(capacity)
     {
         while (!is_zero(size)) {
             push(at(this), x);
@@ -225,7 +227,7 @@ struct array_circular
 
     template <Operation<T> Op>
     constexpr auto
-    fmap(Op op) -> array_circular<T>&
+    fmap(Op op) -> array_circular<T, alloc>&
     {
         using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{op}(first(at(this))));
@@ -245,60 +247,60 @@ struct array_circular
     }
 };
 
-template <typename T>
-struct value_type_t<array_circular<T>>
+template <typename T, Invocable auto alloc>
+struct value_type_t<array_circular<T, alloc>>
 {
     using type = T;
 };
 
-template <typename T>
-struct cursor_type_t<array_circular<T>>
+template <typename T, Invocable auto alloc>
+struct cursor_type_t<array_circular<T, alloc>>
 {
-    using type = array_circular_cursor<T>;
+    using type = array_circular_cursor<T, alloc>;
 };
 
-template <typename T>
-struct cursor_type_t<array_circular<T> const>
+template <typename T, Invocable auto alloc>
+struct cursor_type_t<array_circular<T, alloc> const>
 {
-    using type = array_circular_cursor<T const>;
+    using type = array_circular_cursor<T const, alloc>;
 };
 
-template <typename T>
-struct size_type_t<array_circular<T>>
+template <typename T, Invocable auto alloc>
+struct size_type_t<array_circular<T, alloc>>
 {
     using type = pointer_diff;
 };
 
-template <Regular T>
+template <Regular T, Invocable auto alloc>
 constexpr auto
-operator==(array_circular<T> const& x, array_circular<T> const& y) -> bool
+operator==(array_circular<T, alloc> const& x, array_circular<T, alloc> const& y) -> bool
 {
     return equal_range(x, y);
 }
 
-template <Default_totally_ordered T>
+template <Default_totally_ordered T, Invocable auto alloc>
 constexpr auto
-operator<(array_circular<T> const& x, array_circular<T> const& y) -> bool
+operator<(array_circular<T, alloc> const& x, array_circular<T, alloc> const& y) -> bool
 {
     return less_range(x, y);
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr void
-swap(array_circular<T>& x, array_circular<T>& y)
+swap(array_circular<T, alloc>& x, array_circular<T, alloc>& y)
 {
     swap(x.header, y.header);
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr void
 reserve(
-    array_circular<T>& x,
-    Size_type<array_circular<T>> n,
-    Size_type<array_circular<T>> offset = Zero<Size_type<array_circular<T>>>)
+    array_circular<T, alloc>& x,
+    Size_type<array_circular<T, alloc>> n,
+    Size_type<array_circular<T, alloc>> offset = Zero<Size_type<array_circular<T, alloc>>>)
 {
     if (n < size(x) or n == capacity(x)) return;
-    array_circular<T> temp(n);
+    array_circular<T, alloc> temp(n);
     auto cur = first(x);
     auto dst = first(temp) + offset;
     while (precedes(cur, limit(x))) {
@@ -312,13 +314,13 @@ reserve(
     swap(x, temp);
 }
 
-template <typename T, typename U>
+template <typename T, Invocable auto alloc, typename U>
 constexpr auto
-insert(back<array_circular<T>> arr, U&& x) -> back<array_circular<T>>
+insert(back<array_circular<T, alloc>> arr, U&& x) -> back<array_circular<T, alloc>>
 {
     auto& seq = base(arr);
     if (size(seq) == capacity(seq)) {
-        reserve(seq, max(One<Size_type<array_circular<T>>>, twice(size(seq))));
+        reserve(seq, max(One<Size_type<array_circular<T, alloc>>>, twice(size(seq))));
     } else if (load(seq.header).limit == load(seq.header).limit_of_storage) {
         at(seq.header).limit = pointer_to(at(seq.header).x);
     }
@@ -329,13 +331,13 @@ insert(back<array_circular<T>> arr, U&& x) -> back<array_circular<T>>
     return seq;
 }
 
-template <typename T, typename U>
+template <typename T, Invocable auto alloc, typename U>
 constexpr auto
-insert(front<array_circular<T>> arr, U&& x) -> front<array_circular<T>>
+insert(front<array_circular<T, alloc>> arr, U&& x) -> front<array_circular<T, alloc>>
 {
     auto& seq = base(arr);
     if (size(seq) == capacity(seq)) {
-        reserve(seq, max(One<Size_type<array_circular<T>>>, twice(size(seq))), size(seq));
+        reserve(seq, max(One<Size_type<array_circular<T, alloc>>>, twice(size(seq))), size(seq));
     } else if (load(seq.header).first == pointer_to(load(seq.header).x)) {
         at(seq.header).first = load(seq.header).limit_of_storage;
     }
@@ -346,37 +348,37 @@ insert(front<array_circular<T>> arr, U&& x) -> front<array_circular<T>>
     return seq;
 }
 
-template <typename T, typename U>
+template <typename T, Invocable auto alloc, typename U>
 constexpr void
-emplace(array_circular<T>& arr, U&& x)
+emplace(array_circular<T, alloc>& arr, U&& x)
 {
     insert(back{arr}, fw<U>(x));
 }
 
-template <typename T, typename U>
+template <typename T, Invocable auto alloc, typename U>
 constexpr void
-push(array_circular<T>& arr, U x)
+push(array_circular<T, alloc>& arr, U x)
 {
     insert(back{arr}, mv(x));
 }
 
-template <typename T, typename U>
+template <typename T, Invocable auto alloc, typename U>
 constexpr void
-emplace_first(array_circular<T>& arr, U&& x)
+emplace_first(array_circular<T, alloc>& arr, U&& x)
 {
     insert(front{arr}, fw<U>(x));
 }
 
-template <typename T, typename U>
+template <typename T, Invocable auto alloc, typename U>
 constexpr void
-push_first(array_circular<T>& arr, T x)
+push_first(array_circular<T, alloc>& arr, T x)
 {
     insert(front{arr}, mv(x));
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-erase(back<array_circular<T>> arr) -> back<array_circular<T>>
+erase(back<array_circular<T, alloc>> arr) -> back<array_circular<T, alloc>>
 {
     auto& seq = base(arr);
     auto& header = seq.header;
@@ -387,15 +389,15 @@ erase(back<array_circular<T>> arr) -> back<array_circular<T>>
     destroy(at(load(header).limit));
     decrement(at(header).size);
     if (is_empty(seq)) {
-        deallocate_array_circular(header);
+        deallocate_array_circular<T, alloc>(header);
         header = nullptr;
     }
     return arr;
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-erase(front<array_circular<T>> arr) -> front<array_circular<T>>
+erase(front<array_circular<T, alloc>> arr) -> front<array_circular<T, alloc>>
 {
     auto& seq = base(arr);
     auto& header = seq.header;
@@ -406,70 +408,70 @@ erase(front<array_circular<T>> arr) -> front<array_circular<T>>
     }
     decrement(at(header).size);
     if (is_empty(seq)) {
-        deallocate_array_circular(header);
+        deallocate_array_circular<T, alloc>(header);
         header = nullptr;
     }
     return arr;
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr void
-erase_all(array_circular<T>& x)
+erase_all(array_circular<T, alloc>& x)
 {
     while (!is_empty(x)) erase(back{x});
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr void
-pop(array_circular<T>& arr)
+pop(array_circular<T, alloc>& arr)
 {
     erase(back{arr});
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr void
-pop_first(array_circular<T>& arr)
+pop_first(array_circular<T, alloc>& arr)
 {
     erase(front{arr});
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-first(array_circular<T> const& x) -> Cursor_type<array_circular<T>>
+first(array_circular<T, alloc> const& x) -> Cursor_type<array_circular<T, alloc>>
 {
     if (x.header == nullptr) return {};
-    return array_circular_cursor{const_cast<Pointer_type<array_circular<T>>>(pointer_to(x))};
+    return array_circular_cursor{const_cast<Pointer_type<array_circular<T, alloc>>>(pointer_to(x))};
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-limit(array_circular<T> const& x) -> Cursor_type<array_circular<T>>
+limit(array_circular<T, alloc> const& x) -> Cursor_type<array_circular<T, alloc>>
 {
     if (x.header == nullptr) return {};
-    return array_circular_cursor{const_cast<Pointer_type<array_circular<T>>>(pointer_to(x)), size(x)};
+    return array_circular_cursor{const_cast<Pointer_type<array_circular<T, alloc>>>(pointer_to(x)), size(x)};
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-is_empty(array_circular<T> const& x) -> bool
+is_empty(array_circular<T, alloc> const& x) -> bool
 {
     if (x.header == nullptr) return true;
-    return load(x.header).size == Zero<Size_type<array_circular<T>>>;
+    return load(x.header).size == Zero<Size_type<array_circular<T, alloc>>>;
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-size(array_circular<T> const& x) -> Size_type<array_circular<T>>
+size(array_circular<T, alloc> const& x) -> Size_type<array_circular<T, alloc>>
 {
-    if (x.header == nullptr) return Zero<Size_type<array_circular<T>>>;
+    if (x.header == nullptr) return Zero<Size_type<array_circular<T, alloc>>>;
     return load(x.header).size;
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-capacity(array_circular<T> const& x) -> Size_type<array_circular<T>>
+capacity(array_circular<T, alloc> const& x) -> Size_type<array_circular<T, alloc>>
 {
-    if (x.header == nullptr) return Zero<Size_type<array_circular<T>>>;
+    if (x.header == nullptr) return Zero<Size_type<array_circular<T, alloc>>>;
     return load(x.header).limit_of_storage - pointer_to(load(x.header).x);
 }
 

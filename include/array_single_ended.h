@@ -3,6 +3,7 @@
 #include "functional.h"
 #include "lexicographical.h"
 #include "map.h"
+#include "memory.h"
 #include "ordering.h"
 #include "swap.h"
 
@@ -16,26 +17,27 @@ struct array_single_ended_prefix
     T x;
 };
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
 allocate_array_single_ended(Difference_type<Pointer_type<T>> n) -> Pointer_type<array_single_ended_prefix<T>>
 {
     if (is_zero(n)) return nullptr;
-    auto remote = allocate<array_single_ended_prefix<T>>(predecessor(n) * static_cast<pointer_diff>(sizeof(T)));
+    auto remote = reinterpret_cast<Pointer_type<array_single_ended_prefix<T>>>(
+        allocate(alloc(), static_cast<pointer_diff>(sizeof(array_single_ended_prefix<T>)) + predecessor(n) * static_cast<pointer_diff>(sizeof(T))).first);
     auto const& first = pointer_to(at(remote).x);
     at(remote).limit = first;
     at(remote).limit_of_storage = first + n;
     return remote;
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr void
 deallocate_array_single_ended(Pointer_type<array_single_ended_prefix<T>> prefix)
 {
-    deallocate(prefix);
+    deallocate(alloc(), memory{reinterpret_cast<Pointer_type<byte>>(prefix), prefix->limit_of_storage - pointer_to(prefix->x)});
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc = array_allocator<T>>
 struct array_single_ended
 {
     Pointer_type<array_single_ended_prefix<T>> header{};
@@ -45,7 +47,7 @@ struct array_single_ended
 
     constexpr
     array_single_ended(array_single_ended const& x)
-        : header{allocate_array_single_ended<T>(size(x))}
+        : header{allocate_array_single_ended<T, alloc>(size(x))}
     {
         insert_range(x, back{at(this)});
     }
@@ -58,18 +60,18 @@ struct array_single_ended
     }
 
     explicit constexpr
-    array_single_ended(Size_type<array_single_ended<T>> capacity)
-        : header{allocate_array_single_ended<T>(capacity)}
+    array_single_ended(Size_type<array_single_ended<T, alloc>> capacity)
+        : header{allocate_array_single_ended<T, alloc>(capacity)}
     {}
 
     constexpr
-    array_single_ended(Size_type<array_single_ended<T>> size, T const& x)
+    array_single_ended(Size_type<array_single_ended<T, alloc>> size, T const& x)
         : array_single_ended(size, size, x)
     {}
 
     constexpr
-    array_single_ended(Size_type<array_single_ended<T>> capacity, Size_type<array_single_ended<T>> size, T const& x)
-        : header{allocate_array_single_ended<T>(capacity)}
+    array_single_ended(Size_type<array_single_ended<T, alloc>> capacity, Size_type<array_single_ended<T, alloc>> size, T const& x)
+        : header{allocate_array_single_ended<T, alloc>(capacity)}
     {
         while (!is_zero(size)) {
             push(at(this), x);
@@ -117,7 +119,7 @@ struct array_single_ended
 
     template <Operation<T> Op>
     constexpr auto
-    fmap(Op op) -> array_single_ended<T>&
+    fmap(Op op) -> array_single_ended<T, alloc>&
     {
         using elements::copy;
         copy(first(at(this)), limit(at(this)), map_sink{op}(first(at(this))));
@@ -136,57 +138,57 @@ struct array_single_ended
     }
 };
 
-template <typename T>
-struct value_type_t<array_single_ended<T>>
+template <typename T, Invocable auto alloc>
+struct value_type_t<array_single_ended<T, alloc>>
 {
     using type = T;
 };
 
-template <typename T>
-struct cursor_type_t<array_single_ended<T>>
+template <typename T, Invocable auto alloc>
+struct cursor_type_t<array_single_ended<T, alloc>>
 {
     using type = Pointer_type<T>;
 };
 
-template <typename T>
-struct cursor_type_t<array_single_ended<T> const>
+template <typename T, Invocable auto alloc>
+struct cursor_type_t<array_single_ended<T, alloc> const>
 {
     using type = Pointer_type<T const>;
 };
 
-template <typename T>
-struct size_type_t<array_single_ended<T>>
+template <typename T, Invocable auto alloc>
+struct size_type_t<array_single_ended<T, alloc>>
 {
     using type = pointer_diff;
 };
 
-template <Regular T>
+template <Regular T, Invocable auto alloc>
 constexpr auto
-operator==(array_single_ended<T> const& x, array_single_ended<T> const& y) -> bool
+operator==(array_single_ended<T, alloc> const& x, array_single_ended<T, alloc> const& y) -> bool
 {
     return equal_range(x, y);
 }
 
-template <Default_totally_ordered T>
+template <Default_totally_ordered T, Invocable auto alloc>
 constexpr auto
-operator<(array_single_ended<T> const& x, array_single_ended<T> const& y) -> bool
+operator<(array_single_ended<T, alloc> const& x, array_single_ended<T, alloc> const& y) -> bool
 {
     return less_range(x, y);
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr void
-swap(array_single_ended<T>& x, array_single_ended<T>& y)
+swap(array_single_ended<T, alloc>& x, array_single_ended<T, alloc>& y)
 {
     swap(x.header, y.header);
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr void
-reserve(array_single_ended<T>& x, Size_type<array_single_ended<T>> n)
+reserve(array_single_ended<T, alloc>& x, Size_type<array_single_ended<T, alloc>> n)
 {
     if (n < size(x) or n == capacity(x)) return;
-    array_single_ended<T> temp(n);
+    array_single_ended<T, alloc> temp(n);
     auto cur = first(x);
     auto dst = first(temp);
     while (precedes(cur, limit(x))) {
@@ -198,13 +200,13 @@ reserve(array_single_ended<T>& x, Size_type<array_single_ended<T>> n)
     swap(x, temp);
 }
 
-template <typename T, typename U>
+template <typename T, typename U, Invocable auto alloc>
 constexpr auto
-insert(back<array_single_ended<T>> arr, U&& x) -> back<array_single_ended<T>>
+insert(back<array_single_ended<T, alloc>> arr, U&& x) -> back<array_single_ended<T, alloc>>
 {
     auto& seq = base(arr);
     if (!precedes(limit(seq), limit_of_storage(seq))) {
-        reserve(seq, max(One<Size_type<array_single_ended<T>>>, twice(size(seq))));
+        reserve(seq, max(One<Size_type<array_single_ended<T, alloc>>>, twice(size(seq))));
     }
     auto& header = at(seq.header);
     construct(at(header.limit), fw<U>(x));
@@ -212,90 +214,90 @@ insert(back<array_single_ended<T>> arr, U&& x) -> back<array_single_ended<T>>
     return seq;
 }
 
-template <typename T, typename U>
+template <typename T, typename U, Invocable auto alloc>
 constexpr void
-emplace(array_single_ended<T>& arr, U&& x)
+emplace(array_single_ended<T, alloc>& arr, U&& x)
 {
     insert(back{arr}, fw<U>(x));
 }
 
-template <typename T, typename U>
+template <typename T, typename U, Invocable auto alloc>
 constexpr void
-push(array_single_ended<T>& arr, U x)
+push(array_single_ended<T, alloc>& arr, U x)
 {
     insert(back{arr}, mv(x));
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-erase(back<array_single_ended<T>> arr) -> back<array_single_ended<T>>
+erase(back<array_single_ended<T, alloc>> arr) -> back<array_single_ended<T, alloc>>
 {
     auto& seq = base(arr);
     auto& header = seq.header;
     decrement(at(header).limit);
     destroy(at(load(header).limit));
     if (is_empty(seq)) {
-        deallocate_array_single_ended(header);
+        deallocate_array_single_ended<T, alloc>(header);
         header = nullptr;
     }
     return arr;
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr void
-erase_all(array_single_ended<T>& x)
+erase_all(array_single_ended<T, alloc>& x)
 {
-    while (!is_empty(x)) erase(back{x});
+    while (!is_empty(x)) erase<T, alloc>(back{x});
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr void
-pop(array_single_ended<T>& arr)
+pop(array_single_ended<T, alloc>& arr)
 {
     erase(back{arr});
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-first(array_single_ended<T> const& x) -> Cursor_type<array_single_ended<T>>
+first(array_single_ended<T, alloc> const& x) -> Cursor_type<array_single_ended<T, alloc>>
 {
     if (x.header == nullptr) return nullptr;
     return pointer_to(at(x.header).x);
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-limit(array_single_ended<T> const& x) -> Cursor_type<array_single_ended<T>>
+limit(array_single_ended<T, alloc> const& x) -> Cursor_type<array_single_ended<T, alloc>>
 {
     if (x.header == nullptr) return nullptr;
     return at(x.header).limit;
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-limit_of_storage(array_single_ended<T> const& x) -> Cursor_type<array_single_ended<T>>
+limit_of_storage(array_single_ended<T, alloc> const& x) -> Cursor_type<array_single_ended<T, alloc>>
 {
     if (x.header == nullptr) return nullptr;
     return at(x.header).limit_of_storage;
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-is_empty(array_single_ended<T> const& x) -> bool
+is_empty(array_single_ended<T, alloc> const& x) -> bool
 {
     return first(x) == limit(x);
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-size(array_single_ended<T> const& x) -> Size_type<array_single_ended<T>>
+size(array_single_ended<T, alloc> const& x) -> Size_type<array_single_ended<T, alloc>>
 {
     return limit(x) - first(x);
 }
 
-template <typename T>
+template <typename T, Invocable auto alloc>
 constexpr auto
-capacity(array_single_ended<T> const& x) -> Size_type<array_single_ended<T>>
+capacity(array_single_ended<T, alloc> const& x) -> Size_type<array_single_ended<T, alloc>>
 {
     return limit_of_storage(x) - first(x);
 }

@@ -62,21 +62,6 @@ using Size_type = typename size_type_t<T>::type;
 template <typename T>
 constexpr auto Size = size_type_t<T>::value;
 
-template <typename T, typename E>
-constexpr auto
-allocate(E extra_bytes = Zero<E>) -> Pointer_type<T>
-{
-    return reinterpret_cast<Pointer_type<T>>(
-        std::malloc(sizeof(T) + static_cast<std::size_t>(extra_bytes)));
-}
-
-template <typename T>
-constexpr void
-deallocate(Pointer_type<T> raw)
-{
-    std::free(reinterpret_cast<void*>(raw));
-}
-
 template <Constructible_from T>
 constexpr auto
 load(T const& x) -> Value_type<T> const&

@@ -147,6 +147,20 @@ remainder(M a, M b, Op op = {}) -> M
     }
 }
 
+template <typename M, typename Op = add_op<M>>
+requires Halvable_monoid<M, Op>
+constexpr auto
+round_up_to_multiple(M const& a, M const& b, Op op = {}) -> M
+//[[b > Identity_element<M, Op>]]
+{
+    auto r{remainder(a, b)};
+    if (r == Identity_element<M, Op>) {
+        return a;
+    } else {
+        return op(cancel(a, r), b);
+    }
+}
+
 template <typename G, typename Op>
 concept Archimedean_group =
     Archimedean_monoid<G, Op> and
