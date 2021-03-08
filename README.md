@@ -405,7 +405,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 ## Functional concepts
 
-`Functor` describes a `Movable` type together with a unary `Invocable` type, where the `Value_type` of the type is the same as the domain of the function type, and a member function `.map` is defined and applies the function onto the element(s) it contains, returning an object of the same type.
+`Functor` describes a `Movable` type with a related type constructor `functor_t`, that supports the type function `Constructor_type` and the function `fmap`, returning a new `Functor`.
 
 `Monad` describes a type that is constructible from one value of its `Value_type` with the function `unit`, and where a value of the type and a unary `Invocable` that takes a value of the `Monad`'s `Value_type` can be composed with the function `chain`, returning an object of the same type.
 

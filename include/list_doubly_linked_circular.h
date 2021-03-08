@@ -194,25 +194,6 @@ struct list_doubly_linked_circular
         auto cur = first(at(this)) + i;
         return load(cur);
     }
-
-    template <Operation<T> Op>
-    constexpr auto
-    fmap(Op op) -> list_doubly_linked_circular<T>&
-    {
-        using elements::copy;
-        copy(first(at(this)), limit(at(this)), map_sink{op}(first(at(this))));
-        return at(this);
-    }
-
-    template <Regular_invocable<T> F>
-    constexpr auto
-    fmap(F fun) const -> list_doubly_linked_circular<Return_type<F, T>>
-    {
-        using elements::map;
-        list_doubly_linked_circular<Return_type<F, T>> x;
-        map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
-        return x;
-    }
 };
 
 template <typename T>
@@ -237,6 +218,31 @@ template <typename T>
 struct size_type_t<list_doubly_linked_circular<T>>
 {
     using type = pointer_diff;
+};
+
+template <typename T>
+struct functor_t<list_doubly_linked_circular<T>>
+{
+    using constructor_type = list_doubly_linked_circular<T>;
+
+    template <Operation<T> Op>
+    static constexpr auto
+    fmap(list_doubly_linked_circular<T>& x, Op op) -> list_doubly_linked_circular<T>&
+    {
+        using elements::copy;
+        copy(first(x), limit(x), map_sink{op}(first(x)));
+        return x;
+    }
+
+    template <Regular_invocable<T> F>
+    static constexpr auto
+    fmap(list_doubly_linked_circular<T>&& x, F fun) -> list_doubly_linked_circular<Return_type<F, T>>
+    {
+        using elements::map;
+        list_doubly_linked_circular<Return_type<F, T>> y;
+        map(first(x), limit(x), insert_sink{}(back{y}), fun);
+        return y;
+    }
 };
 
 template <Regular T>

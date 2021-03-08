@@ -179,45 +179,6 @@ struct array_segmented_double_ended
             return load(first_of_storage(index[j / k]) + (j % k));
         }
     }
-
-    template <Operation<T> Op>
-    constexpr auto
-    fmap(Op op) -> array_segmented_double_ended<T, k, alloc>&
-    {
-        using elements::copy;
-        copy(first(at(this)), limit(at(this)), map_sink{op}(first(at(this))));
-        return at(this);
-    }
-
-    template <Regular_invocable<T> F>
-    constexpr auto
-    fmap(F fun) const -> array_segmented_double_ended<Return_type<F, T>, k>
-    {
-        using elements::map;
-        array_segmented_double_ended<Return_type<F, T>, k> x;
-        map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
-        return x;
-    }
-
-    template <Regular_invocable<T> F>
-    requires Same_as<array_segmented_double_ended<Decay<T>>, Return_type<F, T>>
-    constexpr auto
-    flat_map(F fun) -> array_segmented_double_ended<T, k, alloc>&
-    {
-        using elements::flat_map;
-        auto x = flat_map(first(at(this)), limit(at(this)), fun);
-        swap(at(this), x);
-        return at(this);
-    }
-
-    template <Regular_invocable<T> F>
-    requires Regular<T>
-    constexpr auto
-    flat_map(F fun) const -> Return_type<F, T>
-    {
-        using elements::flat_map;
-        return flat_map(first(at(this)), limit(at(this)), fun);
-    }
 };
 
 template <typename T, pointer_diff k, Invocable auto alloc>
@@ -242,6 +203,53 @@ template <typename T, pointer_diff k, Invocable auto alloc>
 struct size_type_t<array_segmented_double_ended<T, k, alloc>>
 {
     using type = Difference_type<array_segmented_double_ended_cursor<T, k, alloc>>;
+};
+
+template <typename T, pointer_diff k, Invocable auto alloc>
+struct functor_t<array_segmented_double_ended<T, k, alloc>>
+{
+    using constructor_type = array_segmented_double_ended<T, k, alloc>;
+
+    template <Operation<T> Op>
+    static constexpr auto
+    fmap(array_segmented_double_ended<T, k, alloc>& x, Op op) -> array_segmented_double_ended<T, k, alloc>&
+    {
+        using elements::copy;
+        copy(first(x), limit(x), map_sink{op}(first(x)));
+        return x;
+    }
+
+    template <Regular_invocable<T> F>
+    static constexpr auto
+    fmap(array_segmented_double_ended<T, k, alloc>&& x, F fun) -> array_segmented_double_ended<Return_type<F, T>, k, alloc>
+    {
+        using elements::map;
+        array_segmented_double_ended<Return_type<F, T>, k, alloc> y;
+        map(first(x), limit(x), insert_sink{}(back{y}), fun);
+        return y;
+    }
+};
+
+template <typename T, pointer_diff k, Invocable auto alloc>
+struct monad_t<array_segmented_double_ended<T, k, alloc>>
+{
+    template <Regular_invocable<T> F>
+    static constexpr auto
+    bind(array_segmented_double_ended<T, k, alloc>& x, F fun) -> Return_type<F, T>&
+    {
+        using elements::flat_map;
+        auto y{flat_map(first(x), limit(x), fun)};
+        swap(x, y);
+        return x;
+    }
+
+    template <Regular_invocable<T> F>
+    static constexpr auto
+    bind(array_segmented_double_ended<T, k, alloc>&& x, F fun) -> Return_type<F, T>
+    {
+        using elements::flat_map;
+        return flat_map(first(x), limit(x), fun);
+    }
 };
 
 template <typename T, pointer_diff k, Invocable auto alloc>

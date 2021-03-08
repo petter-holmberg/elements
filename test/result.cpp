@@ -28,11 +28,11 @@ SCENARIO ("Using result", "[result]")
         auto fn2 = [](double a) { return e::result<double, bool>(a * 2); };
         auto fn3 = [](double){ return e::fail<double>(true); };
 
-        static_assert(e::Monad<decltype(x)>);
         static_assert(e::Functor<decltype(x)>);
+        static_assert(e::Monad<decltype(x)>);
 
-        x.fmap(fn0);
-        auto y = x.fmap(fn1);
+        x = e::fmap(e::mv(x), fn0);
+        auto y = e::fmap(e::mv(x), fn1);
         y = e::chain(y, fn2);
 
         REQUIRE (y);
@@ -45,11 +45,11 @@ SCENARIO ("Using result", "[result]")
 
         auto z(e::fail<int>(true));
 
-        z.fmap(fn0);
+        z = e::fmap(e::mv(z), fn0);
         REQUIRE (!z);
         REQUIRE (e::error(z));
 
-        auto w = z.fmap(fn1);
+        auto w = e::fmap(e::mv(z), fn1);
         REQUIRE (!w);
         REQUIRE (e::error(w));
 

@@ -135,27 +135,6 @@ struct array_double_ended
     {
         return load(first(at(this)) + i);
     }
-
-    template <Operation<T> Op>
-    constexpr auto
-    fmap(Op op) -> array_double_ended<T, alloc>&
-    {
-        using elements::copy;
-        copy(first(at(this)), limit(at(this)), map_sink{op}(first(at(this))));
-        return at(this);
-    }
-
-    template <Regular_invocable<T> F>
-    constexpr auto
-    fmap(F fun) const -> array_double_ended<Return_type<F, T>>
-    {
-        using elements::map;
-        array_double_ended<Return_type<F, T>> x;
-        reserve(x, size(at(this)));
-        map(first(at(this)), limit(at(this)), insert_sink{}(back{x}), fun);
-        at(x.header).limit = at(x.header).limit_of_storage;
-        return x;
-    }
 };
 
 template <typename T, Invocable auto alloc>
@@ -180,6 +159,32 @@ template <typename T, Invocable auto alloc>
 struct size_type_t<array_double_ended<T, alloc>>
 {
     using type = pointer_diff;
+};
+
+template <typename T, Invocable auto alloc>
+struct functor_t<array_double_ended<T, alloc>>
+{
+    using constructor_type = array_double_ended<T, alloc>;
+
+    template <Operation<T> Op>
+    static constexpr auto
+    fmap(array_double_ended<T, alloc>& x, Op op) -> array_double_ended<T, alloc>&
+    {
+        using elements::copy;
+        copy(first(x), limit(x), map_sink{op}(first(x)));
+        return x;
+    }
+
+    template <Regular_invocable<T> F>
+    static constexpr auto
+    fmap(array_double_ended<T, alloc>&& x, F fun) -> array_double_ended<Return_type<F, T>, alloc>
+    {
+        using elements::map;
+        array_double_ended<Return_type<F, T>, alloc> y;
+        reserve(y, size(x));
+        map(first(x), limit(x), insert_sink{}(back{y}), fun);
+        return y;
+    }
 };
 
 template <Regular T, Invocable auto alloc>

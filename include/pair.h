@@ -1,5 +1,6 @@
 #pragma once
 
+#include "functional.h"
 #include "invocable.h"
 #include "cursor.h"
 
@@ -22,24 +23,6 @@ struct pair
         : m0(mv(member0))
         , m1(mv(member1))
     {}
-
-    template <Operation<T0> Op>
-    requires Same_as<T0, T1>
-    constexpr auto
-    fmap(Op op) -> pair<T0>&
-    {
-        m0 = invoke(op, mv(m0));
-        m1 = invoke(op, mv(m1));
-        return *this;
-    }
-
-    template <Regular_invocable<T0> F>
-    requires Same_as<T0, T1>
-    constexpr auto
-    fmap(F fun) const -> pair<Return_type<F, T0>>
-    {
-        return {invoke(fun, m0), invoke(fun, m1)};
-    }
 };
 
 template <typename T>
@@ -64,6 +47,28 @@ template <typename T0, typename T1>
 struct element_type_t<pair<T0, T1>, 1>
 {
     using type = T1;
+};
+
+template <typename T>
+struct functor_t<pair<T>>
+{
+    using constructor_type = pair<T>;
+
+    template <Operation<T> Op>
+    static constexpr auto
+    fmap(pair<T>& x, Op op) -> pair<T>&
+    {
+        x.m0 = invoke(op, x.m0);
+        x.m1 = invoke(op, x.m1);
+        return x;
+    }
+
+    template <Regular_invocable<T> F>
+    static constexpr auto
+    fmap(pair<T>&& x, F fun) -> pair<Return_type<F, T>>
+    {
+        return {invoke(fun, x.m0), invoke(fun, x.m1)};
+    }
 };
 
 template <typename T0, typename T1>

@@ -174,10 +174,10 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
         };
         auto fn1 = [](int const& i){ return i + 0.5; };
 
-        static_assert(e::Monad<decltype(x)>);
         static_assert(e::Functor<decltype(x)>);
+        static_assert(e::Monad<decltype(x)>);
 
-        auto y = e::chain(x, fn0).fmap(fn1);
+        auto y = e::fmap(e::chain(x, fn0), fn1);
 
         REQUIRE (e::size(y) == 10);
         REQUIRE (y[0] == 0.5);
@@ -207,7 +207,7 @@ SCENARIO ("Using segmented single-ended array", "[array_segmented_single_ended]"
         e::emplace(z, 6);
         e::emplace(z, 7);
 
-        auto w = e::chain(z, fn2).fmap(fn1);
+        auto w = e::fmap(e::chain(z, fn2), fn1);
 
         REQUIRE (e::size(w) == 16);
         REQUIRE (w[0] == 0.5);

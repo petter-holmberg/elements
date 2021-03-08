@@ -46,41 +46,6 @@ struct array_k
     {
         return data[i];
     }
-
-    template <Operation<T> Op>
-    constexpr auto
-    fmap(Op op) -> array_k<T, k>&
-    {
-        using elements::copy;
-        copy(first(at(this)), limit(at(this)), map_sink{op}(first(at(this))));
-        return at(this);
-    }
-
-    template <Regular_invocable<T> F>
-    constexpr auto
-    fmap(F fun) const -> array_k<Return_type<F, T>, k>
-    {
-        using elements::map;
-        array_k<Return_type<F, T>, k> x;
-        map(first(at(this)), limit(at(this)), first(x), fun);
-        return x;
-    }
-
-    template <Regular_invocable<T> F>
-    constexpr auto
-    flat_map(F fun) -> array_k<Value_type<Return_type<F, T>>, k * Size<Return_type<F, T>>>
-    {
-        array_k<Value_type<Return_type<F, T>>, k * Size<Return_type<F, T>>> x;
-        auto src = first(at(this));
-        auto lim = limit(at(this));
-        auto dst = first(x);
-        while (precedes(src, lim)) {
-            auto y = fun(load(src));
-            dst = copy(first(y), limit(y), dst);
-            increment(src);
-        }
-        return x;
-    }
 };
 
 template <Semiregular T, pointer_diff k>
@@ -106,6 +71,51 @@ struct size_type_t<array_k<T, k>>
 {
     using type = Difference_type<Pointer_type<T>>;
     static constexpr auto value = k;
+};
+
+template <Semiregular T, pointer_diff k>
+struct functor_t<array_k<T, k>>
+{
+    using constructor_type = array_k<T, k>;
+
+    template <Operation<T> Op>
+    static constexpr auto
+    fmap(array_k<T, k>& x, Op op) -> array_k<T, k>&
+    {
+        using elements::copy;
+        copy(first(x), limit(x), map_sink{op}(first(x)));
+        return x;
+    }
+
+    template <Regular_invocable<T> F>
+    static constexpr auto
+    fmap(array_k<T, k>&& x, F fun) -> array_k<Return_type<F, T>, k>
+    {
+        using elements::map;
+        array_k<Return_type<F, T>, k> y;
+        map(first(x), limit(x), first(y), fun);
+        return y;
+    }
+};
+
+template <Semiregular T, pointer_diff k>
+struct monad_t<array_k<T, k>>
+{
+    template <Regular_invocable<T> F>
+    static constexpr auto
+    bind(array_k<T, k> const& x, F fun) -> array_k<Value_type<Return_type<F, T>>, k * Size<Return_type<F, T>>>
+    {
+        array_k<Value_type<Return_type<F, T>>, k * Size<Return_type<F, T>>> y;
+        auto src = first(x);
+        auto lim = limit(x);
+        auto dst = first(y);
+        while (precedes(src, lim)) {
+            auto z{fun(load(src))};
+            dst = copy(first(z), limit(z), dst);
+            increment(src);
+        }
+        return y;
+    }
 };
 
 template <Regular T, pointer_diff k>

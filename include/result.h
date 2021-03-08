@@ -1,5 +1,6 @@
 #pragma once
 
+#include "functional.h"
 #include "swap.h"
 
 namespace elements {
@@ -144,25 +145,6 @@ struct result
     {
         return has_value;
     }
-
-    template <Operation<T> Op>
-    constexpr auto
-    fmap(Op op) -> result<T, E>&
-    {
-        if (has_value) data.value = op(data.value);
-        return at(this);
-    }
-
-    template <Regular_invocable<T> F>
-    constexpr auto
-    fmap(F fun) const -> result<Return_type<F, T>, E>
-    {
-        if (has_value) {
-            return result<Return_type<F, T>, E>(fun(data.value));
-        } else {
-            return result<Return_type<F, T>, E>(failure<E>(data.error));
-        }
-    }
 };
 
 template <Movable T, Movable E>
@@ -175,6 +157,31 @@ template <Movable T, Movable E>
 struct error_type_t<result<T, E>>
 {
     using type = E;
+};
+
+template <Movable T, Movable E>
+struct functor_t<result<T, E>>
+{
+    using constructor_type = result<T, E>;
+
+    template <Operation<T> Op>
+    static constexpr auto
+    fmap(result<T, E>& x, Op op) -> result<T, E>&
+    {
+        if (x) store(x, op(load(x)));
+        return x;
+    }
+
+    template <Regular_invocable<T> F>
+    static constexpr auto
+    fmap(result<T, E>&& x, F fun) -> result<Return_type<F, T>, E>
+    {
+        if (x) {
+            return result<Return_type<F, T>, E>(fun(load(x)));
+        } else {
+            return result<Return_type<F, T>, E>(failure{error(x)});
+        }
+    }
 };
 
 template <Movable T, Movable E>

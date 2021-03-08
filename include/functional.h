@@ -7,17 +7,25 @@
 namespace elements {
 
 template <typename T>
+struct functor_t;
+
+template <typename T>
 concept Functor =
     Movable<T> and
-    requires (T&& x, Value_type<T>(&fun)(Value_type<T>)) {
-        fmap(fw<T>(x), fun);
+    requires (T& x, T&& y, Value_type<T>(&fun)(Value_type<T>)) {
+        typename functor_t<T>::constructor_type;
+        { functor_t<T>::fmap(x, fun) } -> Same_as<typename functor_t<T>::constructor_type&>;
+        { functor_t<T>::fmap(mv(y), fun) } -> Same_as<typename functor_t<T>::constructor_type>;
     };
 
-template <typename T, typename F>
+template <typename T>
+using Constructor_type = typename functor_t<T>::constructor_type;
+
+template <Functor T, Regular_invocable<Value_type<T>> F>
 constexpr auto
-fmap(T&& x, F fun) -> decltype(x.fmap(fun))
+fmap(T&& x, F fun)
 {
-    return x.fmap(fun);
+    return functor_t<T>::fmap(fw<T>(x), fun);
 }
 
 template <typename T>
@@ -27,12 +35,29 @@ unit(Value_type<T>&& x) -> T
     return T{fw<Value_type<T>>(x)};
 }
 
+template <typename T>
+struct monad_t;
+
 template <typename M>
 concept Monad =
     requires (M m, Value_type<M>&& x, M(&fun)(Value_type<M>)) {
         { unit<M>(fw<Value_type<M>>(x)) } -> Same_as<M>;
         m & fun;
     };
+
+template <Range R, Regular_invocable<Value_type<R>> F>
+constexpr auto
+bind(R const& x, F fun)
+{
+    return monad_t<R>::bind(x, fun);
+}
+
+template <Range R, Regular_invocable<Value_type<R>> F>
+constexpr auto
+operator&(R const& x, F fun)
+{
+    return bind(x, fun);
+}
 
 template <Mutable_range R, Regular_invocable<Value_type<R>> F>
 constexpr auto
@@ -41,18 +66,11 @@ operator&(R& x, F fun) -> Return_type<F, Value_type<R>>
     return flat_map(first(x), limit(x), fun);
 }
 
-template <typename T, Regular_invocable<T> F>
-constexpr auto
-operator&(T&& x, F fun) -> Return_type<F, T>
-{
-    return x.flat_map(fun);
-}
-
 template <typename T, typename... Fs>
 constexpr Monad auto
-chain(T x, Fs... funcs)
+chain(T&& x, Fs... funcs)
 {
-    return (x & ... & funcs);
+    return (fw<T>(x) & ... & funcs);
 }
 
 template <Cursor C, typename P>

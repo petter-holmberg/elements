@@ -83,51 +83,6 @@ struct list_singly_linked_front
         auto cur = head + i;
         return load(cur);
     }
-
-    template <Operation<T> Op>
-    constexpr auto
-    fmap(Op op) -> list_singly_linked_front<T>&
-    {
-        using elements::copy;
-        copy(first(at(this)), limit(at(this)), map_sink{op}(first(at(this))));
-        return at(this);
-    }
-
-    template <Regular_invocable<T> F>
-    constexpr auto
-    fmap(F fun) const -> list_singly_linked_front<Return_type<F, T>>
-    {
-        using elements::map;
-        list_singly_linked_front<Return_type<F, T>> x;
-        map(first(at(this)), limit(at(this)), insert_sink{}(front{x}), fun);
-        reverse(x);
-        return x;
-    }
-
-    template <Regular_invocable<T> F>
-    requires Same_as<list_singly_linked_front<Decay<T>>, Return_type<F, T>>
-    constexpr auto
-    flat_map(F fun) -> list_singly_linked_front<T>&
-    {
-        using elements::flat_map;
-        auto x = flat_map<
-            list_singly_linked_cursor<T>,
-            list_singly_linked_cursor<T>,
-            F,
-            front<list_singly_linked_front<T>>>(first(at(this)), limit(at(this)), fun);
-        reverse(x);
-        swap(at(this), x);
-        return at(this);
-    }
-
-    template <Regular_invocable<T> F>
-    requires Regular<T>
-    constexpr auto
-    flat_map(F fun) const -> Return_type<F, T>
-    {
-        using elements::flat_map;
-        return flat_map(first(at(this)), limit(at(this)), fun);
-    }
 };
 
 template <typename T>
@@ -152,6 +107,46 @@ template <typename T>
 struct size_type_t<list_singly_linked_front<T>>
 {
     using type = pointer_diff;
+};
+
+template <typename T>
+struct functor_t<list_singly_linked_front<T>>
+{
+    using constructor_type = list_singly_linked_front<T>;
+
+    template <Operation<T> Op>
+    static constexpr auto
+    fmap(list_singly_linked_front<T>& x, Op op) -> list_singly_linked_front<T>&
+    {
+        using elements::copy;
+        copy(first(x), limit(x), map_sink{op}(first(x)));
+        return x;
+    }
+
+    template <Regular_invocable<T> F>
+    static constexpr auto
+    fmap(list_singly_linked_front<T> const& x, F fun) -> list_singly_linked_front<Return_type<F, T>>
+    {
+        using elements::map;
+        list_singly_linked_front<Return_type<F, T>> y;
+        map(first(x), limit(x), insert_sink{}(front{y}), fun);
+        reverse(y);
+        return y;
+    }
+};
+
+template <typename T>
+struct monad_t<list_singly_linked_front<T>>
+{
+    template <Regular_invocable<T> F>
+    static constexpr auto
+    bind(list_singly_linked_front<T> const& x, F fun) -> Return_type<F, T>
+    {
+        using elements::flat_map;
+        auto y{flat_map<list_singly_linked_cursor<T>, list_singly_linked_cursor<T>, F, front<Return_type<F, T>>>(first(x), limit(x), fun)};
+        reverse(y);
+        return y;
+    }
 };
 
 template <Regular T>

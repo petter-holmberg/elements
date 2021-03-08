@@ -65,6 +65,7 @@ set (WARNING_FLAGS
     #-Weffc++
     -Wno-unused-variable
     -pedantic
+    -fconcepts-diagnostics-depth=10
 )
 
 add_executable (tests ${TEST_SOURCES})
