@@ -78,6 +78,16 @@ SCENARIO ("Checking ordering", "[ordering]")
             REQUIRE (e::select_0_3(c, a, b, e::lt{}) == a);
             REQUIRE (e::select_0_3(c, b, a, e::lt{}) == b);
 
+            REQUIRE (e::select_1_3_ac(a, b, c, e::lt{}) == b);
+            REQUIRE (e::select_1_3_ac(a, c, b, e::lt{}) == b);
+            REQUIRE (e::select_1_3_ac(b, a, c, e::lt{}) == a);
+            REQUIRE (e::select_1_3_ac(b, c, a, e::lt{}) == a);
+
+            REQUIRE (e::clamp(a, b, c) == b);
+            REQUIRE (e::clamp(a, c, b) == b);
+            REQUIRE (e::clamp(b, a, c) == a);
+            REQUIRE (e::clamp(b, c, a) == a);
+
             REQUIRE (e::select_1_3(a, b, c, e::lt{}) == b);
             REQUIRE (e::select_1_3(a, c, b, e::lt{}) == b);
             REQUIRE (e::select_1_3(b, a, c, e::lt{}) == a);

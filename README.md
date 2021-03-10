@@ -59,7 +59,9 @@ Adapters are type constructors that provide a different behavior and/or differen
 `select_1_2` takes a weak ordering and two values of its domain, and returns the maximum value. `max` uses `lt` as the weak ordering.
 `select_0_3` takes a weak ordering and three values, returning the minimum. `min` uses `lt` as the weak ordering.
 `select_2_3` takes a weak ordering and three values, returning the maximum. `max` uses `lt` as the weak ordering.
-`select_1_3_ab` takes a weak ordering and three values, where the first two are in increasing order, returning the median. `select_1_3` takes a weak ordering and three values, returning the median. `median` uses `lt` as the weak ordering.
+`select_1_3_ab` takes a weak ordering and three values, where the first two are in increasing order, returning the median.
+`select_1_3_ac` takes a weak ordering and three values, where the first and the last are in increasing order, returning the median. `clamp` ises `lt`as the weak ordering.
+`select_1_3` takes a weak ordering and three values, returning the median. `median` uses `lt` as the weak ordering.
 `select_2_3` takes a weak ordering and three values, returning the maximum. `max` uses `lt` as the weak ordering.
 
 `equivalent_lexicographical` takes two loadable ranges and an equivalence relation, comparing them for equivalence. `equal_lexicographical` uses `eq` as the equivalence relation.
@@ -608,8 +610,9 @@ Index
 `max`
 `select_0_3`
 `select_2_3`
-`max`
 `select_1_3_ab`
+`select_1_3_ac`
+`clamp`
 `select_1_3`
 `median`
 `equivalent_lexicographical`

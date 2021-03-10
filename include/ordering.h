@@ -124,6 +124,35 @@ select_1_3_ab(T& a, T& b, T& c, R rel) -> T&
 
 template <typename T, Relation<T, T> R>
 constexpr auto
+select_1_3_ac(T const& a, T const& b, T const& c, R rel) -> T const&
+//[[expects axiom: weak_ordering(rel)]]
+//[[expects: select_0_1(a, c, rel) == a]]
+{
+    if (invoke(rel, b, a)) return a;
+    return select_0_2(b, c, rel);
+}
+
+template <typename T, Relation<T, T> R>
+constexpr auto
+select_1_3_ac(T& a, T& b, T& c, R rel) -> T&
+//[[expects axiom: weak_ordering(rel)]]
+//[[expects: select_0_1(a, c, rel) == a]]
+{
+    if (invoke(rel, b, a)) return a;
+    return select_0_2(b, c, rel);
+}
+
+template <typename T>
+constexpr auto
+clamp(T const& a, T const& b, T const& c) -> T const&
+//[[expects axiom: weak_ordering(rel)]]
+//[[expects: select_0_1(a, c, lt{}) == a]]
+{
+    return select_1_3_ac(a, b, c, lt{});
+}
+
+template <typename T, Relation<T, T> R>
+constexpr auto
 select_1_3(T const& a, T const& b, T const& c, R rel) -> T const&
 //[[expects axiom: weak_ordering(rel)]]
 {
