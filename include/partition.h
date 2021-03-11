@@ -1,9 +1,13 @@
 #pragma once
 
 #include "copy.h"
+#include "cursor.h"
 #include "pair.h"
+#include "range.h"
+#include "rotate.h"
 #include "search.h"
 #include "swap.h"
+#include "transformation.h"
 
 namespace elements {
 
@@ -124,7 +128,7 @@ requires
     Mutable<B> and
     Same_as<Value_type<C>, Value_type<B>>
 constexpr auto
-partition_with_buffer(C cur, L lim, B buf, P pred) -> C
+partition_stable_with_buffer(C cur, L lim, B buf, P pred) -> C
 //[[expects axiom: mutable_range(cur, lim)]]
 //[[expects axiom: mutable_range(buf, distance(cur, lim))]]
 {
@@ -133,10 +137,62 @@ partition_with_buffer(C cur, L lim, B buf, P pred) -> C
     return partition_points.m0;
 }
 
+template <Forward_cursor C, Predicate<Value_type<C>> P>
+requires Mutable<C>
+constexpr auto
+partition_stable_singleton(C cur, P pred) -> bounded_range<C>
+//[[expects axiom: readable_bounded_range(cur, successor(cur))]]
+{
+    auto lim{successor(cur)};
+    if (!pred(load(cur))) cur = lim;
+    return {cur, lim};
+}
+
+template <Forward_cursor C>
+requires Mutable<C>
+constexpr auto
+combine_ranges(bounded_range<C> const& x, bounded_range<C> const& y) -> bounded_range<C>
+//[[expects axiom: mutable_bounded_range(x.m0, y.m0)]]
+{
+    return {rotate(first(x), first(y), limit(x)), limit(y)};
+}
+
+template <Forward_cursor C, Predicate<Value_type<C>> P>
+requires Mutable<C>
+constexpr auto
+partition_stable_nonempty_counted(C cur, Difference_type<C> n, P pred) -> bounded_range<C>
+//[[expects axiom: mutable_counted_range(cur, n)]]
+{
+    if (is_one(n)) return partition_stable_singleton(cur, pred);
+    auto h = half(n);
+    auto x{partition_stable_nonempty_counted(cur, h, pred)};
+    auto y{partition_stable_nonempty_counted(limit(x), n - h, pred)};
+    return combine_ranges(x, y);
+}
+
+template <Forward_cursor C, Predicate<Value_type<C>> P>
+requires Mutable<C>
+constexpr auto
+partition_stable_counted(C cur, Difference_type<C> n, P pred) -> bounded_range<C>
+//[[expects axiom: mutable_counted_range(cur, n)]]
+{
+    if (is_zero(n)) return {cur, cur};
+    return partition_stable_nonempty_counted(cur, n, pred);
+}
+
+template <Forward_cursor C, Limit<C> L, Predicate<Value_type<C>> P>
+requires Mutable<C>
+constexpr auto
+partition_stable(C cur, L lim, P pred) -> C
+//[[expects axiom: mutable_range(cur, lim)]]
+{
+    return first(partition_stable_counted(cur, lim - cur, pred));
+}
+
 template <Bidirectional_cursor C, Limit<C> L, Predicate<Value_type<C>> P>
 requires Mutable<C>
 constexpr auto
-partition(C cur, L lim, P pred) -> C
+partition_unstable(C cur, L lim, P pred) -> C
 //[[expects axiom: mutable_range(cur, lim)]]
 {
     while (true) {

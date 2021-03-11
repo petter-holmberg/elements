@@ -124,9 +124,21 @@ This algorithm minimizes the cost of applying the operation if the size of a red
 
 `partition_semistable` takes a mutable forward range and a unary prediate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It preserves the relative ordering of the elements not satisfying the predicate, but not the relative ordering of the elements satisfying the predicate. It returns the partition point, i.e. a cursor pointing to the first element satisfying the predicate.
 
-`partition_with_buffer` takes a mutable forward range, a cursor pointing to the first element of a mutable buffer with a size not less than the size of the forward range, and a unary prediate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It preserves the relative ordering of the elements on both sides of the partition point. It returns the partition point.
+`partition_stable_with_buffer` takes a mutable forward range, a cursor pointing to the first element of a mutable buffer with a size not less than the size of the forward range, and a unary prediate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It preserves the relative ordering of the elements on both sides of the partition point. It returns the partition point.
 
-`partition` takes a mutable bidirectional range and a unary prediate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It preserves the relative ordering of the elements on both sides of the partition point. It returns the partition point.
+`partition_stable_with_buffer` takes a mutable forward range, a cursor pointing to the first element of a mutable buffer with a size not less than the size of the forward range, and a unary prediate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It preserves the relative ordering of the elements on both sides of the partition point. It returns the partition point.
+
+`partition_stable` takes a mutable forward range and a unary predicate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It preserves the relative ordering of the elements on both sides of the partition point. It returns the partition point.
+
+`partition_unstable` takes a mutable bidirectional range and a unary prediate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It returns the partition point.
+
+## Gathering
+
+`gather_stable_with_buffer` takes a mutable forward range, a cursor within the range, a cursor pointing to the first element of a mutable buffer with a size not less than the size of the forward range, and a unary predicate. It gathers all elements satisfying the predicate around the given cursor. It preserves the relative ordering of both elements satisfying the range and elements not satisfying the range. It returns the `bounded_range` of satisfying elements.
+
+`gather_stable` takes a mutable bidirectional range, a cursor within the range, and a unary predicate. It gathers all elements satisfying the predicate around the given cursor. It preserves the relative ordering of both elements satisfying the range and elements not satisfying the range. It returns the `bounded_range` of satisfying elements.
+
+`gather_unstable` takes a mutable forward range and a unary predicate. It gathers all elements satisfying the predicate around the given cursor. It returns the `bounded_range` of satisfying elements.
 
 ## Searching
 
@@ -647,8 +659,13 @@ Index
 `partition_point_counted`
 `partition_point`
 `partition_semistable`
-`partition_with_buffer`
-`partition`
+`partition_stable_with_buffer`
+`partition_stable`
+`partition_unstable`
+
+`gather_stable_with_buffer`
+`gather_stable`
+`gather_unstable`
 
 `search_binary_lower`
 `search_binary_upper`

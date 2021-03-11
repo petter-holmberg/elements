@@ -61,13 +61,13 @@ SCENARIO ("Partitioning", "[partition]")
         }
 
         {
-            auto cur = e::partition_with_buffer(x, x, buf, is_odd);
+            auto cur = e::partition_stable_with_buffer(x, x, buf, is_odd);
             REQUIRE (e::is_partitioned(x, x, is_odd));
             REQUIRE (cur == x);
         }
 
         {
-            auto cur = e::partition(x, x, is_odd);
+            auto cur = e::partition_unstable(x, x, is_odd);
             REQUIRE (e::is_partitioned(x, x, is_odd));
             REQUIRE (cur == x);
         }
@@ -87,13 +87,13 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition_with_buffer(x, x + 1, buf, is_odd);
+                auto cur = e::partition_stable_with_buffer(x, x + 1, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 1, is_odd));
                 REQUIRE (cur == x + 1);
             }
 
             {
-                auto cur = e::partition(x, x + 1, is_odd);
+                auto cur = e::partition_unstable(x, x + 1, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 1, is_odd));
                 REQUIRE (cur == x + 1);
             }
@@ -109,13 +109,13 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition_with_buffer(x, x + 1, buf, is_odd);
+                auto cur = e::partition_stable_with_buffer(x, x + 1, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 1, is_odd));
                 REQUIRE (cur == x);
             }
 
             {
-                auto cur = e::partition(x, x + 1, is_odd);
+                auto cur = e::partition_unstable(x, x + 1, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 1, is_odd));
                 REQUIRE (cur == x);
             }
@@ -138,7 +138,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition_with_buffer(x, x + 2, buf, is_odd);
+                auto cur = e::partition_stable_with_buffer(x, x + 2, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
                 REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
@@ -146,7 +146,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition(x, x + 2, is_odd);
+                auto cur = e::partition_unstable(x, x + 2, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
                 REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
@@ -166,7 +166,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition_with_buffer(x, x + 2, buf, is_odd);
+                auto cur = e::partition_stable_with_buffer(x, x + 2, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
                 REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
@@ -174,7 +174,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition(x, x + 2, is_odd);
+                auto cur = e::partition_unstable(x, x + 2, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
                 REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
@@ -194,7 +194,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition_with_buffer(x, x + 2, buf, is_odd);
+                auto cur = e::partition_stable_with_buffer(x, x + 2, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
                 REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
@@ -202,7 +202,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition(x, x + 2, is_odd);
+                auto cur = e::partition_unstable(x, x + 2, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
                 REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
@@ -222,7 +222,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition_with_buffer(x, x + 2, buf, is_odd);
+                auto cur = e::partition_stable_with_buffer(x, x + 2, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
                 REQUIRE (cur == x);
                 REQUIRE (x[0] == 1);
@@ -230,7 +230,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition(x, x + 2, is_odd);
+                auto cur = e::partition_unstable(x, x + 2, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 2, is_odd));
                 REQUIRE (cur == x);
                 REQUIRE (x[0] == 1);
@@ -256,7 +256,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_stable_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x + 3);
                 REQUIRE (x[0] == 0);
@@ -265,7 +265,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition_unstable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x + 3);
                 REQUIRE (x[0] == 0);
@@ -287,7 +287,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_stable_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
@@ -296,7 +296,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition_unstable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
@@ -318,7 +318,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_stable_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
@@ -327,7 +327,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition_unstable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
@@ -349,7 +349,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_stable_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
@@ -358,7 +358,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition_unstable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
@@ -380,7 +380,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_stable_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
@@ -389,7 +389,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition_unstable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x + 2);
                 REQUIRE (x[0] == 0);
@@ -411,7 +411,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_stable_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
@@ -420,7 +420,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition_unstable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
@@ -442,7 +442,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_stable_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
@@ -451,7 +451,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition_unstable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x + 1);
                 REQUIRE (x[0] == 0);
@@ -473,7 +473,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition_with_buffer(x, x + 3, buf, is_odd);
+                auto cur = e::partition_stable_with_buffer(x, x + 3, buf, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x);
                 REQUIRE (x[0] == 1);
@@ -482,7 +482,7 @@ SCENARIO ("Partitioning", "[partition]")
             }
 
             {
-                auto cur = e::partition(x, x + 3, is_odd);
+                auto cur = e::partition_unstable(x, x + 3, is_odd);
                 REQUIRE (e::is_partitioned(x, x + 3, is_odd));
                 REQUIRE (cur == x);
                 REQUIRE (x[0] == 1);
