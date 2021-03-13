@@ -336,6 +336,10 @@ Cursors of `array_circular` elements are larger and element access is slower tha
 `fail` constructs a `result` carrying an error.
 `result` also provides a monadic interface through the member functions `.map` and `.flat_map`.
 
+## Concurrency
+
+`locked_stack` implements a thread-safe stack on top of a dynamic sequence. `push` pushes a value on the stack. `pop` tries to pop a value off the stack. It returns a `result` containing the value if the stack was non-empty, or an `empty_stack` error if the stack was empty.
+
 # Concepts
 
 The concepts in this library are largely based on definitions in [StepanovMcJones](#StepanovMcJones), with some name changes and adaptations to modern C++ features, such as move semantics.
@@ -776,6 +780,8 @@ Index
 `list_pool`
 
 `result`
+
+`locked_stack`
 
 # Concepts
 

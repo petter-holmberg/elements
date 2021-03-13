@@ -7,6 +7,7 @@
 #include <initializer_list>
 #include <limits>
 #include <memory>
+#include <mutex>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -283,5 +284,10 @@ constexpr auto construct_at = std::construct_at<T>;
 
 template <typename T>
 constexpr auto destroy_at = std::destroy_at<T>;
+
+using mutex = std::mutex;
+
+template <typename T>
+using scoped_lock = std::scoped_lock<T>;
 
 }
