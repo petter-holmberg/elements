@@ -9,10 +9,10 @@
 namespace elements {
 
 template <Semiregular T, pointer_diff k>
-requires (0 < k) and (k <= std::numeric_limits<pointer_diff>::max() / sizeof(T))
+requires (0 < k) and (k <= max_array_size<T>)
 struct array_k
 {
-    T data[static_cast<std::size_t>(k)];
+    T data[static_cast<size_t>(k)];
 
     constexpr
     array_k()

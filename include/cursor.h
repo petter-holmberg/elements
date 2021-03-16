@@ -15,16 +15,11 @@ template <typename T>
 using Value_type = typename value_type_t<T>::type;
 
 template <typename T>
-using Pointer_type = T*;
-
-template <typename T>
 constexpr auto
 pointer_to(T& x) -> Pointer_type<T>
 {
     return &x;
 }
-
-using pointer_diff = std::ptrdiff_t;
 
 template <typename T>
 struct value_type_t<Pointer_type<T>>
@@ -94,7 +89,7 @@ template <typename T>
 constexpr void
 store(T& x, Value_type<T>&& v)
 {
-    x = std::forward<Value_type<T>>(v);
+    x = fw<Value_type<T>>(v);
 }
 
 template <typename T>
@@ -108,7 +103,7 @@ template <typename T>
 constexpr void
 store(Pointer_type<T> x, Value_type<T>&& v)
 {
-    *x = std::forward<Value_type<T>>(v);
+    *x = fw<Value_type<T>>(v);
 }
 
 template <typename S>
@@ -669,7 +664,7 @@ requires Storable<C>
 constexpr void
 store(cursor<C>& cur, Value_type<C>&& value)
 {
-    store(cur.cur, std::forward<Value_type<C>>(value));
+    store(cur.cur, fw<Value_type<C>>(value));
 }
 
 template <Cursor C>
@@ -783,7 +778,7 @@ requires Storable<C>
 constexpr void
 store(forward_cursor<C>& cur, Value_type<C>&& value)
 {
-    store(cur.cur, std::forward<Value_type<C>>(value));
+    store(cur.cur, fw<Value_type<C>>(value));
 }
 
 template <Forward_cursor C>
@@ -918,7 +913,7 @@ requires Storable<C>
 constexpr void
 store(bidirectional_cursor<C>& cur, Value_type<C>&& value)
 {
-    store(cur.cur, std::forward<Value_type<C>>(value));
+    store(cur.cur, fw<Value_type<C>>(value));
 }
 
 template <Bidirectional_cursor C>

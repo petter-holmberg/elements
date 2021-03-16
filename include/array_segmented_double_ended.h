@@ -13,7 +13,7 @@
 namespace elements {
 
 template <typename T, pointer_diff k = 256, Invocable auto alloc = array_allocator<T>>
-//requires (0 < k) and (k <= std::numeric_limits<pointer_diff>::max() / sizeof(T))
+// requires (0 < k) and (k <= max_array_size<T>)
 struct array_segmented_double_ended;
 
 template <typename T, pointer_diff k, Invocable auto alloc>
@@ -137,7 +137,7 @@ precedes(array_segmented_double_ended_cursor<T, k, alloc> const& cur0, array_seg
 }
 
 template <typename T, pointer_diff k, Invocable auto alloc>
-//requires (0 < k) and (k <= std::numeric_limits<pointer_diff>::max() / sizeof(T))
+// requires (0 < k) and (k <= max_array_size<T>)
 struct array_segmented_double_ended
 {
     array_double_ended<array_double_ended<T, alloc>, alloc> index;

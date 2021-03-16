@@ -19,7 +19,7 @@ SCENARIO ("Using affine spaces", "[affine_space]")
 
 SCENARIO ("Using affine vectors", "[affine_vector]")
 {
-    e::affine_vector<int, 2> x{1, 2};
+    e::affine_vector x{e::array_k<int, 2>{1, 2}};
     static_assert(e::Vector_space<decltype(x)>);
     static_assert(e::Sequence<decltype(x)>);
 
@@ -35,7 +35,7 @@ SCENARIO ("Using affine vectors", "[affine_vector]")
         REQUIRE (z[0] == -1);
         REQUIRE (z[1] == -2);
 
-        e::affine_vector<int, 2> y{3, 4};
+        e::affine_vector y{e::array_k<int, 2>{3, 4}};
 
         z = x + y;
 
@@ -64,7 +64,7 @@ SCENARIO ("Using affine vectors", "[affine_vector]")
 
 SCENARIO ("Using affine points", "[affine_point]")
 {
-    e::affine_point<int, 2> x{1, 2};
+    e::affine_point x{e::array_k<int, 2>{1, 2}};
     static_assert(e::Affine_space<decltype(x)>);
     static_assert(e::Sequence<decltype(x)>);
 

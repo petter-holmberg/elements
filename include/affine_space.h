@@ -54,8 +54,10 @@ struct affine_vector
         fill(first(elements), limit(elements), Zero<S>);
     }
 
-    constexpr
-    affine_vector(std::initializer_list<S> x) : elements{x} {}
+    explicit constexpr
+    affine_vector(E&& x)
+        : elements{fw<E>(x)}
+    {}
 
     constexpr auto
     operator[](int32_t i) const -> S const&
@@ -69,6 +71,9 @@ struct affine_vector
         return elements[i];
     }
 };
+
+template <Sequence E>
+affine_vector(E) -> affine_vector<Value_type<E>, size_type_t<E>::value, E>;
 
 template <typename S, int32_t k, typename E, typename S_add_op, typename S_mul_op>
 requires Semiring<S, S_add_op, S_mul_op>
@@ -284,8 +289,10 @@ struct affine_point
         fill(first(coordinates), limit(coordinates), Zero<Value_type<V>>);
     }
 
-    constexpr
-    affine_point(std::initializer_list<S> x) : coordinates{x} {}
+    explicit constexpr
+    affine_point(C&& x)
+        : coordinates{fw<C>(x)}
+    {}
 
     constexpr auto
     operator[](int32_t i) const -> S const&
@@ -299,6 +306,9 @@ struct affine_point
         return coordinates[i];
     }
 };
+
+template <Sequence C>
+affine_point(C) -> affine_point<Value_type<C>, size_type_t<C>::value, C>;
 
 template <typename S, int32_t k, typename C, typename V>
 requires

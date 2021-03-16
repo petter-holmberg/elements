@@ -1,6 +1,7 @@
 #pragma once
 
 #include <concepts>
+#include <condition_variable>
 #include <cstddef>
 #include <cstdlib>
 #include <functional>
@@ -99,10 +100,10 @@ template <typename T>
 concept Integral = std::is_integral_v<T>;
 
 template <Integral T>
-constexpr auto Min_integral = std::numeric_limits<T>::min();
+inline constexpr auto Min_integral = std::numeric_limits<T>::min();
 
 template <Integral T>
-constexpr auto Max_integral = std::numeric_limits<T>::max();
+inline constexpr auto Max_integral = std::numeric_limits<T>::max();
 
 template <Integral T>
 using Signed_type = typename std::make_signed<T>::type;
@@ -252,19 +253,29 @@ invoke(F&& f, Args&&... args) noexcept(std::is_nothrow_invocable_v<F, Args...>) 
 }
 
 template <typename T>
+using Pointer_type = T*;
+
+using pointer_diff = std::ptrdiff_t;
+
+template <typename T>
+inline constexpr auto max_array_size = std::numeric_limits<pointer_diff>::max() / sizeof(T);
+
+using size_t = std::size_t;
+
+template <typename T>
 constexpr auto
 first(std::initializer_list<T> const& x) -> T const*
 {
     return std::cbegin(x);
 }
 
-constexpr auto lt_address = std::less<void>{};
+inline constexpr auto lt_address = std::less<void>{};
 
-constexpr auto ge_address = std::greater_equal<void>{};
+inline constexpr auto ge_address = std::greater_equal<void>{};
 
-constexpr auto gt_address = std::greater<void>{};
+inline constexpr auto gt_address = std::greater<void>{};
 
-constexpr auto le_address = std::less_equal<void>{};
+inline constexpr auto le_address = std::less_equal<void>{};
 
 template <typename T>
 constexpr auto
@@ -273,21 +284,46 @@ limit(std::initializer_list<T> const& x) -> T const*
     return std::cend(x);
 }
 
-constexpr auto allocate_dynamic = std::malloc;
+inline constexpr auto allocate_dynamic = std::malloc;
 
-constexpr auto reallocate_dynamic = std::realloc;
+inline constexpr auto reallocate_dynamic = std::realloc;
 
-constexpr auto deallocate_dynamic = std::free;
-
-template <typename T>
-constexpr auto construct_at = std::construct_at<T>;
+inline constexpr auto deallocate_dynamic = std::free;
 
 template <typename T>
-constexpr auto destroy_at = std::destroy_at<T>;
+inline constexpr auto construct_at = std::construct_at<T>;
+
+template <typename T>
+inline constexpr auto destroy_at = std::destroy_at<T>;
 
 using mutex = std::mutex;
 
 template <typename T>
 using scoped_lock = std::scoped_lock<T>;
+
+template <typename T>
+using unique_lock = std::unique_lock<T>;
+
+inline constexpr auto try_lock = std::try_to_lock;
+
+using condition_variable = std::condition_variable;
+
+inline void
+notify_one(condition_variable& x)
+{
+    x.notify_one();
+}
+
+inline void
+notify_all(condition_variable& x)
+{
+    x.notify_all();
+}
+
+template <typename L, Predicate P>
+void wait(condition_variable& x, L& lock, P pred)
+{
+    return x.wait(lock, pred);
+}
 
 }

@@ -338,7 +338,9 @@ Cursors of `array_circular` elements are larger and element access is slower tha
 
 ## Concurrency
 
-`locked_stack` implements a thread-safe stack on top of a dynamic sequence. `push` pushes a value on the stack. `pop` tries to pop a value off the stack. It returns a `result` containing the value if the stack was non-empty, or an `empty_stack` error if the stack was empty.
+`locked_stack` implements a thread-safe stack on top of a single-ended dynamic sequence. `try_push` tries to push a value on the stack, failing if the stack is locked. `push` pushes a value on the stack, blocking until it succeeds. `try_pop` tries to pop a value off the stack, failing if the stack is locked or empty.
+
+`locked_queue` implements a thread-safe queue on top of a double-ended dynamic sequence. `try_push` tries to push a value on the queue, failing if the queue is locked. `push` pushes a value on the queue, blocking until it succeeds. `try_pop` tries to pop a value off the queue, failing if the queue is locked or empty. `pop` waits until the queue is non-empty and then pops the value.
 
 # Concepts
 
@@ -782,6 +784,7 @@ Index
 `result`
 
 `locked_stack`
+`locked_queue`
 
 # Concepts
 

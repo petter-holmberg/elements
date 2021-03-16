@@ -1,11 +1,9 @@
 #pragma once
 
 #include "intrinsics.h"
-#include "result.h"
+#include "swap.h"
 
 namespace elements {
-
-struct empty_locked_stack {};
 
 template <typename S>
 struct locked_stack
@@ -46,23 +44,57 @@ struct size_type_t<locked_stack<S>>
     using type = Size_type<S>;
 };
 
+enum stack_error
+{
+    stack_is_locked,
+    stack_is_empty
+};
+
+template <typename S>
+constexpr auto
+try_push(locked_stack<S>& s, Value_type<S> const& x) -> bool
+{
+    unique_lock l{s.m, try_lock};
+    if (!l) return false;
+    emplace(s.stack, x);
+    return true;
+}
+
+template <typename S>
+constexpr auto
+try_push(locked_stack<S>& s, Value_type<S>&& x) -> bool
+{
+    unique_lock l{s.m, try_lock};
+    if (!l) return false;
+    emplace(s.stack, fw<Value_type<S>>(x));
+    return true;
+}
+
 template <typename S>
 constexpr void
-push(locked_stack<S>& s, Value_type<locked_stack<S>> x)
+push(locked_stack<S>& s, Value_type<S> const& x)
 {
     scoped_lock l{s.m};
     emplace(s.stack, mv(x));
 }
 
 template <typename S>
-constexpr auto
-pop(locked_stack<S>& s) -> result<Value_type<locked_stack<S>>, empty_locked_stack>
+constexpr void
+push(locked_stack<S>& s, Value_type<S>&& x)
 {
     scoped_lock l{s.m};
-    if (is_empty(s.stack)) return fail<Value_type<locked_stack<S>>, empty_locked_stack>({});
-    auto res{load(predecessor(limit(s.stack)))};
+    emplace(s.stack, fw<Value_type<S>>(x));
+}
+
+template <typename S>
+constexpr auto
+try_pop(locked_stack<S>& s, Value_type<S>& x) -> bool
+{
+    unique_lock l{s.m, try_lock};
+    if (!l or is_empty(s.stack)) return false;
+    x = mv(at(predecessor(limit(s.stack))));
     pop(s.stack);
-    return result<Value_type<locked_stack<S>>, empty_locked_stack>{res};
+    return true;
 }
 
 }

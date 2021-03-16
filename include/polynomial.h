@@ -15,11 +15,16 @@ struct polynomial
         : coefficients{Zero<R>}
     {}
 
-    explicit polynomial(std::initializer_list<R> coefficients_)
-        : coefficients{static_cast<Size_type<C>>(coefficients_.size())}
+    explicit
+    polynomial(R x)
     {
-        insert_range(coefficients_, back{coefficients});
+        emplace(coefficients, mv(x));
     }
+
+    explicit
+    polynomial(C&& x)
+        : coefficients{fw<C>(x)}
+    {}
 
     polynomial(Size_type<C> const& size, R const& value)
         : coefficients(size, size, value)
@@ -37,6 +42,9 @@ struct polynomial
         return coefficients[i];
     }
 };
+
+template <Dynamic_sequence C>
+polynomial(C) -> polynomial<Value_type<C>, C>;
 
 template <Ring R, Dynamic_sequence C>
 struct value_type_t<polynomial<R, C>>

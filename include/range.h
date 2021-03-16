@@ -443,11 +443,4 @@ insert_range(S const& seq, C cur) -> C
     return copy(first(seq), limit(seq), insert_sink{}(cur)).cur;
 }
 
-template <typename T, typename C>
-constexpr auto
-insert_range(std::initializer_list<T> seq, C cur) -> C
-{
-    return copy(first(seq), limit(seq), insert_sink{}(cur)).cur;
-}
-
 }
