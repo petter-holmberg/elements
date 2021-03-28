@@ -235,19 +235,25 @@ axiom_Regular(T const& x) noexcept -> bool
     return true;
 }
 
-template <typename T>
-concept Default_totally_ordered =
-    Equality_comparable<T> and
-    requires (T const& x, T const& y) {
-        { lt<T>{}(x, y) } -> Boolean_testable;
+template <typename T, typename U>
+concept Default_totally_ordered_with =
+    Equality_comparable_with<T, U> and
+    requires (Remove_ref<T>& x, Remove_ref<U>& y) {
+        { lt<Remove_ref<T>, Remove_ref<U>>{}(x, y) } -> Boolean_testable;
         // axiom total_ordering {
-        //    implication(lt<T>{}(x, y) and lt<T>{}(y, z), lt<T>{}(x, z));
-        //    lt<T>{}(x, y) xor lt<T>{}(y, x) xor x == y;
+        //    implication(
+        //        lt<Remove_ref<T>, Remove_ref<U>>{}(x, y) and lt<Remove_ref<T>, Remove_ref<U>>{}(y, z),
+        //        lt<Remove_ref<T>, Remove_ref<U>>{}(x, z));
+        //    lt<Remove_ref<T>, Remove_ref<U>>{}(x, y) xor lt<Remove_ref<T>, Remove_ref<U>>{}(y, x) xor x == y;
         // }
         // complexity {
         //     O(areaof(x));
         // }
     };
+
+template <typename T>
+concept Default_totally_ordered =
+    Default_totally_ordered_with<T, T>;
 
 template <Regular T>
 constexpr auto

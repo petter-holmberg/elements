@@ -8,7 +8,7 @@ namespace elements {
 
 template <typename T, Relation<T, T> R>
 constexpr auto
-select_0_2(T& a, T& b, R rel) -> T&
+select_0_2(T const& a, T const& b, R rel) -> T const&
 //[[expects axiom: weak_ordering(rel)]]
 {
     if (invoke(rel, b, a)) return b;
@@ -17,25 +17,19 @@ select_0_2(T& a, T& b, R rel) -> T&
 
 template <typename T, Relation<T, T> R>
 constexpr auto
-select_0_2(T const& a, T const& b, R rel) -> T const&
+select_0_2(T& a, T& b, R rel) -> T&
 //[[expects axiom: weak_ordering(rel)]]
 {
     if (invoke(rel, b, a)) return b;
     return a;
 }
 
-template <Default_totally_ordered T>
-constexpr auto
-min(T const& a, T const& b) -> T const&
+template <typename T0, typename T1>
+requires Default_totally_ordered_with<T0, T1>
+constexpr decltype(auto)
+min(T0&& a, T1&& b)
 {
-    return select_0_2(a, b, lt{});
-}
-
-template <Default_totally_ordered T>
-constexpr auto
-min(T& a, T& b) -> T&
-{
-    return select_0_2(a, b, lt{});
+    return select_0_2(fw<T0>(a), fw<T1>(b), lt{});
 }
 
 template <typename T, Relation<T, T> R>
@@ -56,18 +50,12 @@ select_1_2(T& a, T& b, R rel) -> T&
     return b;
 }
 
-template <Default_totally_ordered T>
-constexpr auto
-max(T const& a, T const& b) -> T const&
+template <typename T0, typename T1>
+requires Default_totally_ordered_with<T0, T1>
+constexpr decltype(auto)
+max(T0&& a, T1&& b)
 {
-    return select_1_2(a, b, lt{});
-}
-
-template <Default_totally_ordered T>
-constexpr auto
-max(T& a, T& b) -> T const&
-{
-    return select_1_2(a, b, lt{});
+    return select_1_2(fw<T0>(a), fw<T1>(b), lt{});
 }
 
 // 3 values
@@ -88,18 +76,15 @@ select_0_3(T& a, T& b, T& c, R rel) -> T&
     return select_0_2(select_0_2(a, b, rel), c, rel);
 }
 
-template <Default_totally_ordered T>
-constexpr auto
-min(T const& a, T const& b, T const& c) -> T const&
+template <typename T0, typename T1, typename T2>
+requires
+    Default_totally_ordered_with<T0, T1> and
+    Default_totally_ordered_with<T0, T2> and
+    Default_totally_ordered_with<T1, T2>
+constexpr decltype(auto)
+min(T0&& a, T1&& b, T2&& c)
 {
-    return select_0_3(a, b, c, lt{});
-}
-
-template <Default_totally_ordered T>
-constexpr auto
-min(T& a, T& b, T& c) -> T&
-{
-    return select_0_3(a, b, c, lt{});
+    return select_0_3(fw<T0>(a), fw<T1>(b), fw<T2>(c), lt{});
 }
 
 template <typename T, Relation<T, T> R>
@@ -142,13 +127,14 @@ select_1_3_ac(T& a, T& b, T& c, R rel) -> T&
     return select_0_2(b, c, rel);
 }
 
-template <typename T>
-constexpr auto
-clamp(T const& a, T const& b, T const& c) -> T const&
+template <typename T0, typename T1, typename T2>
+requires Default_totally_ordered_with<T1, T2>
+constexpr decltype(auto)
+clamp(T0&& a, T1&& b, T2&& c)
 //[[expects axiom: weak_ordering(rel)]]
 //[[expects: select_0_1(a, c, lt{}) == a]]
 {
-    return select_1_3_ac(a, b, c, lt{});
+    return select_1_3_ac(fw<T0>(a), fw<T1>(b), fw<T2>(c), lt{});
 }
 
 template <typename T, Relation<T, T> R>
@@ -173,18 +159,12 @@ select_1_3(T& a, T& b, T& c, R rel) -> T&
         return select_1_3_ab(a, b, c, rel);
 }
 
-template <Default_totally_ordered T>
-constexpr auto
-median(T const& a, T const& b, T const& c) -> T const&
+template <typename T0, typename T1, typename T2>
+requires Default_totally_ordered_with<T0, T2>
+constexpr decltype(auto)
+median(T0&& a, T1&& b, T2&& c)
 {
-    return select_1_3(a, b, c, lt{});
-}
-
-template <Default_totally_ordered T>
-constexpr auto
-median(T& a, T& b, T& c) -> T&
-{
-    return select_1_3(a, b, c, lt{});
+    return select_1_3(fw<T0>(a), fw<T1>(b), fw<T2>(c), lt{});
 }
 
 template <typename T, Relation<T, T> R>
@@ -203,18 +183,15 @@ select_2_3(T& a, T& b, T& c, R rel) -> T&
     return select_1_2(select_1_2(a, b, rel), c, rel);
 }
 
-template <Default_totally_ordered T>
-constexpr auto
-max(T const& a, T const& b, T const& c) -> T const&
+template <typename T0, typename T1, typename T2>
+requires
+    Default_totally_ordered_with<T0, T1> and
+    Default_totally_ordered_with<T0, T2> and
+    Default_totally_ordered_with<T1, T2>
+constexpr decltype(auto)
+max(T0&& a, T1&& b, T2&& c)
 {
-    return select_2_3(a, b, c, lt{});
-}
-
-template <Default_totally_ordered T>
-constexpr auto
-max(T& a, T& b, T& c) -> T&
-{
-    return select_2_3(a, b, c, lt{});
+    return select_2_3(fw<T0>(a), fw<T1>(b), fw<T2>(c), lt{});
 }
 
 }
