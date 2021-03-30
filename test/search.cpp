@@ -9,7 +9,7 @@ SCENARIO ("Linear search", "[search]")
     int x[]{0, 1, 2, 3, 4};
     auto is_even = [](int i){ return i % 2 == 0; };
 
-    SECTION ("search")
+    SECTION ("search, search_not")
     {
         SECTION ("Searcing for an existing element")
         {
@@ -36,7 +36,34 @@ SCENARIO ("Linear search", "[search]")
         }
     }
 
-    SECTION ("search_backward")
+    SECTION ("search_n, search_not_n")
+    {
+        SECTION ("Searcing for an existing element")
+        {
+            auto range = e::search_n(e::loadable_cursor(x), 5, 2);
+            REQUIRE (!e::precedes(e::get<0>(range), x + 2));
+        }
+
+        SECTION ("Searching for a non-existing element")
+        {
+            auto range = e::search_n(x, 5, 5);
+            REQUIRE (e::get<0>(range) == x + 5);
+        }
+
+        SECTION ("Searching for the absence of an existing element")
+        {
+            auto range = e::search_not_n(e::loadable_cursor(x), 5, 0);
+            REQUIRE (!e::precedes(e::get<0>(range), x + 1));
+        }
+
+        SECTION ("Searching for the absence of a non-existing element")
+        {
+            auto range = e::search_not_n(x, 5, 5);
+            REQUIRE (e::get<0>(range) == x);
+        }
+    }
+
+    SECTION ("search_backward, search_backward_not")
     {
         SECTION ("Searcing backward for an existing element")
         {
@@ -63,7 +90,34 @@ SCENARIO ("Linear search", "[search]")
         }
     }
 
-    SECTION ("search_if")
+    SECTION ("search_backward_n, search_backward_not_n")
+    {
+        SECTION ("Searcing backward for an existing element")
+        {
+            auto range = e::search_backward_n(x, 5, 2);
+            REQUIRE (!e::precedes(e::get<0>(range), x + 3));
+        }
+
+        SECTION ("Searching backward for a non-existing element")
+        {
+            auto range = e::search_backward_n(x, 5, 5);
+            REQUIRE (e::get<0>(range) == x);
+        }
+
+        SECTION ("Searching backward for the absence of an existing element")
+        {
+            auto range = e::search_backward_not_n(x, 5, 0);
+            REQUIRE (!e::precedes(e::get<0>(range), x + 5));
+        }
+
+        SECTION ("Searching backward for the absence of a non-existing element")
+        {
+            auto range = e::search_backward_not_n(x, 5, 5);
+            REQUIRE (e::get<0>(range) == x + 5);
+        }
+    }
+
+    SECTION ("search_if, search_if_not")
     {
         SECTION ("Searcing for an even element")
         {
@@ -78,7 +132,22 @@ SCENARIO ("Linear search", "[search]")
         }
     }
 
-    SECTION ("search_backward_if")
+    SECTION ("search_if_n, search_if_not_n")
+    {
+        SECTION ("Searcing for an even element")
+        {
+            auto range = e::search_if_n(e::loadable_cursor(x), 5, is_even);
+            REQUIRE (!e::precedes(e::get<0>(range), +x));
+        }
+
+        SECTION ("Searcing for an odd element")
+        {
+            auto range = e::search_if_not_n(x, 5, is_even);
+            REQUIRE (e::get<0>(range) == x + 1);
+        }
+    }
+
+    SECTION ("search_backward_if, search_backward_if_not")
     {
         SECTION ("Searcing for an even element")
         {
@@ -90,6 +159,21 @@ SCENARIO ("Linear search", "[search]")
         {
             auto cur = e::search_backward_if_not(x, x + 5, is_even);
             REQUIRE (cur == x + 4);
+        }
+    }
+
+    SECTION ("search_backward_if_n, search_backward_if_not_n")
+    {
+        SECTION ("Searcing for an even element")
+        {
+            auto range = e::search_backward_if_n(x, 5, is_even);
+            REQUIRE (!e::precedes(e::get<0>(range), x + 5));
+        }
+
+        SECTION ("Searcing for an odd element")
+        {
+            auto range = e::search_backward_if_not_n(x, 5, is_even);
+            REQUIRE (e::get<0>(range) == x + 4);
         }
     }
 
@@ -267,6 +351,34 @@ SCENARIO ("Linear search", "[search]")
         }
     }
 
+    SECTION ("search_match_n")
+    {
+        SECTION ("Searcing for a match between two empty ranges")
+        {
+            auto range = e::search_match_n(e::loadable_cursor(x), 0, x);
+            REQUIRE (!e::precedes(e::get<0>(e::get<0>(range)), +x));
+            REQUIRE (!e::precedes(e::get<1>(e::get<0>(range)), +x));
+        }
+
+        SECTION ("Searcing for a match between two arrays where there is a match")
+        {
+            int y[]{4, 3, 2, 1, 0};
+
+            auto range = e::search_match_n(x, 5, y);
+            REQUIRE (e::get<0>(e::get<0>(range)) == x + 2);
+            REQUIRE (e::get<1>(e::get<0>(range)) == y + 2);
+        }
+
+        SECTION ("Searcing for a match between two arrays where there is no match")
+        {
+            int y[]{1, 2, 3, 4, 5};
+
+            auto range = e::search_match_n(x, 5, y);
+            REQUIRE (e::get<0>(e::get<0>(range)) == x + 5);
+            REQUIRE (e::get<1>(e::get<0>(range)) == y + 5);
+        }
+    }
+
     SECTION ("search_mismatch")
     {
         SECTION ("Searcing for a mismatch between two empty ranges")
@@ -321,9 +433,37 @@ SCENARIO ("Linear search", "[search]")
         }
     }
 
-    SECTION ("search_adjacent_match")
+    SECTION ("search_mismatch_n")
     {
-        SECTION ("Positions")
+        SECTION ("Searcing for a mismatch between two empty ranges")
+        {
+            auto range = e::search_mismatch_n(e::loadable_cursor(x), 0, x);
+            REQUIRE (!e::precedes(e::get<0>(e::get<0>(range)), +x));
+            REQUIRE (!e::precedes(e::get<1>(e::get<0>(range)), +x));
+        }
+
+        SECTION ("Searcing for a mismatch between two arrays where there is a mismatch")
+        {
+            int y[]{0, 1, 0, 3, 4};
+
+            auto range = e::search_mismatch_n(x, 5, y);
+            REQUIRE (e::get<0>(e::get<0>(range)) == x + 2);
+            REQUIRE (e::get<1>(e::get<0>(range)) == y + 2);
+        }
+
+        SECTION ("Searcing for a mismatch between two arrays where there is no mismatch")
+        {
+            int y[]{0, 1, 2, 3, 4};
+
+            auto range = e::search_mismatch_n(x, 5, y);
+            REQUIRE (e::get<0>(e::get<0>(range)) == x + 5);
+            REQUIRE (e::get<1>(e::get<0>(range)) == y + 5);
+        }
+    }
+
+    SECTION ("search_adjacent_match, search_adjacent_mismatch")
+    {
+        SECTION ("Cursors")
         {
             SECTION ("Searcing for an adjacent equality match in an array that contains it")
             {
@@ -390,6 +530,79 @@ SCENARIO ("Linear search", "[search]")
 
                 auto cur = e::search_adjacent_mismatch(e::forward_cursor(y), y + 7);
                 REQUIRE (!e::precedes(cur, y + 7));
+            }
+        }
+    }
+
+    SECTION ("search_adjacent_match_n, search_adjacent_mismatch_n")
+    {
+        SECTION ("Cursors")
+        {
+            SECTION ("Searcing for an adjacent equality match in an array that contains it")
+            {
+                int y[]{0, 1, 2, 3, 3, 4, 5};
+
+                auto range = e::search_adjacent_match_n(e::cursor(y), 7);
+                REQUIRE (!e::precedes(e::get<0>(range), y + 4));
+            }
+
+            SECTION ("Searcing for an adjacent equality match in an array that doesn't contain it")
+            {
+                int y[]{0, 1, 2, 3, 4, 5, 6};
+
+                auto range = e::search_adjacent_match_n(e::cursor(y), 7);
+                REQUIRE (!e::precedes(e::get<0>(range), y + 7));
+            }
+
+            SECTION ("Searcing for an adjacent equality mismatch in an array that contains it")
+            {
+                int y[]{0, 0, 0, 0, 1, 1, 1};
+
+                auto range = e::search_adjacent_mismatch_n(e::cursor(y), 7);
+                REQUIRE (!e::precedes(e::get<0>(range), y + 4));
+            }
+
+            SECTION ("Searcing for an adjacent equality mismatch in an array that doesn't contain it")
+            {
+                int y[]{0, 0, 0, 0, 0, 0, 0};
+
+                auto range = e::search_adjacent_mismatch_n(e::cursor(y), 7);
+                REQUIRE (!e::precedes(e::get<0>(range), y + 7));
+            }
+        }
+
+        SECTION ("Forward cursors")
+        {
+            SECTION ("Searcing for an adjacent equality match in an array that contains it")
+            {
+                int y[]{0, 1, 2, 3, 3, 4, 5};
+
+                auto range = e::search_adjacent_match_n(e::forward_cursor(y), 7);
+                REQUIRE (!e::precedes(e::get<0>(range), y + 4));
+            }
+
+            SECTION ("Searcing for an adjacent equality match in an array that doesn't contain it")
+            {
+                int y[]{0, 1, 2, 3, 4, 5, 6};
+
+                auto range = e::search_adjacent_match_n(e::forward_cursor(y), 7);
+                REQUIRE (!e::precedes(e::get<0>(range), y + 7));
+            }
+
+            SECTION ("Searcing for an adjacent equality mismatch in an array that contains it")
+            {
+                int y[]{0, 0, 0, 0, 1, 1, 1};
+
+                auto range = e::search_adjacent_mismatch_n(e::forward_cursor(y), 7);
+                REQUIRE (!e::precedes(e::get<0>(range), y + 4));
+            }
+
+            SECTION ("Searcing for an adjacent equality mismatch in an array that doesn't contain it")
+            {
+                int y[]{0, 0, 0, 0, 0, 0, 0};
+
+                auto range = e::search_adjacent_mismatch_n(e::forward_cursor(y), 7);
+                REQUIRE (!e::precedes(e::get<0>(range), y + 7));
             }
         }
     }

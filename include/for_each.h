@@ -1,32 +1,13 @@
 #pragma once
 
-#include "cursor.h"
+#include "pair.h"
 
 namespace elements {
-
-template <Cursor C, Invocable<Value_type<C>> P>
-struct for_each_result
-{
-    C cursor;
-    P procedure;
-
-    constexpr
-    for_each_result()
-        : cursor()
-        , procedure()
-    {}
-
-    constexpr
-    for_each_result(C cur, P proc)
-        : cursor(mv(cur))
-        , procedure(mv(proc))
-    {}
-};
 
 template <Cursor C, Limit<C> L, Invocable<Value_type<C>> P>
 requires Loadable<C>
 constexpr auto
-for_each(C cur, L lim, P proc) -> for_each_result<C, P>
+for_each(C cur, L lim, P proc) -> pair<C, P>
 //[[expects axiom: loadable_range(cur, lim)]]
 {
     while (precedes(cur, lim)) {
@@ -39,7 +20,7 @@ for_each(C cur, L lim, P proc) -> for_each_result<C, P>
 template <Segmented_cursor C, Invocable<Value_type<C>> P>
 requires Loadable<C>
 constexpr auto
-for_each(C cur, C lim, P proc) -> for_each_result<C, P>
+for_each(C cur, C lim, P proc) -> pair<C, P>
 {
     auto index_cur = index_cursor(cur);
     auto index_lim = index_cursor(lim);
@@ -53,6 +34,19 @@ for_each(C cur, C lim, P proc) -> for_each_result<C, P>
         } while (precedes(index_cur, index_lim));
         return {mv(cur), mv(proc)};
     }
+}
+
+template <Cursor C, Invocable<Value_type<C>> P>
+requires Loadable<C>
+constexpr auto
+for_each_n(C cur, Difference_type<C> n, P proc) -> pair<C, P>
+//[[expects axiom: weak_range(cur, n)]]
+{
+    while (count_down(n)) {
+        invoke(proc, load(cur));
+        increment(cur);
+    }
+    return {mv(cur), mv(proc)};
 }
 
 }

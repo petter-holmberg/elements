@@ -44,6 +44,16 @@ struct search_binary_upper_predicate
     }
 };
 
+template <Forward_cursor C, Relation<Value_type<C>, Value_type<C>> R = lt<Value_type<C>>>
+requires Loadable<C>
+constexpr auto
+search_binary_lower_n(C cur, Difference_type<C> n, Value_type<C> const& value, R rel = {}) -> C
+//[[expects axiom: increasing_counted_range(cur, n, rel)]]
+//[[expects axiom: weak_ordering(rel)]]
+{
+    return partition_point_n(mv(cur), n, search_binary_lower_predicate<Value_type<C>, R>{value, rel});
+}
+
 template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = lt<Value_type<C>>>
 requires Loadable<C>
 constexpr auto
@@ -51,7 +61,17 @@ search_binary_lower(C cur, L lim, Value_type<C> const& value, R rel = {}) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
 //[[expects axiom: weak_ordering(rel)]]
 {
-    return partition_point(mv(cur), mv(lim), search_binary_lower_predicate<Value_type<C>, R>{value, rel});
+    return search_binary_lower_n(cur, lim - cur, value, rel);
+}
+
+template <Forward_cursor C, Relation<Value_type<C>, Value_type<C>> R = lt<Value_type<C>>>
+requires Loadable<C>
+constexpr auto
+search_binary_upper_n(C cur, Difference_type<C> n, Value_type<C> const& value, R rel = {}) -> C
+//[[expects axiom: increasing_counted_range(cur, n, rel)]]
+//[[expects axiom: weak_ordering(rel)]]
+{
+    return partition_point_n(mv(cur), n, search_binary_upper_predicate<Value_type<C>, R>{value, rel});
 }
 
 template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = lt<Value_type<C>>>
@@ -61,20 +81,19 @@ search_binary_upper(C cur, L lim, Value_type<C> const& value, R rel = {}) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
 //[[expects axiom: weak_ordering(rel)]]
 {
-    return partition_point(mv(cur), mv(lim), search_binary_upper_predicate<Value_type<C>, R>{value, rel});
+    return search_binary_upper_n(cur, lim - cur, value, rel);
 }
 
-template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = lt<Value_type<C>>>
+template <Forward_cursor C, Relation<Value_type<C>, Value_type<C>> R = lt<Value_type<C>>>
 requires Loadable<C>
 constexpr auto
-search_binary(C cur, L lim, Value_type<C> const& value, R rel = {}) -> bounded_range<C>
+search_binary_n(C cur, Difference_type<Decay<C>> dist, Value_type<C> const& value, R rel = {}) -> bounded_range<C>
 //[[expects axiom: loadable_range(cur, lim)]]
 //[[expects axiom: weak_ordering(rel)]]
 {
     search_binary_lower_predicate<Value_type<C>, R> first_pred{value, rel};
     search_binary_upper_predicate<Value_type<C>, R> limit_pred{value, rel};
 
-    auto dist = lim - cur;
     while (!is_zero(dist)) {
         auto const half_dist = half(dist);
         auto mid = cur + half_dist;
@@ -92,6 +111,16 @@ search_binary(C cur, L lim, Value_type<C> const& value, R rel = {}) -> bounded_r
     }
 
     return {cur, cur};
+}
+
+template <Forward_cursor C, Limit<C> L, Relation<Value_type<C>, Value_type<C>> R = lt<Value_type<C>>>
+requires Loadable<C>
+constexpr auto
+search_binary(C cur, L lim, Value_type<C> const& value, R rel = {}) -> bounded_range<C>
+//[[expects axiom: loadable_range(cur, lim)]]
+//[[expects axiom: weak_ordering(rel)]]
+{
+    return search_binary_n(cur, lim - cur, value, rel);
 }
 
 }

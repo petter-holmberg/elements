@@ -24,6 +24,18 @@ SCENARIO ("Quantifiers", "[quantify]")
 
         REQUIRE (e::any_of(x, x + 5, is_even));
         REQUIRE (!e::any_of(x, x + 5, is_odd));
+
+        REQUIRE (e::each_of_n(x, 5, is_even));
+        REQUIRE (!e::each_of_n(x, 5, is_odd));
+
+        REQUIRE (!e::any_not_of_n(x, 5, is_even));
+        REQUIRE (e::any_not_of_n(x, 5, is_odd));
+
+        REQUIRE (!e::none_of_n(x, 5, is_even));
+        REQUIRE (e::none_of_n(x, 5, is_odd));
+
+        REQUIRE (e::any_of_n(x, 5, is_even));
+        REQUIRE (!e::any_of_n(x, 5, is_odd));
     }
 
     GIVEN ("Array of even and odd integers")
@@ -41,5 +53,17 @@ SCENARIO ("Quantifiers", "[quantify]")
 
         REQUIRE (e::any_of(x, x + 5, is_even));
         REQUIRE (e::any_of(x, x + 5, is_odd));
+
+        REQUIRE (!e::each_of_n(x, 5, is_even));
+        REQUIRE (!e::each_of_n(x, 5, is_odd));
+
+        REQUIRE (e::any_not_of_n(x, 5, is_even));
+        REQUIRE (e::any_not_of_n(x, 5, is_odd));
+
+        REQUIRE (!e::none_of_n(x, 5, is_even));
+        REQUIRE (!e::none_of_n(x, 5, is_odd));
+
+        REQUIRE (e::any_of_n(x, 5, is_even));
+        REQUIRE (e::any_of_n(x, 5, is_odd));
     }
 }

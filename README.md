@@ -84,7 +84,10 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 ## Copying
 
-`copy` takes a loadable range as source and a storable cursor as destination. It performs copying from the first to the last element of the source, which implies that the range starting at the destination cursor can overlap with the source cursor, as long as no source cursor is read after an aliased destination cursor.
+`copy` takes a loadable range as source and a storable cursor as destination. It performs copying from the first to the last element of the source. The range starting at the destination cursor can overlap with the source range, as long as no source cursor is read after an aliased destination cursor. The range starting at the destination cursor must be at least as long as the source range.
+`copy` may also take a loadable range as source and a storable range as destination. Then it performs copying from the first element of the source until either the source range or the destination range reaches its last element.
+
+`copy_n` takes a loadable position and a count as source and a storable cursor as destination. It performs copying of n elements from the source. The range starting at the destination cursor can overlap with the source range, as long as no source cursor is read after an aliased destination cursor.
 
 `copy_select` takes a loadable range as source, a storable cursor as destination, and a unary `Predicate` to determine which of the elements from the source that should be copied to the destination.
 
@@ -118,9 +121,12 @@ This algorithm minimizes the cost of applying the operation if the size of a red
 
 `is_partitioned` takes a loadable range and a unary predicate. It checks if the range is partitioned according to the predicate, with all elements not satisfying the predicate preceding the elements satisfying the predicate.
 
-`partition_point_counted` takes a forward cursor, a distance, and a unary predicate, assuming that the range from the cursor to the cursor + distance is partitioned according to the predicate. Using bisection, it returns a cursor pointing to the first element satisfying the predicate.
+`is_partitioned_n` takes a forward cursor, a distance, and a unary predicate. It checks if the range is partitioned according to the predicate, with all elements not satisfying the predicate preceding the elements satisfying the predicate.
 
-`partition_point` takes a loadable forward range and a unary predicate, assuming that the range is partitioned according to the predicate. Using bisection, it returns a cursor pointing to the first element satisfying the predicate.
+`partition_point` takes a loadable forward range and a unary predicate, assuming that the range is partitioned according to the predicate. Using bisection, it returns a cursor pointing to the first
+element satisfying the predicate.
+
+`partition_point_n` takes a forward cursor, a distance, and a unary predicate, assuming that the range from the cursor to the cursor + distance is partitioned according to the predicate. Using bisection, it returns a cursor pointing to the first element satisfying the predicate.
 
 `partition_semistable` takes a mutable forward range and a unary prediate. It partitions the range such that all elements not satisfying the predicate precede the elements satisfying the predicate. It preserves the relative ordering of the elements not satisfying the predicate, but not the relative ordering of the elements satisfying the predicate. It returns the partition point, i.e. a cursor pointing to the first element satisfying the predicate.
 
@@ -144,13 +150,19 @@ This algorithm minimizes the cost of applying the operation if the size of a red
 
 ### Binary search
 
-The functions in `search.h` implement algorithms based on binary search, as described in [Knuth3](#Knuth3), Chapter 6.2.
+The functions in `search_binary.h` implement algorithms based on binary search, as described in [Knuth3](#Knuth3), Chapter 6.2.
 
 `search_binary_lower` takes a loadable forward range and a relation defaulting to `lt`, assuming that the range is ordered in accordance with the relation. It returns a cursor pointing to the first element satisfying the relation.
 
+`search_binary_lower_n` takes a loadable forward cursor, a count, and a relation defaulting to `lt`, assuming that the range is ordered in accordance with the relation. It returns a cursor pointing to the first element satisfying the relation.
+
 `search_binary_upper` takes a loadable forward range and a relation defaulting to `lt`, assuming that the range is ordered in accordance with the relation. It returns the successor of a cursor pointing to the last element satisfying the relation.
 
+`search_binary_upper_n` takes a loadable forward cursor, a count, and a relation defaulting to `lt`, assuming that the range is ordered in accordance with the relation. It returns the successor of a cursor pointing to the last element satisfying the relation.
+
 `search_binary` takes a loadable forward range and a relation defaulting to `lt`, assuming that the range is ordered in accordance with the relation. It finds the `bounded_range` of elements satisfying the relation.
+
+`search_binary_n` takes a loadable forward cursor, a count, and a relation defaulting to `lt`, assuming that the range is ordered in accordance with the relation. It finds the `bounded_range` of elements satisfying the relation.
 
 ### Linear search
 
@@ -160,11 +172,17 @@ The functions in `search.h` implement algorithms based on linear search, as desc
 For `search`, a match is defined as the first element `y` in the range for which the given element `x` equals `y`.
 For `search_not`, a match is defined as the first element `y` in the range for which the given element `x` differs from `y`.
 
+`search_n` and `search_not_n` take a weak range instead of a loadable range. They return a pair of the cursor and the count so that a search can be resumed.
+
 `search_if` and `search_if_not` take a unary predicate instead of an element.
 For `search_if`, a match is defined as the first element `x` for which the given predicate is true.
-For `search_not`, a match is defined as the first element `y` for which the given predicate is false.
+For `search_if_not`, a match is defined as the first element `y` for which the given predicate is false.
 
-`search_backward`, `search_backward_not`, `search_backward_if`, and `search_backward_if_not` are variations of the functions above that search backward through the loadable range.
+`search_if_n` and `search_if_not_n` take a weak range instead of a loadable range. They return a pair of the cursor and the count so that a search can be resumed.
+
+`search_backward`, `search_backward_not`, `search_backward_if`, and `search_backward_if_not` are variations of the functions above that search backward through the loadable range. They require a bidirectional range.
+
+`search_backward_n`, `search_backward_not_n`, `search_backward_if_n`, and `search_backward_if_not_n` take a weak range instead of a loadable range. They return a pair of the cursor and the remaining count so that a search can be resumed.
 
 `search_unguarded`, `search_not_unguarded`, `search_if_unguarded`, and `search_if_not_unguarded` are variations of the functions above that assum_ope an element satisfying the applied predicate is known to exist in the given range (which necessarily is nonempty). They take a cursor pointing to the first element to be tested instead of a range as they don't need to check for the limit of the range at each iteration. Iteration is faster because the end of the range doesn't need to be checked.
 
@@ -174,8 +192,12 @@ assum_ope an element satisfying the applied predicate is known to exist in the g
 
 `search_match` and `search_mismatch` take two loadable ranges and an optional relation, simultaneously traversing the ranges and stopping at the first positions where a match or a mismatching element is found, respectively. The default relation is `eq`. If the second range is not shorter than the first, or if a match is known to exist before the end of the second range, the algorithm can be called with only a `cursor` to the first element of the second range.
 
+`search_match_n` and `search_mismatch_n` are variants of the functions above that take a weak range and a cursor. They return a pair of a cursor pair and the remaining count so that a search can be resumed.
+
 `search_adjacent_match` and `search_adjacent_mismatch` take a loadable range and a relation,
 stopping at the first position where an element and its successor satisfy the relation, or does not satisfy the relation, respectively. The default relation is `eq`.
+
+`search_adcacent_match_n` and `search_adjacent_mismatch_n` are variants of the functions above that take a weak range and a cursor. They return a pair of a cursor and the remaining count so that a search can be resumed.
 
 ### Subsequence search
 
@@ -194,7 +216,9 @@ It will return a cursor pointing to the first subsequence in the first range tha
 
 ## Side effects
 
-`for_each` takes a loadable range and a procedure of arity 1. It applies the procedure on each value in the range, returning a `for_each_result` containing a cursor and the procedure. The cursor points at the position where the iteration has stopped (which may not be reachable a second time), and the procedure is returned as it could have accumulated information during the traversal.
+`for_each` takes a loadable range and a procedure of arity 1. It applies the procedure on each value in the range, returning a `pair` containing a cursor and the procedure. The cursor points at the position where the iteration has stopped (which may not be reachable a second time), and the procedure is returned as it could have accumulated information during the traversal.
+
+`for_each_n` takes a loadable cursor, a count, and a range and a procedure of arity 1. It applies the procedure on each value in the range, returning a `pair` containing a cursor and the procedure. The cursor points at the position where the iteration has stopped (which may not be reachable a second time), and the procedure is returned as it could have accumulated information during the traversal.
 
 ## Quantifiers
 
@@ -202,6 +226,8 @@ It will return a cursor pointing to the first subsequence in the first range tha
 `any_not_of` takes a loadable range and a unary predicate. It checks if any value in the range does not satisfy the predicate.
 `none_of` takes a loadable range and a unary predicate. It checks if none of the values in the range satisfies the predicate.
 `any_of` takes a loadable range and a unary predicate. It checks if any value in the range satisfies the predicate.
+
+`each_of_n`, `any_not_of`, `none_of_n`, and `any_of_n` are variants of the functions above that take a weak range instead of a loadable range.
 
 ## Transformations and Actions
 
@@ -648,6 +674,7 @@ Index
 `count_not`
 
 `copy`
+`copy_n`
 `copy_select`
 `copy_if`
 `copy_if_not`
@@ -661,9 +688,11 @@ Index
 
 `flat_map`
 
+`is_relation_preserving`
 `is_partitioned`
-`partition_point_counted`
+`is_partitioned_n`
 `partition_point`
+`partition_point_n`
 `partition_semistable`
 `partition_stable_with_buffer`
 `partition_stable`
@@ -679,13 +708,21 @@ Index
 
 `search`
 `search_not`
+`search_n`
+`search_not_n`
 `search_if`
 `search_if_not`.
+`search_if_n`
+`search_if_not_n`
 
 `search_backward`
 `search_backward_not`
 `search_backward_if`
 `search_backward_if_not`
+`search_backward_n`
+`search_backward_not_n`
+`search_backward_if_n`
+`search_backward_if_not_n`
 
 `search_unguarded`,
 `search_not_unguarded`,
@@ -699,20 +736,28 @@ Index
 
 `search_match`
 `search_mismatch`
+`search_match_n`
+`search_mismatch_n`
 
 `search_adjacent_match`
 `search_adjacent_mismatch`
+`search_adjacent_match_n`
+`search_adjacent_mismatch_n`
 
 `reverse`
 `rotate`
 
 `for_each`
-`for_each_result`
+`for_each_n`
 
 `each_of`
 `any_not_of`
 `none_of`
 `any_of`
+`each_of_n`
+`any_not_of_n`
+`none_of_n`
+`any_of_n`
 
 `zip`
 `unzip`

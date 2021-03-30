@@ -35,6 +35,34 @@ SCENARIO ("Copying", "[copy]")
         CHECK (x[4] == 4);
     }
 
+    SECTION ("Copying an array to a shorter array with destination bounds checking")
+    {
+        auto curs = e::copy(x, x + 5, y, y + 3);
+
+        REQUIRE(e::get<0>(curs) == x + 3);
+        REQUIRE(e::get<1>(curs) == y + 3);
+
+        CHECK (y[0] == 0);
+        CHECK (y[1] == 1);
+        CHECK (y[2] == 2);
+        CHECK (y[3] == 8);
+        CHECK (y[4] == 9);
+    }
+
+    SECTION ("Copying one array to another, counted")
+    {
+        auto p = e::copy_n(x, 5, y);
+
+        REQUIRE(p.m0 == x + 5);
+        REQUIRE(p.m1 == y + 5);
+
+        CHECK (y[0] == 0);
+        CHECK (y[1] == 1);
+        CHECK (y[2] == 2);
+        CHECK (y[3] == 3);
+        CHECK (y[4] == 4);
+    }
+
     SECTION ("Copying a backward-overlapping sub-range of an array")
     {
         auto cur = e::copy(x + 1, x + 5, x);

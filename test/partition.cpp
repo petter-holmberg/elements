@@ -13,6 +13,7 @@ SCENARIO ("Partition points", "[partition]")
         int x[]{0};
 
         REQUIRE (e::is_partitioned(x, x, is_even));
+        REQUIRE (e::is_partitioned_n(x, 0, is_even));
         REQUIRE (!e::precedes(e::partition_point(x, x, is_even), +x));
     }
 
@@ -21,6 +22,7 @@ SCENARIO ("Partition points", "[partition]")
         int x[]{0};
 
         REQUIRE (e::is_partitioned(x, x + 1, is_even));
+        REQUIRE (e::is_partitioned_n(x, 1, is_even));
     }
 
     SECTION ("Checking if a single-element array with an odd number is partitioned")
@@ -28,6 +30,7 @@ SCENARIO ("Partition points", "[partition]")
         int x[]{1};
 
         REQUIRE (e::is_partitioned(x, x + 1, is_even));
+        REQUIRE (e::is_partitioned_n(x, 1, is_even));
     }
 
     SECTION ("Checking if an array with an even and an odd number is partitioned")
@@ -35,6 +38,7 @@ SCENARIO ("Partition points", "[partition]")
         int x[]{0, 1};
 
         REQUIRE (!e::is_partitioned(x, x + 2, is_even));
+        REQUIRE (e::is_partitioned_n(x, 2, is_even));
     }
 
     SECTION ("Checking if an array with an odd and an even number is partitioned")
@@ -42,6 +46,7 @@ SCENARIO ("Partition points", "[partition]")
         int x[]{1, 0};
 
         REQUIRE (e::is_partitioned(x, x + 2, is_even));
+        REQUIRE (e::is_partitioned_n(x, 2, is_even));
     }
 }
 

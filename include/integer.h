@@ -124,4 +124,13 @@ concept Integer =
         { is_odd(a) } -> Boolean_testable;
     };
 
+template <Integer N>
+constexpr auto
+count_down(N& n) -> bool
+{
+    if (is_zero(n)) return false;
+    decrement(n);
+    return true;
+}
+
 }

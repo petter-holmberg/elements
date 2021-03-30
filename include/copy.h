@@ -1,14 +1,11 @@
 #pragma once
 
-#include "cursor.h"
+#include "pair.h"
 
 namespace elements {
 
 template <Cursor S, Cursor D>
-requires
-    Loadable<S> and
-    Storable<D> and
-    Same_as<Decay<Value_type<S>>, Decay<Value_type<D>>>
+requires Indirectly_copyable<S, D>
 constexpr void
 copy_step(S& src, D& dst)
 {
@@ -18,10 +15,7 @@ copy_step(S& src, D& dst)
 }
 
 template <Cursor S, Limit<S> L, Cursor D>
-requires
-    Loadable<S> and
-    Storable<D> and
-    Same_as<Decay<Value_type<S>>, Decay<Value_type<D>>>
+requires Indirectly_copyable<S, D>
 constexpr auto
 copy(S src, L lim, D dst) -> D
 //[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (lim - src))]]
@@ -30,11 +24,27 @@ copy(S src, L lim, D dst) -> D
     return dst;
 }
 
+template <Cursor S, Limit<S> LS, Cursor D, Limit<D> LD>
+requires Indirectly_copyable<S, D>
+constexpr auto
+copy(S src, LS lims, D dst, LD limd) -> pair<S, D>
+//[[expects axiom: not_overlapped_forward(src, lims, dst, limd))]]
+{
+    while (precedes(src, lims) and precedes(dst, limd)) copy_step(src, dst);
+    return {mv(src), mv(dst)};
+}
+
+template <Cursor S, Integer N, Cursor D>
+requires Indirectly_copyable<S, D>
+constexpr auto
+copy_n(S src, N n, D dst) -> pair<S, D>
+{
+   while (count_down(n)) copy_step(src, dst);
+   return {mv(src), mv(dst)};
+}
+
 template <Segmented_cursor S, Cursor D>
-requires
-    Loadable<S> and
-    Storable<D> and
-    Same_as<Decay<Value_type<S>>, Decay<Value_type<D>>>
+requires Indirectly_copyable<S, D>
 constexpr auto
 copy(S src, S lim, D dst) -> D
 {
@@ -53,12 +63,10 @@ copy(S src, S lim, D dst) -> D
 }
 
 template <Cursor S, Cursor D, Limit<S> L, Predicate<S> P>
-requires
-    Loadable<S> and
-    Storable<D>
+requires Indirectly_copyable<S, D>
 constexpr auto
 copy_select(S src, L lim, D dst, P pred) -> D
-//[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (# of iterators satisfying pred))]]
+//[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (# of cursors satisfying pred))]]
 {
     auto cur{src};
     while (precedes(cur, lim)) {
@@ -89,27 +97,21 @@ struct predicate_load
 };
 
 template <Cursor S, Cursor D, Limit<S> L, Predicate<Value_type<S>> P>
-requires
-    Loadable<S> and
-    Storable<D> and
-    Same_as<Value_type<S>, Value_type<D>>
+requires Indirectly_copyable<S, D>
 constexpr auto
 copy_if(S src, L lim, D dst, P pred) -> D
-//[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (# of iterators satisfying pred))]]
+//[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (# of cursors satisfying pred))]]
 {
-    return copy_select(src, lim, dst, predicate_load<S, P>{pred});
+    return copy_select(mv(src), lim, mv(dst), predicate_load<S, P>{pred});
 }
 
 template <Cursor S, Cursor D, Limit<S> L, Predicate<Value_type<S>> P>
-requires
-    Loadable<S> and
-    Storable<D> and
-    Same_as<Value_type<S>, Value_type<D>>
+requires Indirectly_copyable<S, D>
 constexpr auto
 copy_if_not(S src, L lim, D dst, P pred) -> D
-//[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (# of iterators satisfying pred))]]
+//[[expects axiom: not_overlapped_forward(src, lim, dst, dst + (# of cursors satisfying pred))]]
 {
-    return copy_if(src, lim, dst, negation<Value_type<S>, P>{pred});
+    return copy_if(mv(src), lim, mv(dst), negation<Value_type<S>, P>{pred});
 }
 
 }

@@ -20,10 +20,20 @@ is_partitioned(C cur, L lim, P pred) -> bool
     return !precedes(search_if_not(search_if(mv(cur), lim, pred), lim, pred), lim);
 }
 
+template <Cursor C, Predicate<Value_type<C>> P>
+requires Loadable<C>
+constexpr auto
+is_partitioned_n(C cur, Difference_type<C> n, P pred) -> bool
+//[[expects axiom: counted_range(cur, n)]]
+{
+    auto rng = search_if_n(mv(cur), n, pred);
+    return get<1>(search_if_not_n(get<0>(rng), get<1>(rng), pred)) == Zero<Difference_type<C>>;
+}
+
 template <Forward_cursor C, Predicate<Value_type<C>> P>
 requires Loadable<C>
 constexpr auto
-partition_point_counted(C cur, Difference_type<C> dist, P pred) -> C
+partition_point_n(C cur, Difference_type<C> dist, P pred) -> C
 //[[expects axiom: loadable_counted_range(cur, dist)]]
 //[[expects: is_partitioned(counted_cursor(cur, dist), pred)]]
 {
@@ -48,7 +58,7 @@ partition_point(C cur, L lim, P pred) -> C
 //[[expects axiom: loadable_range(cur, lim)]]
 //[[expects: is_partitioned(cur, lim, pred)]]
 {
-    return partition_point_counted(cur, lim - cur, pred);
+    return partition_point_n(cur, lim - cur, pred);
 }
 
 template <Forward_cursor C, Limit<C> L, Predicate<Value_type<C>> P>
@@ -160,24 +170,24 @@ combine_ranges(bounded_range<C> const& x, bounded_range<C> const& y) -> bounded_
 template <Forward_cursor C, Predicate<Value_type<C>> P>
 requires Mutable<C>
 constexpr auto
-partition_stable_nonempty_counted(C cur, Difference_type<C> n, P pred) -> bounded_range<C>
+partition_stable_nonempty_n(C cur, Difference_type<C> n, P pred) -> bounded_range<C>
 //[[expects axiom: mutable_counted_range(cur, n)]]
 {
     if (is_one(n)) return partition_stable_singleton(cur, pred);
     auto h = half(n);
-    auto x{partition_stable_nonempty_counted(cur, h, pred)};
-    auto y{partition_stable_nonempty_counted(limit(x), n - h, pred)};
+    auto x{partition_stable_nonempty_n(cur, h, pred)};
+    auto y{partition_stable_nonempty_n(limit(x), n - h, pred)};
     return combine_ranges(x, y);
 }
 
 template <Forward_cursor C, Predicate<Value_type<C>> P>
 requires Mutable<C>
 constexpr auto
-partition_stable_counted(C cur, Difference_type<C> n, P pred) -> bounded_range<C>
+partition_stable_n(C cur, Difference_type<C> n, P pred) -> bounded_range<C>
 //[[expects axiom: mutable_counted_range(cur, n)]]
 {
     if (is_zero(n)) return {cur, cur};
-    return partition_stable_nonempty_counted(cur, n, pred);
+    return partition_stable_nonempty_n(cur, n, pred);
 }
 
 template <Forward_cursor C, Limit<C> L, Predicate<Value_type<C>> P>
@@ -186,7 +196,7 @@ constexpr auto
 partition_stable(C cur, L lim, P pred) -> C
 //[[expects axiom: mutable_range(cur, lim)]]
 {
-    return first(partition_stable_counted(cur, lim - cur, pred));
+    return first(partition_stable_n(cur, lim - cur, pred));
 }
 
 template <Bidirectional_cursor C, Limit<C> L, Predicate<Value_type<C>> P>

@@ -149,8 +149,11 @@ concept Mutable =
         { at(x) } -> Same_as<Value_type<M>&>;
     };
 
-static_assert(Mutable<int>);
-static_assert(Mutable<int*>);
+template <typename S, typename D>
+concept Indirectly_copyable =
+    Loadable<S> and
+    Storable<D> and
+    Convertible_to<Decay<Value_type<S>>, Decay<Value_type<D>>>;
 
 template <Constructible_from T>
 constexpr void
