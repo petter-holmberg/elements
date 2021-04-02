@@ -55,14 +55,24 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 ## Equivalence and ordering
 
+The functions in `ordering.h` implement order selection algorithms, as described in [StepanovMcJones](#StepanovMcJones), Chapter 4.3. They are all *stable*, i.e. equivalent objects are ordered with respect to the order in which they are passed as arguments.
+
 `select_0_2` takes a weak ordering and two values of its domain, and returns the minimum value. `min` uses `lt` as the weak ordering.
 `select_1_2` takes a weak ordering and two values of its domain, and returns the maximum value. `max` uses `lt` as the weak ordering.
 `select_0_3` takes a weak ordering and three values, returning the minimum. `min` uses `lt` as the weak ordering.
 `select_2_3` takes a weak ordering and three values, returning the maximum. `max` uses `lt` as the weak ordering.
 `select_1_3_ab` takes a weak ordering and three values, where the first two are in increasing order, returning the median.
-`select_1_3_ac` takes a weak ordering and three values, where the first and the last are in increasing order, returning the median. `clamp` ises `lt`as the weak ordering.
+`select_1_3_ac` takes a weak ordering and three values, where the first and the last are in increasing order, returning the median. `clamp` uses `lt`as the weak ordering.
 `select_1_3` takes a weak ordering and three values, returning the median. `median` uses `lt` as the weak ordering.
 `select_2_3` takes a weak ordering and three values, returning the maximum. `max` uses `lt` as the weak ordering.
+`select_0_4` takes a weak ordering and four values, returning the minimum. `min` uses `lt` as the weak ordering.
+`select_1_4` takes a weak ordering and four values, returning the second minimum.
+`select_1_4_ab` takes a weak ordering and four values, where the first two are in increasing order, returning the second minimum.
+`select_1_4_ab_cd` takes a weak ordering and four values, where the first two and the last two are in increasing order, returning the second minimum.
+`select_2_4` takes a weak ordering and four values, returning the second maximum.
+`select_2_4_cd` takes a weak ordering and four values, where the last two are in increasing order, returning the second maximum.
+`select_2_4_ab_cd` takes a weak ordering and four values, where the first two and the last two are in increasing order, returning the second maximum.
+`select_3_4` takes a weak ordering and four values, returning the maximum. `max` uses `lt` as the weak ordering.
 
 `equivalent_lexicographical` takes two loadable ranges and an equivalence relation, comparing them for equivalence. `equal_lexicographical` uses `eq` as the equivalence relation.
 
@@ -658,6 +668,14 @@ Index
 `select_1_3_ac`
 `clamp`
 `select_1_3`
+`select_0_4`
+`select_1_4`
+`select_1_4_ab`
+`select_1_4_ab_cd`
+`select_2_4`
+`select_2_4_cd`
+`select_2_4_ab_cd`
+`select_3_4`
 `median`
 `equivalent_lexicographical`
 `equal_lexicographical`
