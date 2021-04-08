@@ -96,9 +96,4 @@ SCENARIO ("Using built-in and library algebraic types", "[algebra]")
 
         static_assert(e::Module<std::ptrdiff_t>);
     }
-
-    SECTION ("Vector spaces")
-    {
-        static_assert(e::Vector_space<std::ptrdiff_t>);
-    }
 }

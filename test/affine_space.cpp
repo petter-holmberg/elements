@@ -17,82 +17,50 @@ SCENARIO ("Using affine spaces", "[affine_space]")
                 typename std::chrono::system_clock::time_point::duration::rep>);
 }
 
-SCENARIO ("Using affine vectors", "[affine_vector]")
+SCENARIO ("Using points", "[point]")
 {
-    e::affine_vector x{e::array_k<int, 2>{1, 2}};
-    static_assert(e::Vector_space<decltype(x)>);
-    static_assert(e::Sequence<decltype(x)>);
-
-    SECTION ("Vector algebra")
-    {
-        e::affine_vector<int, 2> z;
-
-        REQUIRE (z[0] == 0);
-        REQUIRE (z[1] == 0);
-
-        z = -x;
-
-        REQUIRE (z[0] == -1);
-        REQUIRE (z[1] == -2);
-
-        e::affine_vector y{e::array_k<int, 2>{3, 4}};
-
-        z = x + y;
-
-        REQUIRE (z[0] == 4);
-        REQUIRE (z[1] == 6);
-
-        z = x - y;
-
-        REQUIRE (z[0] == -2);
-        REQUIRE (z[1] == -2);
-
-        z = x * 2;
-
-        REQUIRE (z[0] == 2);
-        REQUIRE (z[1] == 4);
-
-        z = y / 2;
-
-        REQUIRE (z[0] == 1);
-        REQUIRE (z[1] == 2);
-
-        REQUIRE (x * y == 11);
-        REQUIRE (y * x == 11);
-    }
-}
-
-SCENARIO ("Using affine points", "[affine_point]")
-{
-    e::affine_point x{e::array_k<int, 2>{1, 2}};
-    static_assert(e::Affine_space<decltype(x)>);
-    static_assert(e::Sequence<decltype(x)>);
+    e::point p{e::array_k<int, 2>{1, 2}};
+    static_assert(e::Affine_space<decltype(p)>);
 
     SECTION ("Affine transformations")
     {
-        e::affine_point<int, 2> z;
+        e::point<int, 2> q;
 
-        REQUIRE (z[0] == 0);
-        REQUIRE (z[1] == 0);
+        REQUIRE (q(0) == 0);
+        REQUIRE (q(1) == 0);
 
-        e::Difference_type<decltype(x)> v = x - z;
+        e::Difference_type<decltype(p)> v = p - q;
 
-        REQUIRE (v[0] == 1);
-        REQUIRE (v[1] == 2);
+        REQUIRE (v(0) == 1);
+        REQUIRE (v(1) == 2);
 
-        x = x + v;
+        p = p + v;
 
-        REQUIRE (x[0] == 2);
-        REQUIRE (x[1] == 4);
+        REQUIRE (p(0) == 2);
+        REQUIRE (p(1) == 4);
 
-        x = v + x;
+        p = v + p;
 
-        REQUIRE (x[0] == 3);
-        REQUIRE (x[1] == 6);
+        REQUIRE (p(0) == 3);
+        REQUIRE (p(1) == 6);
 
-        x = x - v;
+        p = p - v;
 
-        REQUIRE (x[0] == 2);
-        REQUIRE (x[1] == 4);
+        REQUIRE (p(0) == 2);
+        REQUIRE (p(1) == 4);
+    }
+
+    SECTION ("Quadrance")
+    {
+        e::point p0{e::array_k<int, 2>{0, 0}};
+        e::point p1{e::array_k<int, 2>{4, 0}};
+        e::point p2{e::array_k<int, 2>{4, 3}};
+
+        REQUIRE (e::quadrance(p0, p1) == 16);
+        REQUIRE (e::quadrance(p1, p0) == 16);
+        REQUIRE (e::quadrance(p1, p2) == 9);
+        REQUIRE (e::quadrance(p2, p1) == 9);
+        REQUIRE (e::quadrance(p2, p0) == 25);
+        REQUIRE (e::quadrance(p0, p2) == 25);
     }
 }

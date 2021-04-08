@@ -146,33 +146,23 @@ struct le<void>
 };
 
 template <typename T>
-requires Destructible<Remove_const<T>>
+requires Destructible<T>
 constexpr void
 destroy(T& x)
     //[[expects axiom: partially_formed(x)]]
     //[[ensures axiom: raw_memory(x)]]
 {
-    x.~T();
+    destroy_at(addressof(x));
 }
 
-template <typename T>
-requires Default_initializable<Remove_const<T>>
+template <typename T, typename... Args>
+requires Constructible_from<T, Args...>
 constexpr void
-construct(T& raw)
+construct(T& raw, Args&&... args)
     //[[expects axiom: raw_memory(raw)]]
-    //[[ensures axiom: partially_formed(raw)]]
+    //[[ensures axiom: raw == T{args...}]]
 {
-    new (&raw) T();
-}
-
-template <typename T, typename U>
-requires Default_initializable<Remove_const<T>>
-constexpr void
-construct(T& raw, U&& initializer)
-    //[[expects axiom: raw_memory(raw)]]
-    //[[ensures axiom: raw == initializer]]
-{
-    new (&raw) T(fw<U>(initializer));
+    construct_at(addressof(raw), fw<Args>(args)...);
 }
 
 template <Semiregular T>

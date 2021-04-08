@@ -53,6 +53,10 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 `choose` selects the n choose k binomial coefficent.
 
+## Geometry
+
+`quadrance` gives the quadrance between two `points`. It is a quadratic measure of the separation between two points.
+
 ## Equivalence and ordering
 
 The functions in `ordering.h` implement order selection algorithms, as described in [StepanovMcJones](#StepanovMcJones), Chapter 4.3. They are all *stable*, i.e. equivalent objects are ordered with respect to the order in which they are passed as arguments.
@@ -265,9 +269,11 @@ It will return a cursor pointing to the first subsequence in the first range tha
 
 `bit` implements a type supporting the algebra of Boole and propositional logic. It is a `Commutative_semiring`, with addition represented by "xor" and multiplication represented by "and". The 16 possible logical operations on two bits are implemented over this semiring by the following named functions, in binary counting order: `contradiction`, `conjunction`, `nonimplication`, `projection_left`, `converse_nonimplication`, `projection_right`, `nonequivalence`, `disjunction`, `nondisjunction`, `equivalence`, `nonprojection_right`, `converse_implication`, `nonprojection_left`, `implication`, `nonconjunction`, `tautology`.
 
-`affine_point` implements an affine point type for use in linear algebra. It is an `Affine_space` over a `Vector_space` and a `Sequence`. By default it uses `array_k` for storage of the coordinates.
+`vector` implements an affine vector type for use in linear algebra. It is a `Semimodule` over a `Semiring`, and a `Mutable_range`. It is customizable by an `Engine_type`, which handles element storage, and an operation traits type, which allows customization of vector operations. `matrix_operation_t` implements default operations for linear algebra.
+`static_vector` implements a fixed-size `vector` type where the engine uses `array_k` for storage and `matrix_operation_t` for operations.
+`dynamic_vector` implements a variable-size `vector` type where the engine uses `array` for storage and `matrix_operation_t` for operations.
 
-`affine_vector` implements an affine vector type for use in linear algebra. It is both a `Semimodule` over a `Semiring` and a `Sequence`. If the `Semiring` is a `Field` it supports all operations on a `Vector_space`. By default it uses `array_k` for storage of the elements. It takes two optional operators for addition and multiplication of the semiring elements.
+`point` implements an affine point type for use in linear algebra. It is an `Affine_space` over a `Vector_space`. By default it uses `array_k` for storage of the coordinates.
 
 `rational` implements a rational number type, forming a `Field` over any `Integral_domain`.
 
@@ -455,7 +461,7 @@ The concepts in this library are largely based on definitions in [StepanovMcJone
 
 ### Linear algebra
 
-`Vector_space` describes a `Module` where the "scalar" type is a `Field` and is defaulted to the `Value_type` of the "vector" type.
+`Vector_space` describes a `Module` where the "scalar" type is a `Field` and is defaulted to the `Scalar_type` of the "vector" type.
 
 `Affine_space` describes a triple of types, representing a "point", a "vector", and a "scalar", where the vector and scalar form an `Affine_space` and the point is a `Regular` type where `operator+` and `operator-` are defined such that addition and subtraction of point and vector yields a point, and subtraction of point and point yields a vector.
 
@@ -658,6 +664,8 @@ Index
 
 `choose`
 
+`quadrance`
+
 `select_0_2`
 `min`
 `select_1_2`
@@ -811,8 +819,10 @@ Index
 # Data structures
 
 `bit`
-`affine_point`
-`affine_vector`
+`vector`
+`static_vector`
+`dynamic_vector`
+`point`
 `rational`
 `polynomial`
 

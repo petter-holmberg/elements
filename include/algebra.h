@@ -97,6 +97,21 @@ struct add_op<void>
 
 constexpr auto add = add_op<void>{};
 
+template <typename T>
+struct add_unary
+{
+    T const& x;
+
+    explicit constexpr
+    add_unary(T const& x_) : x{x_} {}
+
+    constexpr auto
+    operator()(T const& y) -> T
+    {
+        return x + y;
+    }
+};
+
 template <Additive_semigroup S>
 struct zero_type_t
 {
@@ -178,6 +193,21 @@ struct mul_op<void>
 };
 
 constexpr auto multiply = mul_op<void>{};
+
+template <typename T>
+struct mul_unary
+{
+    T const& x;
+
+    explicit constexpr
+    mul_unary(T const& x_) : x{x_} {}
+
+    constexpr auto
+    operator()(T const& y) -> T
+    {
+        return x * y;
+    }
+};
 
 template <Multiplicative_semigroup S>
 struct one_type_t;
@@ -471,7 +501,7 @@ axiom_Additive_group(G const& a, G const& b, G const& c) noexcept -> bool
 }
 
 template <typename T = void>
-struct difference
+struct sub_op
 {
     template <Additive_group G>
     constexpr auto
@@ -482,13 +512,13 @@ struct difference
 };
 
 template <>
-struct difference<void>
+struct sub_op<void>
 {
     template <Additive_group G>
     constexpr auto
     operator()(G const& a, G const& b) const -> G
     {
-        return difference<G>{}(a, b);
+        return sub_op<G>{}(a, b);
     }
 };
 
@@ -781,36 +811,6 @@ concept Module =
     Left_module<V, V_add_op, S, S_add_op, S_mul_op> and
     Right_module<V, V_add_op, S, S_add_op, S_mul_op> and
     Commutative_ring<S, S_add_op, S_mul_op>;
-
-template <typename V, typename S = Scalar_type<V>>
-concept Vector_space =
-    Module<V, add_op<V>, S, add_op<S>, mul_op<S>> and
-    Field<S, add_op<S>, mul_op<S>>;
-
-template <typename V, typename S = Scalar_type<V>>
-requires Vector_space<V, S>
-constexpr auto
-operator-(V const& v, V const& w) -> V
-{
-    return v + (-w);
-}
-
-template <typename V, typename S = Scalar_type<V>>
-requires Vector_space<V>
-constexpr auto
-operator/(V const& v, Scalar_type<V> const& a) -> V
-{
-    return (One<Scalar_type<V>> / a) * v;
-}
-
-template <typename V, typename S = Scalar_type<V>>
-requires Vector_space<V>
-constexpr auto
-operator/=(V const& v, Scalar_type<V> const& a) -> V
-{
-    v = v / a;
-    return v;
-}
 
 template <typename>
 struct difference_type_t;

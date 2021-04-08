@@ -46,6 +46,7 @@ set (TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/search_binary.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/swap.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/transformation.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/vector_space.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/zip.cpp)
 
 set (WARNING_FLAGS

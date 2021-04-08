@@ -255,28 +255,30 @@ concept Forward_cursor =
     Regular<C> and
     Cursor<C>;
 
-template <
-    Cursor S0,
-    Limit<S0> L0,
-    Cursor S1,
-    Forward_cursor D,
-    Operation<Value_type<S0>, Value_type<S1>> S_add_op,
-    Operation<Value_type<S0>, Value_type<S1>> S_mul_op>
+template <Forward_cursor C, Limit<C> L, typename T, typename... Args>
 requires
-    Loadable<S0> and
-    Loadable<S1> and
-    Storable<D> and
-    Semiring<Decay<Value_type<S0>>, S_add_op, S_mul_op> and
-    Semiring<Decay<Value_type<S1>>, S_add_op, S_mul_op> and
-    Semiring<Decay<Value_type<D>>, S_add_op, S_mul_op>
+    Same_as<Value_type<C>, T> and
+    Constructible_from<T, Args...>
 constexpr auto
-inner_product(S0 src0, L0 lim0, S1 src1, D dst, S_add_op add_op, S_mul_op mul_op) -> Value_type<D>
+construct(C src, L lim, Args&&... args)
 {
-    return reduce(
-        dst,
-        map(mv(src0), mv(lim0), mv(src1), dst, mul_op),
-        add_op,
-        Zero<Value_type<D>>);
+    while (precedes(src, lim)) {
+        construct_at(addressof(at(src)), fw<Args>(args)...);
+        increment(src);
+    }
+    return src;
+}
+
+template <Forward_cursor C, Limit<C> L>
+requires Destructible<Value_type<C>>
+constexpr auto
+destroy(C src, L lim) -> C
+{
+    while (precedes(src, lim)) {
+        destroy_at(addressof(at(src)));
+        increment(src);
+    }
+    return src;
 }
 
 template <typename C>

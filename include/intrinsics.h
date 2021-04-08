@@ -94,6 +94,13 @@ concept Totally_ordered = std::totally_ordered<T>;
 //     O(areaof(x));
 // }
 
+template <typename T>
+auto
+declval() noexcept -> std::add_rvalue_reference<T>::type
+{
+    return std::declval<T>();
+}
+
 using byte = std::byte;
 
 template <typename T>
@@ -264,6 +271,13 @@ using size_t = std::size_t;
 
 template <typename T>
 constexpr auto
+addressof(T& x) noexcept
+{
+    return std::addressof(x);
+}
+
+template <typename T>
+constexpr auto
 first(std::initializer_list<T> const& x) -> T const*
 {
     return std::cbegin(x);
@@ -290,11 +304,19 @@ inline constexpr auto reallocate_dynamic = std::realloc;
 
 inline constexpr auto deallocate_dynamic = std::free;
 
-template <typename T>
-inline constexpr auto construct_at = std::construct_at<T>;
+template <typename T, typename... Args>
+constexpr auto
+construct_at(T* p, Args&&... args) -> T*
+{
+    return std::construct_at(p, std::forward<Args>(args)...);
+}
 
 template <typename T>
-inline constexpr auto destroy_at = std::destroy_at<T>;
+constexpr void
+destroy_at(T* p)
+{
+    std::destroy_at(p);
+}
 
 using mutex = std::mutex;
 

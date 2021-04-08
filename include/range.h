@@ -126,6 +126,15 @@ concept Range =
         // }
     };
 
+template <typename T>
+struct range_type_t
+{
+    using type = T;
+};
+
+template <typename T>
+using Range_type = typename range_type_t<T>::type;
+
 template <typename R>
 concept Mutable_range =
     Range<R> and
