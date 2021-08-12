@@ -5,13 +5,13 @@
 namespace elements {
 
 template <typename T, Predicate<T> P, Cursor N>
-struct counter
+struct predicate_counter
 {
     P& pred;
     N& count;
 
     constexpr
-    counter(P& pred_, N& count_)
+    predicate_counter(P& pred_, N& count_)
         : pred{pred_}
         , count{count_}
     {}
@@ -29,7 +29,7 @@ constexpr auto
 count_if(C cur, L lim, P pred, N count = Zero<N>) -> N
 //[[expects axiom: loadable_range(cur, lim)]]
 {
-    return get<1>(for_each(mv(cur), lim, counter<Value_type<C>, P, N>{pred, count})).count;
+    return get<1>(for_each(mv(cur), lim, predicate_counter<Value_type<C>, P, N>{pred, count})).count;
 }
 
 template <Cursor C, Limit<C> L, Predicate<Value_type<C>> P, Cursor N = Difference_type<C>>

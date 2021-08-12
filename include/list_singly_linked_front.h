@@ -297,7 +297,7 @@ template <typename S>
     requires Forward_cursor<Cursor_type<S>>
 constexpr auto
 reverse_append(Cursor_type<S> cur, Cursor_type<S> lim, Cursor_type<S> head, S set_link) -> Cursor_type<S>
-//[[expects: bounded_range(cur, lim)]]
+//[[expects: is_bounded_range(cur, lim)]]
 {
     linker_to_head<S> link_to_head{set_link};
     while (cur != lim) link_to_head(head, cur);

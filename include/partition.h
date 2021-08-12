@@ -24,7 +24,7 @@ template <Cursor C, Predicate<Value_type<C>> P>
 requires Loadable<C>
 constexpr auto
 is_partitioned_n(C cur, Difference_type<C> n, P pred) -> bool
-//[[expects axiom: counted_range(cur, n)]]
+//[[expects axiom: is_counted_range(cur, n)]]
 {
     auto rng = search_if_n(mv(cur), n, pred);
     return get<1>(search_if_not_n(get<0>(rng), get<1>(rng), pred)) == Zero<Difference_type<C>>;

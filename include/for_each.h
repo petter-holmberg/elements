@@ -40,7 +40,7 @@ template <Cursor C, Invocable<Value_type<C>> P>
 requires Loadable<C>
 constexpr auto
 for_each_n(C cur, Difference_type<C> n, P proc) -> pair<C, P>
-//[[expects axiom: weak_range(cur, n)]]
+//[[expects axiom: is_weak_range(cur, n)]]
 {
     while (count_down(n)) {
         invoke(proc, load(cur));

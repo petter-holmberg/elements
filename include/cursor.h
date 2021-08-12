@@ -498,15 +498,15 @@ template <Cursor C>
 struct counted_cursor
 {
     C cur{};
-    Difference_type<C> count{Zero<Difference_type<C>>};
+    Difference_type<C> offset{Zero<Difference_type<C>>};
 
     constexpr
     counted_cursor() = default;
 
     explicit constexpr
-    counted_cursor(C const& cur_, Difference_type<C> const& count_ = Zero<Difference_type<C>>)
+    counted_cursor(C const& cur_, Difference_type<C> const& offset_ = Zero<Difference_type<C>>)
         : cur{cur_}
-        , count{count_}
+        , offset{offset_}
     {}
 };
 
@@ -526,7 +526,7 @@ template <Cursor C>
 constexpr auto
 operator==(counted_cursor<C> const& cur0, counted_cursor<C> const& cur1) -> bool
 {
-    return cur0.cur == cur1.cur and cur0.count == cur1.count;
+    return cur0.cur == cur1.cur and cur0.offset == cur1.offset;
 }
 
 template <Cursor C>
@@ -534,7 +534,7 @@ constexpr void
 increment(counted_cursor<C>& cur)
 {
     increment(cur.cur);
-    increment(cur.count);
+    decrement(cur.offset);
 }
 
 template <Bidirectional_cursor C>
@@ -542,21 +542,21 @@ constexpr void
 decrement(counted_cursor<C>& cur)
 {
     decrement(cur.cur);
-    decrement(cur.count);
+    increment(cur.offset);
 }
 
 template <Cursor C>
 constexpr auto
 successor(counted_cursor<C> const& cur) -> counted_cursor<C>
 {
-    return counted_cursor<C>{successor(cur.cur), successor(cur.count)};
+    return counted_cursor<C>{successor(cur.cur), predecessor(cur.offset)};
 }
 
 template <Bidirectional_cursor C>
 constexpr auto
 predecessor(counted_cursor<C> const& cur) -> counted_cursor<C>
 {
-    return counted_cursor<C>{predecessor(cur.cur), predecessor(cur.count)};
+    return counted_cursor<C>{predecessor(cur.cur), successor(cur.offset)};
 }
 
 template <Cursor C>
@@ -594,9 +594,9 @@ at(counted_cursor<C>& cur) -> Value_type<C>&
 template <Cursor C, Regular T>
 requires Equality_comparable_with<Difference_type<C>, T>
 constexpr auto
-precedes(counted_cursor<C> const& cur, T const& count) -> bool
+precedes(counted_cursor<C> const& cur, T const& offset) -> bool
 {
-    return cur.count != count;
+    return cur.offset != offset;
 }
 
 template <Cursor C>
@@ -1024,11 +1024,111 @@ using Segment_cursor_type = typename segment_cursor_type_t<T>::type;
 template <typename C>
 concept Segmented_cursor =
     Movable<C> and
-    requires (C x) {
+    requires (C cur) {
         Cursor<Index_cursor_type<C>>;
         Cursor<Segment_cursor_type<C>>;
-        { index_cursor(x) } -> Same_as<Index_cursor_type<C>&>;
-        { segment_cursor(x) } -> Same_as<Segment_cursor_type<C>&>;
+        { index_cursor(cur) } -> Same_as<Index_cursor_type<C>&>;
+        { segment_cursor(cur) } -> Same_as<Segment_cursor_type<C>&>;
     };
+
+template <typename>
+struct weight_type_t;
+
+template <typename T>
+using Weight_type = typename weight_type_t<T>::type;
+
+template <typename C>
+concept Bicursor =
+    Regular<C> and
+    requires (C cur) {
+        Integer<Weight_type<C>>;
+        { is_empty(cur) } -> Boolean_testable;
+        { has_left_successor(cur) } -> Boolean_testable;
+        { has_right_successor(cur) } -> Boolean_testable;
+        increment_left(cur);
+        increment_right(cur);
+    };
+
+template <Bicursor C>
+struct difference_type_t<C>
+{
+    using type = Weight_type<C>;
+};
+
+template <Bicursor C>
+struct distance_type_t<C>
+{
+    using type = Difference_type<C>;
+};
+
+template <Bicursor C>
+constexpr auto
+left_successor(C cur) -> C
+{
+    increment_left(cur);
+    return cur;
+}
+
+template <Bicursor C>
+constexpr auto
+right_successor(C cur) -> C
+{
+    increment_right(cur);
+    return cur;
+}
+
+template <typename C>
+concept Bidirectional_bicursor =
+    Bicursor<C> and
+    requires (C cur) {
+        { has_predecessor(cur) } -> Boolean_testable;
+        decrement(cur);
+    };
+
+template <Bidirectional_bicursor C>
+constexpr auto
+predecessor(C cur) -> C
+{
+    decrement(cur);
+    return cur;
+}
+
+template <Bidirectional_bicursor C>
+constexpr auto
+is_left_successor(C const& cur) -> bool
+//[[expects: has_predecessor(cur)]]
+{
+    C pre{predecessor(cur)};
+    return has_left_successor(pre) and left_successor(pre) == cur;
+}
+
+template <Bidirectional_bicursor C>
+constexpr auto
+is_right_successor(C const& cur) -> bool
+//[[expects: has_predecessor(cur)]]
+{
+    C pre{predecessor(cur)};
+    return has_right_successor(pre) and right_successor(pre) == cur;
+}
+
+template <typename C>
+concept Linked_bicursor =
+    Bicursor<C> and
+    requires (C cur) {
+        { set_left_successor(cur, cur) } -> Same_as<void>;
+        // axiom {
+        //     implication(set_left_successor(x, y), left_successor(x) == y);
+        // }
+        { set_right_successor(cur, cur) } -> Same_as<void>;
+        // axiom {
+        //     implication(set_right_successor(x, y), right_successor(x) == y);
+        // }
+    };
+    // axiom empty {
+    //     is_empty(C{});
+    //     implication(!is_empty(x), is_defined(x) and is_defined(y));
+    //     implication(!is_empty(x), equivalence(has_left_successor(x), is_empty(left_successor(x)));
+    //     implication(!is_empty(x), equivalence(has_right_successor(x), is_empty(right_successor(x)));
+    // }
 
 }

@@ -42,7 +42,7 @@ template <Cursor C, Predicate<Value_type<C>> P>
 requires Loadable<C>
 constexpr auto
 search_if_n(C cur, Difference_type<C> n, P pred) -> pair<C, Difference_type<C>>
-//[[expects axiom: weak_range(cur, n)]]
+//[[expects axiom: is_weak_range(cur, n)]]
 {
     while (count_down(n)) {
         if (invoke(pred, load(cur))) break;
@@ -70,7 +70,7 @@ template <Bidirectional_cursor C, Predicate<Value_type<C>> P>
 requires Loadable<C>
 constexpr auto
 search_backward_if_n(C cur, Difference_type<C> n, P pred) -> pair<C, Difference_type<C>>
-//[[expects axiom: weak_range(cur, n)]]
+//[[expects axiom: is_weak_range(cur, n)]]
 {
     cur = cur + n;
     while (count_down(n)) {
@@ -101,7 +101,7 @@ template <Cursor C, Predicate<Value_type<C>> P>
 requires Loadable<C>
 constexpr auto
 search_if_not_n(C cur, Difference_type<C> n, P pred) -> pair<C, Difference_type<C>>
-//[[expects axiom: weak_range(cur, n)]]
+//[[expects axiom: is_weak_range(cur, n)]]
 {
     return search_if_n(mv(cur), n, negation<Value_type<C>, P>{pred});
 }
@@ -119,7 +119,7 @@ template <Bidirectional_cursor C, Predicate<Value_type<C>> P>
 requires Loadable<C>
 constexpr auto
 search_backward_if_not_n(C cur, Difference_type<C> n, P pred) -> pair<C, Difference_type<C>>
-//[[expects axiom: weak_range(cur, n)]]
+//[[expects axiom: is_weak_range(cur, n)]]
 {
     return search_backward_if_n(cur, n, negation<Value_type<C>, P>{pred});
 }
@@ -145,7 +145,7 @@ template <Cursor C, Equality_comparable_with<Value_type<C>> T>
 requires Loadable<C>
 constexpr auto
 search_n(C cur, Difference_type<C> n, T const& value) -> pair<C, Difference_type<C>>
-//[[expects axiom: weak_range(cur, n)]]
+//[[expects axiom: is_weak_range(cur, n)]]
 {
     return search_if_n(mv(cur), n, eq_unary{value});
 }
@@ -163,7 +163,7 @@ template <Bidirectional_cursor C, Equality_comparable_with<Value_type<C>> T>
 requires Loadable<C>
 constexpr auto
 search_backward_n(C cur, Difference_type<C> n, T const& value) -> pair<C, Difference_type<C>>
-//[[expects axiom: weak_range(cur, n)]]
+//[[expects axiom: is_weak_range(cur, n)]]
 {
     return search_backward_if_n(cur, n, eq_unary{value});
 }
@@ -189,7 +189,7 @@ template <Cursor C, Equality_comparable_with<Value_type<C>> T>
 requires Loadable<C>
 constexpr auto
 search_not_n(C cur, Difference_type<C> n, T const& value) -> pair<C, Difference_type<C>>
-//[[expects axiom: weak_range(cur, n)]]
+//[[expects axiom: is_weak_range(cur, n)]]
 {
     return search_if_not_n(mv(cur), n, eq_unary{value});
 }
@@ -207,7 +207,7 @@ template <Bidirectional_cursor C, Equality_comparable_with<Value_type<C>> T>
 requires Loadable<C>
 constexpr auto
 search_backward_not_n(C cur, Difference_type<C> n, T const& value) -> pair<C, Difference_type<C>>
-//[[expects axiom: weak_range(cur, n)]]
+//[[expects axiom: is_weak_range(cur, n)]]
 {
     return search_backward_if_not_n(cur, n, eq_unary{value});
 }
@@ -337,8 +337,8 @@ requires
     Loadable<C1>
 constexpr auto
 search_match_n(C0 cur0, Difference_type<C0> n, C1 cur1, R rel = {}) -> pair<pair<C0, C1>, Difference_type<C0>>
-//[[expects axiom: weak_range(cur0, n)]]
-//[[expects axiom: weak_range(cur0, n)]]
+//[[expects axiom: is_weak_range(cur0, n)]]
+//[[expects axiom: is_weak_range(cur0, n)]]
 {
     while (count_down(n)) {
         if (rel(load(cur0), load(cur1))) break;
@@ -378,8 +378,8 @@ requires
     Loadable<C1>
 constexpr auto
 search_mismatch_n(C0 cur0, Difference_type<C0> n, C1 cur1, R rel = {}) -> pair<pair<C0, C1>, Difference_type<C0>>
-//[[expects axiom: weak_range(cur0, n)]]
-//[[expects axiom: weak_range(cur0, n)]]
+//[[expects axiom: is_weak_range(cur0, n)]]
+//[[expects axiom: is_weak_range(cur0, n)]]
 {
     return search_match_n(mv(cur0), n, mv(cur1), complement<Value_type<C0>, Value_type<C1>, R>{rel});
 }
@@ -422,7 +422,7 @@ template <Cursor C, Relation<Value_type<C>, Value_type<C>> R = eq<Value_type<C>>
 requires Loadable<C>
 constexpr auto
 search_adjacent_match_n(C cur, Difference_type<C> n, R rel = {}) -> pair<C, Difference_type<C>>
-//[[expects axiom: weak_range(cur, n)]]
+//[[expects axiom: is_weak_range(cur, n)]]
 {
     if (is_zero(n)) return {mv(cur), n};
     decrement(n);
@@ -440,7 +440,7 @@ template <Forward_cursor C, Relation<Value_type<C>, Value_type<C>> R = eq<Value_
 requires Loadable<C>
 constexpr auto
 search_adjacent_match_n(C cur, Difference_type<C> n, R rel = {}) -> pair<C, Difference_type<C>>
-//[[expects axiom: weak_range(cur, n)]]
+//[[expects axiom: is_weak_range(cur, n)]]
 {
     if (is_zero(n)) return {cur, n};
     decrement(n);
@@ -476,7 +476,7 @@ template <Cursor C, Relation<Value_type<C>, Value_type<C>> R = eq<Value_type<C>>
 requires Loadable<C>
 constexpr auto
 search_adjacent_mismatch_n(C cur, Difference_type<C> n, R rel = {}) -> pair<C, Difference_type<C>>
-//[[expects axiom: weak_range(cur, n)]]
+//[[expects axiom: is_weak_range(cur, n)]]
 {
     return search_adjacent_match_n(mv(cur), n, complement<Value_type<C>, Value_type<C>, R>{rel});
 }
@@ -485,7 +485,7 @@ template <Forward_cursor C, Relation<Value_type<C>, Value_type<C>> R = eq<Value_
 requires Loadable<C>
 constexpr auto
 search_adjacent_mismatch_n(C cur, Difference_type<C> n, R rel = {}) -> pair<C, Difference_type<C>>
-//[[expects axiom: weak_range(cur, n)]]
+//[[expects axiom: is_weak_range(cur, n)]]
 {
     return search_adjacent_match_n(cur, n, complement<Value_type<C>, Value_type<C>, R>{rel});
 }

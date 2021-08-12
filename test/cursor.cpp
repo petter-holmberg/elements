@@ -5,6 +5,8 @@
 
 namespace e = elements;
 
+namespace elements {
+
 struct storable_cursor
 {
     int value;
@@ -23,8 +25,6 @@ struct storable_cursor
 
     ~storable_cursor() = default;
 };
-
-namespace elements {
 
 template <>
 struct value_type_t<storable_cursor>
@@ -72,33 +72,33 @@ SCENARIO ("Using access functions", "[cursor]")
     SECTION ("Loadable")
     {
         static_assert(e::Loadable<e::loadable_cursor<int>>);
-        static_assert(e::Loadable<e::forward_cursor<int>>);
+        static_assert(e::Loadable<e::bidirectional_cursor<int>>);
         static_assert(e::Loadable<int>);
         static_assert(e::Loadable<int*>);
 
         e::loadable_cursor lc{0};
-        REQUIRE(lc.cur == 0);
-        REQUIRE(e::predecessor(lc).cur == -1);
-        REQUIRE(e::load(lc) == 0);
+        REQUIRE (lc.cur == 0);
+        REQUIRE (e::predecessor(lc).cur == -1);
+        REQUIRE (e::load(lc) == 0);
 
         e::forward_cursor fc{0};
-        REQUIRE(e::load(fc) == 0);
+        REQUIRE (e::load(fc) == 0);
 
         REQUIRE (e::load(x) == x);
 
         REQUIRE (e::load(xs) == x);
 
         auto y = e::pointer_to(x);
-        REQUIRE(e::load(y) == x);
+        REQUIRE (e::load(y) == x);
     }
 
     SECTION ("Storable")
     {
-        static_assert(e::Storable<storable_cursor>);
+        static_assert(e::Storable<e::storable_cursor>);
         static_assert(e::Storable<int>);
         static_assert(e::Storable<int*>);
 
-        storable_cursor sc{0};
+        e::storable_cursor sc{0};
         e::store(sc, 1);
         REQUIRE (sc.value == 1);
 
@@ -182,39 +182,39 @@ SCENARIO ("Counted cursors", "[counted_cursor]")
 
     SECTION ("Counted traversal")
     {
-        auto cx = e::counted_cursor(xs + 0);
+        e::counted_cursor cx{xs + 0, 2};
         static_assert(e::Bidirectional_cursor<decltype(cx)>);
 
-        REQUIRE(load(cx) == 0);
-        REQUIRE(cx.cur == xs);
-        REQUIRE(cx.count == 0);
-        REQUIRE(successor(cx).cur == xs + 1);
-        REQUIRE(successor(cx).count == 1);
-        REQUIRE(precedes(cx, 2));
+        REQUIRE (load(cx) == 0);
+        REQUIRE (cx.cur == xs);
+        REQUIRE (cx.offset == 2);
+        REQUIRE (successor(cx).cur == xs + 1);
+        REQUIRE (successor(cx).offset == 1);
+        REQUIRE (precedes(cx, 0));
 
         increment(cx);
-        REQUIRE(load(cx) == 1);
-        REQUIRE(cx.cur == xs + 1);
-        REQUIRE(cx.count == 1);
-        REQUIRE(successor(cx).cur == xs + 2);
-        REQUIRE(successor(cx).count == 2);
-        REQUIRE(precedes(cx, 2));
+        REQUIRE (load(cx) == 1);
+        REQUIRE (cx.cur == xs + 1);
+        REQUIRE (cx.offset == 1);
+        REQUIRE (successor(cx).cur == xs + 2);
+        REQUIRE (successor(cx).offset == 0);
+        REQUIRE (precedes(cx, 0));
 
         increment(cx);
-        REQUIRE(cx.cur == xs + 2);
-        REQUIRE(cx.count == 2);
-        REQUIRE(predecessor(cx).cur == xs + 1);
-        REQUIRE(predecessor(cx).count == 1);
-        REQUIRE(!precedes(cx, 2));
+        REQUIRE (cx.cur == xs + 2);
+        REQUIRE (cx.offset == 0);
+        REQUIRE (predecessor(cx).cur == xs + 1);
+        REQUIRE (predecessor(cx).offset == 1);
+        REQUIRE (!precedes(cx, 0));
 
         decrement(cx);
-        REQUIRE(load(cx) == 1);
-        REQUIRE(cx.cur == xs + 1);
-        REQUIRE(cx.count == 1);
-        REQUIRE(successor(cx).cur == xs + 2);
-        REQUIRE(successor(cx).count == 2);
-        REQUIRE(predecessor(cx).cur == xs);
-        REQUIRE(predecessor(cx).count == 0);
-        REQUIRE(precedes(cx, 2));
+        REQUIRE (load(cx) == 1);
+        REQUIRE (cx.cur == xs + 1);
+        REQUIRE (cx.offset == 1);
+        REQUIRE (successor(cx).cur == xs + 2);
+        REQUIRE (successor(cx).offset == 0);
+        REQUIRE (predecessor(cx).cur == xs);
+        REQUIRE (predecessor(cx).offset == 2);
+        REQUIRE (precedes(cx, 0));
     }
 }

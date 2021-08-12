@@ -12,7 +12,7 @@ requires
 constexpr auto
 equivalent_lexicographical(C0 cur0, L0 lim0, C1 cur1, L1 lim1, R rel) -> bool
 //[[expects axiom: loadable_range(cur0, lim0)]]
-//[[expects axiom: loadable_range(cur0, lim1)]]
+//[[expects axiom: loadable_range(cur1, lim1)]]
 //[[expects axiom: equivalence(rel)]]
 {
     auto cur{search_mismatch(mv(cur0), lim0, mv(cur1), lim1, rel)};
@@ -26,7 +26,7 @@ requires
 constexpr auto
 equal_lexicographical(C0 cur0, L0 lim0, C1 cur1, L1 lim1) -> bool
 {
-    return equivalent_lexicographical(mv(cur0), lim0, mv(cur1), lim1, eq<Value_type<C0>>{});
+    return equivalent_lexicographical(mv(cur0), lim0, mv(cur1), lim1, eq{});
 }
 
 template <Cursor C0, Limit<C0> L0, Cursor C1, Limit<C1> L1, Relation<Value_type<C0>, Value_type<C1>> R>
@@ -36,7 +36,7 @@ requires
 constexpr auto
 compare_lexicographical(C0 cur0, L0 lim0, C1 cur1, L1 lim1, R rel) -> bool
 //[[expects axiom: loadable_range(cur0, lim0)]]
-//[[expects axiom: loadable_range(cur0, lim1)]]
+//[[expects axiom: loadable_range(cur1, lim1)]]
 //[[expects axiom: weak_ordering(rel)]]
 {
     while (true) {

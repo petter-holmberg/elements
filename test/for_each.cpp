@@ -21,7 +21,7 @@ SCENARIO ("For each", "[for_each]")
         int x[]{0, 1, 2, 3, 4};
 
         int sum = 0;
-        e::for_each(e::counted_cursor(x + 0), 3, [&sum](int a){ sum += a; });
+        e::for_each(x, x + 3, [&sum](int a){ sum += a; });
 
         REQUIRE (sum == 3);
     }
@@ -34,7 +34,7 @@ SCENARIO ("For each n", "[for_each_n]")
         int x[]{0, 1, 2, 3, 4};
 
         int sum = 0;
-        e::for_each_n(x, 5, [&sum](int a){ sum += a; });
+        e::for_each_n(e::counted_cursor{x + 0, 5}, 5, [&sum](int a){ sum += a; });
 
         REQUIRE (sum == 10);
     }

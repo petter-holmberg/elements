@@ -24,12 +24,28 @@ select_0_2(T& a, T& b, R rel) -> T&
     return a;
 }
 
+template <typename T, Relation<T, T> R>
+constexpr void
+select_0_2_accumulate(T& a, T const& b, R rel)
+//[[expects axiom: weak_ordering(rel)]]
+{
+    if (invoke(rel, b, a)) a = b;
+}
+
 template <typename T0, typename T1>
 requires Default_totally_ordered_with<T0, T1>
 constexpr decltype(auto)
 min(T0&& a, T1&& b)
 {
     return select_0_2(fw<T0>(a), fw<T1>(b), lt{});
+}
+
+template <typename T0, typename T1>
+requires Default_totally_ordered_with<T0, T1>
+constexpr void
+min_accumulate(T0& a, T1 const& b)
+{
+    select_0_2_accumulate(a, b, lt{});
 }
 
 template <typename T, Relation<T, T> R>
@@ -50,12 +66,28 @@ select_1_2(T& a, T& b, R rel) -> T&
     return b;
 }
 
+template <typename T, Relation<T, T> R>
+constexpr void
+select_1_2_accumulate(T& a, T const& b, R rel)
+//[[expects axiom: weak_ordering(rel)]]
+{
+    if (!invoke(rel, b, a)) a = b;
+}
+
 template <typename T0, typename T1>
 requires Default_totally_ordered_with<T0, T1>
 constexpr decltype(auto)
 max(T0&& a, T1&& b)
 {
     return select_1_2(fw<T0>(a), fw<T1>(b), lt{});
+}
+
+template <typename T0, typename T1>
+requires Default_totally_ordered_with<T0, T1>
+constexpr void
+max_accumulate(T0& a, T1 const& b)
+{
+    select_1_2_accumulate(a, b, lt{});
 }
 
 // 3 values

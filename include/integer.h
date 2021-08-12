@@ -95,8 +95,11 @@ precedes(I const& i0, I const& i1) -> bool
     return i0 < i1;
 }
 
-template <typename, typename...>
-struct distance_type_t;
+template <typename T, typename... Us>
+struct distance_type_t
+{
+    using type = Unsigned_type<Difference_type<T, Us...>>;
+};
 
 template <typename T, typename... Us>
 using Distance_type = typename distance_type_t<T, Us...>::type;

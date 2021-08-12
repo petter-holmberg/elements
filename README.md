@@ -11,7 +11,7 @@ Adapters are type constructors that provide a different behavior and/or differen
 
 `forward_cursor` takes a `Forward_cursor` and provides the minimal interface required.
 
-`counted_cursor` takes a `Cursor` and optionally a count of the `Difference_type` of the cursor, constructing a cursor type that can be compared against a limit that is `Equality_comparable_with` the count. `increment` increments both the cursor and the count, `decrement` decrements both the cursor and the count.
+`counted_cursor` takes a `Cursor` and optionally an offset of the `Difference_type` of the cursor, constructing a cursor type that can be compared against a limit that is `Equality_comparable_with` the offset. `increment` increments both the cursor and the offset, `decrement` decrements both the cursor and the offset.
 
 `loadable_cursor` takes a `Loadable` `Cursor` and provides the minimal interface required.
 
@@ -262,6 +262,33 @@ It will return a cursor pointing to the first subsequence in the first range tha
 `zip` takes two loadable ranges as sources and a storable cursor as destination. It performs copying from the first to the last element of the sources, starting with the first source and alternating between the sources for every element. If one of the source ranges is longer than the other, its remaining elements are appended at the end.
 
 `unzip` takes one loadable range as source and two storable cursors as destinations. It performs copying from the first to the last element of the source, alternating between the destinations for each element.
+
+## Graph theory
+
+`is_dag` takes a `Bidirectional_bicursor` with no predecessor and checks if it forms a directed acyclic graph (DAG).
+
+## Binary trees
+
+The following algorithms assume that the given `Bicursor`s traverse binary trees.
+
+`is_reachable` takes two `Bidirectional_bicursor`s of a binary tree. It checks if the second can be reached from the first.
+
+`tree_weight` takes a `Bicursor` and calculates the number of tree nodes reachable from it. If the given bicursor is not a `Bidirectional_bicursor` but is a `Linked_bicursor` to non-constant tree nodes, it uses link rotation and avoids recursion. Otherwise recursion is used, which may be an issue with unbalanced trees.
+
+`tree_height` takes a `Bicursor` and calculates the height of the tree with the bicursor as its root. If the given bicursor is not a `Bidirectional_bicursor` recursion is used, which may be an issue with unbalanced trees.
+
+`tree_traverse` takes a `Bicursor` and a binary `Invocable` procedure where the first argument is a `df_visit` and the second argument is of the bicursor type. It traverses the tree in depth-first order, invoking the given procedure three times for each node visit, passing in the order of the visit (`preorder`, `inorder`, `postorder`) of the call along with a copy of the cursor for each node visit.
+
+`tree_traverse_rotating` takes a `Linked_bicursor` and a unary `Invocable` procedure where the argument is of the bicursor type. It traverses the tree in depth-first order, visiting each node three times with no information about the order of the visit.
+
+`tree_traverse_phased_rotating` takes a `Linked_bicursor`, a phase between 0 and 3 and a unary `Invocable` procedure where the argument is of the bicursor type. It traverses the tree in depth-first order, visiting each node three times but invoking the procedure only once per node.
+
+`tree_isomorphic` takes two `Bicursor`s, comparing two trees for isomorphism (i.e. if they have the same shape).
+
+`tree_equivalent` takes two `Loadable` `Bicursor`s and an equivalence relation, comparing two trees for equivalence. Trees that are not isomorphic are not equivalent. `tree_equal` uses `eq` as the equivalence relation.
+
+`tree_compare` takes two `Loadable` `Bicursor`s and a weak ordering, comparing them for lexicographical ordering. A missing left or right successor for otherwise equivalent trees during traversal makes that tree less than the other. `tree_less` uses `lt` as the ordering. `tree_shape_less` uses a relation
+that is always false, and can be used for sorting trees by shape.
 
 # Data structures
 
@@ -521,7 +548,7 @@ implements cancellation.
 ## Cursors
 
 Cursors are types representing a point in a space, such as a number in a numeric type or a memory address to an element in a data structure.
-When defined, cursors have successors and predecessors that can be accessed with the functions `increment` and `decrement`. The value that the cursor points to can often be accessed via the cursor using the functions `load` and `store`.
+When defined, cursors may have accessible have successors and predecessors. If the cursor points to a point holding a value, it can often be accessed via the cursor using the functions `load`, `store`, and `at`.
 
 ### Linear traversal
 
@@ -541,9 +568,17 @@ When defined, cursors have successors and predecessors that can be accessed with
 
 `Bidirectional_linker` describes a function object type that can be called with two `Linked_bidirectional_cursor` objects and will link the first one to the second one.
 
-#### Segmented traversal
+### Segmented traversal
 
 `Segmented_cursor` describes a cursor in a segmented range, consisting of an index cursor and a segment cursor at the current index, both of which are `Cursor` types.
+
+### Bifurcate traversal
+
+`Bicursor` describes an object representing the position of a node in a directed graph with up to two outgoing edges from each node, labelled *left* and *right*, with a function `is_empty` to check if no outgoing edges exist, functions `has_left_successor` and `has_right_successor` to check for outgoing edges, and functions `increment_left` and `increment_right` to move it to an existing outgoing edge.
+
+`Bidirectional_bicursor` describes a `Bicursor` type with a function `has_predecessor` to check if an incoming edge exists, and a function `decrement` to move it to an existing incoming edge.
+
+`Linked_bicursor` describes a `Bicursor` type with functions `set_left_successor` and `set_right_successor` that set the outgoing edges to link to a given bicursor. `is_empty` must also be defined on a default-constructed (empty) bicursor, and `left_successor` and `right_successor` must be defined and refer to empty bicursors when they don't refer to a node.
 
 ### Access
 
@@ -606,7 +641,9 @@ returns either a reference or a constant reference to its held object.
 
 `Size` is the size of a given type (when known at compile time).
 
-`Index_cursor_type` and `Segment_cursor_type` describe the two `Cursor` types of a `Segment_cursor`
+`Index_cursor_type` and `Segment_cursor_type` are the two `Cursor` types of a `Segment_cursor`.
+
+`Weight_type` is a type capable of storing the weight of a graph.
 
 ## Memory management
 
@@ -788,6 +825,21 @@ Index
 `zip`
 `unzip`
 
+`is_dag`
+
+`is_reachable`
+`tree_weight`
+`tree_height`
+`tree_traverse`
+`tree_traverse_rotating`
+`tree_traverse_phased_rotating`
+`tree_isomorphic`
+`tree_equivalent`
+`tree_equal`
+`tree_compare`
+`tree_less`
+`tree_shape_less`
+
 `distance`
 `collision_point`
 `collision_point_nonterminating_orbit`
@@ -943,6 +995,10 @@ Index
 `Forward_linker`
 `Linked_bidirectional_cursor`
 `Bidirectional_linker`
+`Segmented_cursor`
+`Bicursor`
+`Bidirectional_bicursor`
+`Linked_bicursor`
 `Loadable`
 `Storable`
 `Mutable`
@@ -976,6 +1032,7 @@ Index
 `Size`
 `Index_cursor_type`
 `Segment_cursor_type`
+`Weight_type`
 
 `Allocator_alignment`
 
