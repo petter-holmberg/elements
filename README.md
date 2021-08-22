@@ -87,7 +87,7 @@ The functions in `ordering.h` implement order selection algorithms, as described
 
 ## Assigning
 
-`fill` takes a writable range and a value, filling the range with that value.
+`fill` takes a writable range and a value, filling the range with that value. Alternatively, it takes a range, a value and a binary sink function, invoking the sink function with each cursor in the range and the given value.
 
 ## Counting
 
