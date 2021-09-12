@@ -5,6 +5,22 @@
 
 namespace elements {
 
+struct empty_t {};
+
+constexpr auto
+operator==(empty_t, empty_t) -> bool
+{
+    return true;
+}
+
+constexpr auto
+operator<(empty_t, empty_t) -> bool
+{
+    return false;
+}
+
+static_assert(Totally_ordered<empty_t>);
+
 template <Bidirectional_bicursor C>
 constexpr auto
 is_reachable(C cur0, C cur1) -> bool
@@ -466,5 +482,86 @@ tree_shape_less(C0 cur0, C1 cur1) -> bool
 {
     return tree_compare(cur0, cur1, [](Value_type<C0> const&, Value_type<C1> const&){ return false; });
 }
+
+template <Linked_bicursor C, typename Cons>
+constexpr auto
+//[[expects axiom: is_tree(cur)]]
+tree_copy(C cur) -> C
+{
+    Cons node_construct;
+    if (is_empty(cur)) return cur;
+    C stack{node_construct(cur, cur, C{})};
+    C new_cur{stack};
+    while (!is_empty(stack)) {
+        cur = left_successor(stack);
+        C left{left_successor(cur)};
+        C right{right_successor(cur)};
+        C top{stack};
+        if (!is_empty(left)) {
+            if (!is_empty(right)) {
+                right = node_construct(right, right, right_successor(stack));
+                stack = node_construct(left, left, right);
+            } else {
+                right = C{};
+                stack = node_construct(left, left, right_successor(stack));
+            }
+            left = stack;
+        } else if (!is_empty(right)) {
+            stack = node_construct(right, right, right_successor(stack));
+            right = stack;
+        } else {
+            stack = right_successor(stack);
+        }
+        set_right_successor(top, right);
+        set_left_successor(top, left);
+    }
+    return new_cur;
+}
+
+template <Bicursor C, typename Del>
+void tree_erase(C cur, Del node_delete)
+//[[expects axiom: is_tree(cur)]]
+{
+    if (is_empty(cur)) return;
+    C stack;
+    while (true) {
+        C left{left_successor(cur)};
+        C right{right_successor(cur)};
+        if (!is_empty(left)) {
+            if (!is_empty(right)) {
+                set_left_successor(cur, stack);
+                stack = cur;
+            } else {
+                node_delete(cur);
+            }
+            cur = left;
+        } else if (!is_empty(right)) {
+            node_delete(cur);
+            cur = right;
+        } else {
+            node_delete(cur);
+            if (!is_empty(stack)) {
+                cur = stack;
+                stack = left_successor(stack);
+                set_left_successor(cur, {});
+            } else {
+                return;
+            }
+        }
+    }
+}
+
+template <typename T, typename Proc>
+concept Traversable =
+    Invocable<Proc, df_visit, Cursor_type<T>> and
+    requires (T& x) {
+        first(x);
+    } and
+    requires (T& x, Proc proc) {
+        { is_empty(x) } -> Boolean_testable;
+        { height(x) } -> Same_as<Weight_type<T>>;
+        { weight(x) } -> Same_as<Weight_type<T>>;
+        { traverse(x, proc) } -> Same_as<Proc>;
+    };
 
 }

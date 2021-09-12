@@ -399,6 +399,20 @@ Cursors of `array_circular` elements are larger and element access is slower tha
 
 `list_pool` implements a pool of contiguously allocated singly linked elements. `allocate` inserts a new element after a given position and returns the position of the new element. `free` removes an element at a given position. free_pool removes all elements starting at a given position until the last reachable element.
 
+## Bifurcate data structures
+
+### Binary trees
+
+`tree_oriented` implements a binary tree, optionally containing elements. Trees are constructed by supplying (optional) left and right subtrees. Tree nodes contain links to the left and right child nodes, supporting `Bicursor` traversal.
+
+`tree_bidirectional` implements a binary tree, optionally containing elements. Trees are constructed by supplying (optional) left and right subtrees. Tree nodes contain links to the left and right child nodes, and a link to the parent node, supporting `Bidirectional_bicursor` traversal,
+which avoids recursion.
+
+`height` returns the height of a binary tree. `weight` returns the weight of a binary tree.
+
+`traverse` performs a depth-first traversal of a binary tree, invoking a binary procedure on each node at the preorder, inorder, and postorder visit. The first argument is a `df_visit` and the second argument is a `Bicursor` used to access the tree node.
+`traverse_rotating` performs a depth-first traversal of a binary tree, invoking a unary procedure once on each node. The argument is a `Bicursor` used to access the tree node. It uses `traverse_phased_rotating`, which implies that the tree must be mutable and the traversal much be completed to preserve the tree invariant.
+
 ## Sum types
 
 `result` implements a type that carries either a value or an error. The presence of a value can be checked by boolean evaluation. An expected object is `Mutable` if its `Value_type` is.
@@ -598,6 +612,10 @@ returns either a reference or a constant reference to its held object.
 
 `Sequence` describes a `Range` that is `Totally_ordered`, and represents a composite object whose range of elements are its parts. It has functions `is_empty`. `size` and `operator[]` for element access.
 `Dynamic_sequence` describes a `Sequence` that can change size at runtime. It has functions `insert` and `erase` to change elements at the back or the front of the range.
+
+### Trees
+
+`Traversable` describes a tree with a `Bicursor` type that can be used to visit every node from a starting/ending point given by `root` with a function `traverse`. The tree also features functions `is_empty`, `height`, and `weight`.
 
 # Type functions
 
@@ -906,6 +924,9 @@ Index
 
 `list_pool`
 
+`tree_oriented`
+`tree_bidirectional`
+
 `result`
 
 `locked_stack`
@@ -1007,6 +1028,7 @@ Index
 `Mutable_range`
 `Sequence`
 `Dynamic_sequence`
+`Traversable`
 
 # Type functions
 
