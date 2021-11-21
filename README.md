@@ -5,6 +5,10 @@ Library contents
 
 Adapters are type constructors that provide a different behavior and/or different interface than the given type.
 
+## Regular adapters
+
+`instrumented` takes an type and provides a global counting mechanism that stores the number of default constructions, copy constructions, copy assignments, move constructions, move assignments, destructions, equality comparisons, and less than comparisons on objects. The static member array `counts` stores the counts. `counter_names` contains names of the counters, and `initialize` resets them to 0. It takes an optional count that is stored in `counts[0]` and can be used for labelling.
+
 ## Cursor adapters
 
 `cursor` takes a `Cursor` and provides the minimal interface required.
@@ -688,6 +692,8 @@ Index
 -----
 
 # Adapters
+
+`instrumented`
 
 `cursor`
 `forward_cursor`
